@@ -19,12 +19,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.TextInputDialog;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 
 public class JATbot extends Application {
-
+    private static Stage primaryStage;
     // init logger
     public static final Logger botLogger = LoggerFactory.getLogger(JATbot.class);
-
+    
     @Override
     public void start(Stage primaryStage) throws Exception {
     // Ensure that a dedicated folder for JAT exists in the user's home directory
@@ -70,13 +71,23 @@ public class JATbot extends Application {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("mainscene.fxml"));
         Parent root = loader.load();
         Controller controller = loader.getController();
+
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
         controller.setMainWindow(primaryStage);
         primaryStage.setTitle("JATbot");
-        primaryStage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.setFill(null);
+        primaryStage.setScene(scene);
         primaryStage.setResizable(false);
         primaryStage.show();
     }
-
+    public static void setPrimaryStage(Stage theStage) {
+        primaryStage = theStage; 
+    
+    }
+    public static Stage getPrimaryStage() {
+        return primaryStage;
+    }
     public static void main(String[] args) {
 
         try {

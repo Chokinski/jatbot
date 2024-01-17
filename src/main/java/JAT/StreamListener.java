@@ -7,7 +7,7 @@ import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.realtime.enums.
 
 import net.jacobpeterson.alpaca.websocket.marketdata.MarketDataListener;
 
-
+import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -25,9 +25,21 @@ public class StreamListener implements MarketDataListener {
     }
 
     public void connectStream() {
-        alpacaAPICrypto.cryptoMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,MarketDataMessageType.SUBSCRIPTION,
-                                                                       MarketDataMessageType.SUCCESS,MarketDataMessageType.TRADE);
+        alpacaAPICrypto.cryptoMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
+                MarketDataMessageType.SUBSCRIPTION,
+                MarketDataMessageType.SUCCESS, MarketDataMessageType.TRADE);
+        alpacaAPIStocks.stockMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
+                MarketDataMessageType.SUBSCRIPTION,
+                MarketDataMessageType.SUCCESS,MarketDataMessageType.TRADE);
+                                                                                                                                 
         alpacaAPIStocks.stockMarketDataStreaming().connect();
+        alpacaAPICrypto.cryptoMarketDataStreaming().connect();
+    }
+
+    public void connectCryptoStream() {
+        alpacaAPICrypto.cryptoMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
+                MarketDataMessageType.SUBSCRIPTION,
+                MarketDataMessageType.SUCCESS, MarketDataMessageType.TRADE);                                                                                                                           
         alpacaAPICrypto.cryptoMarketDataStreaming().connect();
     }
 
@@ -68,16 +80,22 @@ public class StreamListener implements MarketDataListener {
     }
 
     public void listenToStock(List<String> symbols) {
-        alpacaAPIStocks.stockMarketDataStreaming().subscribe(symbols, null, null);
+        alpacaAPIStocks.stockMarketDataStreaming().subscribe(symbols, null, Arrays.asList("*"));
     }
 
     public void listenToCoin(List<String> symbols) {
-        alpacaAPICrypto.cryptoMarketDataStreaming().subscribe(symbols, null, null);
+        alpacaAPICrypto.cryptoMarketDataStreaming().subscribe(null, symbols, null);
     }
     @Override
     public void onMessage(MarketDataMessageType messageType, MarketDataMessage message) {
         JATbot.botLogger.info("Received {} : {}", messageType.name(), message);
+        DashController dc = new DashController();
+        dc.updateTokenDisplay(String.format("Received %s \n%s",messageType, message));
 
+    }
+
+    public String[] getMessages(MarketDataMessageType msgType, MarketDataMessage msg){
+        return new String[]{msgType.name(), msg.toString()};
     }
     
 

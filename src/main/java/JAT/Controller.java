@@ -19,13 +19,18 @@ import javafx.scene.control.Label;
 
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-
+import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
 
 
 public class Controller {    
+
+    @FXML
+    private BorderPane bp;
+    
     @FXML
     private Button btnLightMode;
 
@@ -54,7 +59,8 @@ public class Controller {
     public boolean rememberMe;
     Properties properties = new Properties();
     InputStream jatConfig = getClass().getResourceAsStream("/JAT/JATconfig.properties");
-    
+    private double yOffset;
+    private double xOffset;
     @FXML
     void initialize() {
         // Load the state of the checkbox when the program starts
@@ -111,7 +117,10 @@ public class Controller {
                 tfSec_ID.setText(ac.loadProperties()[1]);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("dashscene.fxml"));
                 Parent root = loader.load();
+                DashController dashController = loader.getController();
+                dashController.setMainWindow(mainWindow);
                 Scene scene = new Scene(root);
+                scene.setFill(null);    
                 mainWindow.setScene(scene);
             } catch (IOException e) {
                 JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
@@ -137,6 +146,8 @@ public class Controller {
 
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("dashscene.fxml"));
                 Parent root = loader.load();
+                DashController dashController = loader.getController();
+                dashController.setMainWindow(mainWindow);
                 Scene scene = new Scene(root);
                 mainWindow.setScene(scene);
             } catch (IOException e) {
@@ -165,7 +176,17 @@ public class Controller {
     }
 
 
+    @FXML
+    void onDragged(MouseEvent event) {
+        mainWindow.setX(event.getScreenX() - xOffset);
+        mainWindow.setY(event.getScreenY() - yOffset);
+    }
 
+    @FXML
+    void onPressed(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
+    }
     
     private Stage mainWindow;
 
