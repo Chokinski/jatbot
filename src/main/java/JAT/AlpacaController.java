@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-
+import java.util.Arrays;
 import java.util.List;
 
 import java.util.Properties;
@@ -247,6 +247,23 @@ public class AlpacaController {
         } catch (AlpacaClientException exception) {
             exception.printStackTrace();
         }
+    }
+
+    public void getBarsData(String sym, int stYr,int stMo,int stDay,int stHr,int endYr,int endMo,int endDay,int endHr,int endMin,int endSe ) {
+        try {
+            StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(
+                sym,
+                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
+                ZonedDateTime.of(endYr, endMo, stDay, endDay, endHr, endMin, endSe, null),
+                null,
+                null,
+                1,
+                BarTimePeriod.DAY, null, BarFeed.IEX);
+        } catch (AlpacaClientException e) {
+            // TODO Auto-generated catch block
+            JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+        }
+
     }
 
     public static OkHttpClient getOkHttpClient() {

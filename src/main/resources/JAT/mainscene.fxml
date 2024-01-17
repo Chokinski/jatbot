@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.String?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
@@ -7,17 +8,23 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-
-<BorderPane fx:id="bp" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="227.0" prefWidth="391.0" style="-fx-background-radius: 20; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.Controller">
+<BorderPane fx:id="bp" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="237.0" prefWidth="431.0" style="-fx-background-radius: 20; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.Controller">
    <center>
-      <AnchorPane id="splashLogin" focusTraversable="true" maxHeight="237.0" maxWidth="409.0" minHeight="237.0" minWidth="409.0" prefHeight="237.0" prefWidth="409.0" styleClass="root" stylesheets="@styles.css">
+      <AnchorPane id="splashLogin" focusTraversable="true" maxHeight="237.0" maxWidth="409.0" minHeight="237.0" minWidth="409.0" prefHeight="237.0" prefWidth="409.0" stylesheets="@styles.css">
          <children>
-            <Label alignment="TOP_CENTER" layoutX="117.0" layoutY="27.0" prefHeight="45.0" prefWidth="176.0" styleClass="mainPanels" text="J.A.TBot" textAlignment="CENTER">
+            <ImageView fitHeight="65.0" fitWidth="73.0" layoutX="82.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" styleClass="mainWindow">
+               <image>
+                  <Image url="@maaain.png" />
+               </image>
+            </ImageView>
+            <Label alignment="TOP_CENTER" layoutX="152.0" layoutY="25.0" prefHeight="45.0" prefWidth="176.0" styleClass="mainPanels" text="J.A.TBot" textAlignment="CENTER">
                <font>
                   <Font name="Sitka Heading" size="51.0" />
                </font>
@@ -42,18 +49,34 @@
                   <Font name="Sitka Small" size="12.0" />
                </font>
             </PasswordField>
-            <Button fx:id="btnLogin" layoutX="180.0" layoutY="193.0" mnemonicParsing="false" onAction="#onBtnLogin" styleClass="mainPanels" text="Login">
+            <Button fx:id="btnLogin" layoutX="180.0" layoutY="193.0" mnemonicParsing="false" onAction="#onBtnLogin" styleClass="btnAccent" text="Login">
                <font>
                   <Font name="Sitka Subheading" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="btnLightMode" layoutX="14.0" layoutY="15.0" mnemonicParsing="false" onAction="#btnLightSwitch" styleClass="mainPanels" text="Dim it down" />
-            <CheckBox fx:id="chkRemember" layoutX="54.0" layoutY="185.0" mnemonicParsing="false" onAction="#onRememberMe" prefHeight="16.0" prefWidth="115.0" styleClass="mainPanels" stylesheets="@styles.css" text="Remember Me" textFill="#8a6b6b">
+            <Button fx:id="btnLightMode" layoutX="280.0" layoutY="185.0" mnemonicParsing="false" onAction="#btnLightSwitch" styleClass="btnAccent" text="Dim it down" />
+            <CheckBox fx:id="chkRemember" layoutX="54.0" layoutY="185.0" mnemonicParsing="false" onAction="#onRememberMe" prefHeight="16.0" prefWidth="115.0" stylesheets="@styles.css" text="Remember Me" textFill="#8a6b6b">
                <font>
-                  <Font name="Sitka Small" size="15.0" />
+                  <Font name="Sitka Small" size="12.0" />
                </font>
             </CheckBox>
          </children>
+         <styleClass>
+            <String fx:value="root" />
+            <String fx:value="mainWindow" />
+         </styleClass>
       </AnchorPane>
    </center>
+   <top>
+      <AnchorPane prefHeight="17.0" prefWidth="431.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER" />
+   </top>
+   <bottom>
+      <AnchorPane prefHeight="18.0" prefWidth="431.0" style="-fx-background-color: transparent;" BorderPane.alignment="CENTER" />
+   </bottom>
+   <left>
+      <AnchorPane prefHeight="237.0" prefWidth="14.0" BorderPane.alignment="CENTER" />
+   </left>
+   <right>
+      <AnchorPane prefHeight="237.0" prefWidth="14.0" BorderPane.alignment="CENTER" />
+   </right>
 </BorderPane>

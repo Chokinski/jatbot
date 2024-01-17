@@ -26,7 +26,8 @@
 }
 
 .accent {
-    -fx-background-color: #9d9080; 
+    -fx-background-color: #9d9080;
+    
 }
 
 .txtColor {
@@ -36,6 +37,7 @@
 
 .btnAccent {
     -fx-background-color:#9d9080;
+    -fx-font-family: "Sitka Display", monospace;
     -fx-transition: all 0.3s ease;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
@@ -43,7 +45,7 @@
 
 .btnAccent:hover {
     -fx-transform: translate(0, -5px);
-    -fx-background-color: linear-gradient(to bottom, #9d9080 10%, #86859e9e 150%);
+    -fx-background-color: linear-gradient(to bottom, #9d9080 10%, #F6F6F4 150%);
 }
 
 .mainPanels {
@@ -71,14 +73,14 @@
 
 .separatorVPanel {
 
-    -fx-background-color: linear-gradient(to bottom, #2E3436, #F6F6F4,#2E3436);
+    -fx-background-color: linear-gradient(to bottom, #86859e9e,#2E3436, #86859e9e,#2E3436);
     -fx-border-color: transparent #9d9080 transparent #9d9080;
     -fx-padding: 2px;
 }
 
 .separatorHPanel {
 
-    -fx-background-color: linear-gradient(to right, #F6F6F4,#2E3436, #F6F6F4,#2E3436);
+    -fx-background-color: linear-gradient(to right, #86859e9e,#2E3436, #86859e9e,#2E3436);
     -fx-border-color: #9d9080 transparent #2E3436 transparent ;
     -fx-padding: 2px;
 }

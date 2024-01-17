@@ -18,29 +18,35 @@ import java.util.concurrent.TimeUnit;
 public class StreamListener implements MarketDataListener {
     protected AlpacaAPI alpacaAPICrypto;
     protected AlpacaAPI alpacaAPIStocks;
+    protected MarketDataListener marketDataListener;
     public StreamListener() {
+
+// Add a 'MarketDataListener' that simply prints market data information
+        MarketDataListener marketDataListener = (messageType, message) ->
+        onMessage(messageType, message);
+
+
         AlpacaController ac = new AlpacaController();
         this.alpacaAPIStocks = ac.connect();
         this.alpacaAPICrypto = ac.connect();
     }
 
-    public void connectStream() {
-        alpacaAPICrypto.cryptoMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
-                MarketDataMessageType.SUBSCRIPTION,
-                MarketDataMessageType.SUCCESS, MarketDataMessageType.TRADE);
+    public void connectStockStream() {
+        alpacaAPIStocks.stockMarketDataStreaming().setListener(marketDataListener);
         alpacaAPIStocks.stockMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
                 MarketDataMessageType.SUBSCRIPTION,
-                MarketDataMessageType.SUCCESS,MarketDataMessageType.TRADE);
-                                                                                                                                 
+                MarketDataMessageType.SUCCESS,MarketDataMessageType.TRADE);                                                                    
         alpacaAPIStocks.stockMarketDataStreaming().connect();
-        alpacaAPICrypto.cryptoMarketDataStreaming().connect();
     }
 
     public void connectCryptoStream() {
+
+        alpacaAPICrypto.cryptoMarketDataStreaming().setListener(marketDataListener);
         alpacaAPICrypto.cryptoMarketDataStreaming().subscribeToControl(MarketDataMessageType.ERROR,
                 MarketDataMessageType.SUBSCRIPTION,
                 MarketDataMessageType.SUCCESS, MarketDataMessageType.TRADE);                                                                                                                           
         alpacaAPICrypto.cryptoMarketDataStreaming().connect();
+        alpacaAPICrypto.cryptoMarketDataStreaming().waitForAuthorization(2, TimeUnit.SECONDS);
     }
 
     public boolean[] areStreamsConnected() {
@@ -48,6 +54,7 @@ public class StreamListener implements MarketDataListener {
         if (alpacaAPIStocks.stockMarketDataStreaming().isConnected() && alpacaAPICrypto.cryptoMarketDataStreaming().isConnected()) {
             return new boolean[]{true, true};
         } else if (alpacaAPIStocks.stockMarketDataStreaming().isConnected() && !alpacaAPICrypto.cryptoMarketDataStreaming().isConnected()) {
+            
             return new boolean[]{true, false};
         } else if (!alpacaAPIStocks.stockMarketDataStreaming().isConnected() && alpacaAPICrypto.cryptoMarketDataStreaming().isConnected()) {
             return new boolean[]{false, true};
@@ -84,7 +91,7 @@ public class StreamListener implements MarketDataListener {
     }
 
     public void listenToCoin(List<String> symbols) {
-        alpacaAPICrypto.cryptoMarketDataStreaming().subscribe(null, symbols, null);
+        alpacaAPICrypto.cryptoMarketDataStreaming().subscribe(symbols, null, Arrays.asList("*"));
     }
     @Override
     public void onMessage(MarketDataMessageType messageType, MarketDataMessage message) {
