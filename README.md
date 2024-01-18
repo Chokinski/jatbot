@@ -1,4 +1,4 @@
-Please Note while development is still ongoing. Commits will be delayed/hidden.
+This is the Pre-Deployment Live Branch
 
 <p align="center">
   <img src="https://github.com/Chokinski/jatbot/blob/2f5085264dfff325c20875f3832d38b8ad0ff085/src/main/resources/JAT/maaain.png" alt="Logo" width="540" height="540">
