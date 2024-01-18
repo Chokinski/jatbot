@@ -156,21 +156,22 @@ public class DashController {
                 chart.draw(graphics2d, rectangle2D, null);
             }
         };
-    // Add the strings to the ListView when the scene is loaded
-    lblChecking.setText("");
-    lvAccTypes.getItems().addAll(
-        "Account ID", "Portfolio Value", "Account Created", "Account Status",
-        "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",    
-        "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
-        lvAccValues.getItems().addAll(ac.logAccID(), ac.logPortValue(),
-            ac.logCreateDate(), ac.logAccStatus(),
-            ac.logAccCash(), ac.logBuyingPower(),
-            ac.logDayTradeCount(), ac.logDayTradeLimit(),
-            ac.logEquity(), ac.logInitialMargin(),
-            ac.logLastEquity(), ac.logLastMaintenanceMargin(),
-            "")
-            
-            ;
+        // Add the strings to the ListView when the scene is loaded
+        Platform.runLater(() -> {
+            lblChecking.setText("");
+            lvDataDisplay.getItems().addAll("");
+            lvAccTypes.getItems().addAll(
+                "Account ID", "Portfolio Value", "Account Created", "Account Status",
+                "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",    
+                "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
+            lvAccValues.getItems().addAll(ac.logAccID(), ac.logPortValue(),
+                ac.logCreateDate(), ac.logAccStatus(),
+                ac.logAccCash(), ac.logBuyingPower(),
+                ac.logDayTradeCount(), ac.logDayTradeLimit(),
+                ac.logEquity(), ac.logInitialMargin(),
+                ac.logLastEquity(), ac.logLastMaintenanceMargin(),
+                "");
+        });
             chartCanvas.widthProperty().addListener(redrawChart);
             chartCanvas.heightProperty().addListener(redrawChart);
             redrawChart.changed(null, null, null);
@@ -312,7 +313,8 @@ public class DashController {
 
     @FXML
     void setText(ActionEvent event) {
-        lvDataDisplay.getItems().addAll("Hello World!");
+        String sym = tfSymboltoGet.getText();
+        ac.getBarsData(this, sym, 2023, 12, 30, 2024, 1, 15);
     }
 
 

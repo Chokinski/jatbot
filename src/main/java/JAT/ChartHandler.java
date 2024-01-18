@@ -7,6 +7,7 @@ import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.CandlestickRenderer;
 import org.jfree.data.xy.DefaultHighLowDataset;
 
+import javafx.scene.paint.Color;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 
 import org.jfree.data.time.Millisecond;
@@ -16,6 +17,7 @@ import org.jfree.data.time.ohlc.OHLCSeriesCollection;
 
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
+import java.awt.Paint;
 import java.util.Date;
 import org.jfree.data.time.Second;
 
@@ -93,8 +95,10 @@ public class ChartHandler {
         );
     
         XYPlot plot = (XYPlot) chart.getPlot();
+        plot.setBackgroundPaint(null);
         plot.setDomainAxis(new DateAxis("Time")); // Set the x-axis to display dates
         plot.setRenderer(new CandlestickRenderer()); // Use a candlestick renderer
+        
     
         return chart;
     }

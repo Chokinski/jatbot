@@ -11,6 +11,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -249,22 +250,37 @@ public class AlpacaController {
         }
     }
 
-    public void getBarsData(String sym, int stYr,int stMo,int stDay,int stHr,int endYr,int endMo,int endDay,int endHr,int endMin,int endSe ) {
+    public void getBarsData(DashController dc, String sym, int stYr,int stMo,int stDay,int endYr,int endMo,int endDay ) {
+
         try {
-            StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(
-                sym,
-                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-                ZonedDateTime.of(endYr, endMo, stDay, endDay, endHr, endMin, endSe, null),
-                null,
-                null,
-                1,
-                BarTimePeriod.DAY, null, BarFeed.IEX);
-        } catch (AlpacaClientException e) {
-            // TODO Auto-generated catch block
-            JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+                StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(
+                    sym,
+                    ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
+                    ZonedDateTime.of(endYr, endMo, endDay, 12+4, 0, 0, 0, ZoneId.of("America/New_York")),
+                    5000,
+                    null,
+                    4,
+                    BarTimePeriod.HOUR, null, BarFeed.IEX);
+                barsResponses.getBars().forEach(bar -> {
+                ZonedDateTime timestamp = bar.getTimestamp();
+                Double open = bar.getOpen();
+                Double high = bar.getHigh();
+                Double low = bar.getLow();
+                Double close = bar.getClose();
+                long tradeCount = bar.getTradeCount();
+                Double vwap = bar.getVwap();
+                long volume = bar.getVolume();
+                String barData = String.format("Timestamp: %s, Open: %s, High: %s, Low: %s, Close: %s, TradeCount: %d, Vwap: %s, Volume: %d",
+                timestamp, open, high, low, close, tradeCount, vwap, volume);
+            dc.updateTokenDisplay(sym + " Bar: " + barData);
+            JATbot.botLogger.info(sym + " Bar: {}", barData);
+        });
+            } catch (AlpacaClientException e) {
+                // TODO Auto-generated catch block
+                JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+            }
         }
 
-    }
 
     public static OkHttpClient getOkHttpClient() {
         return new OkHttpClient();

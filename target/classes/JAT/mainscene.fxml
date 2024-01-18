@@ -1,50 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import java.lang.String?>
-<?import javafx.scene.Cursor?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
-<?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.effect.DropShadow?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
 <BorderPane fx:id="bp" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="237.0" prefWidth="431.0" style="-fx-background-radius: 20; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.Controller">
    <center>
       <AnchorPane id="splashLogin" focusTraversable="true" maxHeight="237.0" maxWidth="409.0" minHeight="237.0" minWidth="409.0" prefHeight="237.0" prefWidth="409.0" stylesheets="@styles.css">
          <children>
-            <ImageView fitHeight="65.0" fitWidth="73.0" layoutX="82.0" layoutY="25.0" pickOnBounds="true" preserveRatio="true" styleClass="mainWindow">
+            <ImageView fitHeight="116.0" fitWidth="204.0" layoutX="147.0" layoutY="-10.0" pickOnBounds="true" preserveRatio="true" styleClass="mainWindow">
                <image>
                   <Image url="@maaain.png" />
                </image>
             </ImageView>
-            <Label alignment="TOP_CENTER" layoutX="152.0" layoutY="25.0" prefHeight="45.0" prefWidth="176.0" styleClass="mainPanels" text="J.A.TBot" textAlignment="CENTER">
-               <font>
-                  <Font name="Sitka Heading" size="51.0" />
-               </font>
-               <cursor>
-                  <Cursor fx:constant="OPEN_HAND" />
-               </cursor>
-               <effect>
-                  <DropShadow height="7.02" offsetY="5.0" radius="2.8425" width="6.35">
-                     <color>
-                        <Color opacity="0.5992366075515747" />
-                     </color>
-                  </DropShadow>
-               </effect>
-            </Label>
-            <TextField fx:id="tfKey_ID" layoutX="54.0" layoutY="106.0" prefHeight="25.0" prefWidth="302.0" promptText="Enter Key id..." styleClass="accent">
+            <TextField fx:id="tfKey_ID" layoutX="54.0" layoutY="106.0" prefHeight="25.0" prefWidth="302.0" promptText="Enter Key id..." style="-fx-text-fill: F6F6F4; -fx-border-color: f6f6f4;" styleClass="accent">
                <font>
                   <Font name="Sitka Small" size="12.0" />
                </font>
             </TextField>
-            <PasswordField fx:id="tfSec_ID" layoutX="54.0" layoutY="156.0" prefHeight="25.0" prefWidth="302.0" promptText="Paste secret key..." styleClass="accent">
+            <PasswordField fx:id="tfSec_ID" layoutX="54.0" layoutY="156.0" prefHeight="25.0" prefWidth="302.0" promptText="Paste secret key..." style="-fx-text-color: F6F6F4; -fx-border-color: F6F6F4;" styleClass="accent">
                <font>
                   <Font name="Sitka Small" size="12.0" />
                </font>
@@ -54,7 +35,7 @@
                   <Font name="Sitka Subheading" size="14.0" />
                </font>
             </Button>
-            <Button fx:id="btnLightMode" layoutX="280.0" layoutY="185.0" mnemonicParsing="false" onAction="#btnLightSwitch" styleClass="btnAccent" text="Dim it down" />
+            <Button fx:id="btnLightMode" layoutX="257.0" layoutY="181.0" mnemonicParsing="false" onAction="#btnLightSwitch" style="-fx-background-color: transparent;" styleClass="btnAccent" text="Dim it down" />
             <CheckBox fx:id="chkRemember" layoutX="54.0" layoutY="185.0" mnemonicParsing="false" onAction="#onRememberMe" prefHeight="16.0" prefWidth="115.0" stylesheets="@styles.css" text="Remember Me" textFill="#8a6b6b">
                <font>
                   <Font name="Sitka Small" size="12.0" />

@@ -1,6 +1,6 @@
 .root {
-    -fx-background-color: #2E3436;
-    -fx-font-family: "Sitka Display", monospace;
+    -fx-background-color: #383F42;
+    -fx-font-family: 'Montserrat', sans-serif;
     
 
 }
@@ -13,20 +13,21 @@
 
 .menuBar {
  
-    -fx-background-color: linear-gradient(to bottom, #9d9080 40%, transparent 45%);
+    -fx-background-color: linear-gradient(to bottom, #383F42, #583d96, #331872);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-background-radius: 80px 80px 0 0;
     -fx-padding: 39;
 }
 
 .footer {
-    -fx-background-color:#9d9080;
+    -fx-background-color: linear-gradient(to top, #383F42 5%, #583d96, #331872);
     -fx-background-radius: 0 0 80px 80px;
     -fx-padding: 40;
 }
 
 .accent {
-    -fx-background-color: #9d9080;
+    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66);
+    
     
 }
 
@@ -36,28 +37,31 @@
 }
 
 .btnAccent {
-    -fx-background-color:#9d9080;
-    -fx-font-family: "Sitka Display", monospace;
+    -fx-background-color:#331872;
+    -fx-text-fill: #f6f6f492;
+    -fx-font-family: 'Montserrat', sans-serif;;
     -fx-transition: all 0.3s ease;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
 }
 
 .btnAccent:hover {
-    -fx-transform: translate(0, -5px);
-    -fx-background-color: linear-gradient(to bottom, #9d9080 10%, #F6F6F4 150%);
+    -fx-transform: scale(1.05) translate(0, -5px);
+    -fx-background-color: linear-gradient(to bottom, #6931ec, #583d96);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 0);
+    -fx-text-fill: #ffffffe0;
 }
 
 .mainPanels {
 
-    -fx-text-fill: #7C8C9C;
-    -fx-font-family: "Sitka Display", monospace;
+    -fx-text-fill: #F6F6F4;
+    -fx-font-family: 'Montserrat', sans-serif;
     -fx-alignment: center;
     
 }
 
 .titled-pane >.title {
-    -fx-background-color: #F6F6F4;
+    -fx-background-color: #383F42;
     -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 5, 0);
 }
@@ -73,14 +77,18 @@
 
 .separatorVPanel {
 
-    -fx-background-color: linear-gradient(to bottom, #86859e9e,#2E3436, #86859e9e,#2E3436);
-    -fx-border-color: transparent #9d9080 transparent #9d9080;
+    -fx-background-color: linear-gradient(to bottom, #86859e9e,#383F42, #86859e9e,#383F42);
+    -fx-border-color: transparent #F6F6F4 transparent #F6F6F4;
     -fx-padding: 2px;
 }
 
 .separatorHPanel {
 
-    -fx-background-color: linear-gradient(to right, #86859e9e,#2E3436, #86859e9e,#2E3436);
-    -fx-border-color: #9d9080 transparent #2E3436 transparent ;
+    -fx-background-color: linear-gradient(to right, #86859e9e,#383F42, #F6F6F4,#383F42);
+    -fx-border-color: #383F42 transparent #6931ec transparent ;
     -fx-padding: 2px;
+}
+
+.chart-plot-background {
+    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66)
 }
