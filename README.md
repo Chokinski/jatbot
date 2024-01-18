@@ -39,8 +39,8 @@ You will also need to modify the `alpaca.properties` file with your Alpaca API c
 
 <h2 align="center" style="color:#CC7832;">Usage</h2>
 <p align="center">
-  <img src="usage.png" alt="Logo" width="1184" height="749">
-  <img src="usage2.png" alt="Logo" width="516" height="314">
+  <img src="usage.png" alt="DashUI" width="600 " height="379">
+  <img src="usage2.png" alt="LoginUI" width="516" height="314">
 </p>
 <p align="center" style="color:#A9B7C6;">[to be completed]</p>
 
