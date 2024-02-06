@@ -21,6 +21,8 @@ import java.util.List;
 
 import java.util.Properties;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.chart.XYChart;
 import net.jacobpeterson.alpaca.model.endpoint.assets.Asset;
 import net.jacobpeterson.alpaca.model.endpoint.assets.enums.AssetClass;
@@ -258,55 +260,34 @@ public class AlpacaController {
 /**
  * Represents a series of Open, High, Low, Close (OHLC) data for a specific symbol.
  */
-public XYChart.Series<LocalDate, Number> getBarsData(DashController dc, String sym, int stYr, int stMo, int stDay,
-        int endYr, int endMo, int endDay, BarTimePeriod barPeriod, int duration) {
-    XYChart.Series<LocalDate, Number> series = new XYChart.Series<>();
+public ObservableList<OHLCData> getBarsData(String sym, int stYr, int stMo, int stDay,
+                                            int endYr, int endMo, int endDay, BarTimePeriod barPeriod, int duration) {
+    ObservableList<OHLCData> ohlcDataList = FXCollections.observableArrayList();
 
     try {
-        JATbot.botLogger.info("Start time: {}",
-                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")));
-        JATbot.botLogger.info("End time: {}",
-                ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")));
         StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(sym,
-                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-                ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")), 10000, null,
-                duration, barPeriod, BarAdjustment.SPLIT, BarFeed.IEX);
+            ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
+            ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")), 10000, null,
+            duration, barPeriod, BarAdjustment.SPLIT, BarFeed.IEX);
+
         barsResponses.getBars().forEach(bar -> {
             ZonedDateTime timestamp = bar.getTimestamp();
-            LocalDate date = timestamp.toLocalDate(); // Convert ZonedDateTime to LocalDate
+            LocalDate date = timestamp.toLocalDate();
 
             double open = bar.getOpen().doubleValue();
             double high = bar.getHigh().doubleValue();
             double low = bar.getLow().doubleValue();
             double close = bar.getClose().doubleValue();
-            long tradeCount = bar.getTradeCount();
-            double vwap = bar.getVwap().doubleValue();
             long volume = bar.getVolume();
 
-            // Check if a bar with the same values already exists in the dataset
-            boolean barExists = false;
-            for (int i = 0; i < series.getData().size(); i++) {
-                XYChart.Data<LocalDate, Number> data = series.getData().get(i);
-                if (data.getXValue().equals(date) && (double) data.getYValue() == close) {
-                    barExists = true;
-                    break;
-                }
-            }
-            if (!barExists) {
-                series.getData().add(new XYChart.Data<>(date, close));
-                String barData = String.format(
-                        "Timestamp: %s, Open: %s, High: %s, Low: %s, Close: %s, TradeCount: %d, Vwap: %s, Volume: %d",
-                        timestamp, open, high, low, close, tradeCount, vwap, volume);
-                JATbot.botLogger.info(sym + " Bar: {}", barData);
-                dc.updateTokenDisplay(barData);
-            } else {
-                JATbot.botLogger.info("Bar already exists for this period: Timestamp: {}, Date: {}", timestamp, date);
-            }
+            OHLCData ohlcData = new OHLCData(date, open, high, low, close, volume);
+            ohlcDataList.add(ohlcData);
         });
     } catch (AlpacaClientException e) {
         JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
     }
-    return series;
+
+    return ohlcDataList;
 }
 
         

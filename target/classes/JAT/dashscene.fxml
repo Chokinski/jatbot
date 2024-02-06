@@ -73,7 +73,11 @@
                         <AnchorPane fx:id="nodeChart" focusTraversable="true" prefHeight="535.0" prefWidth="708.0" styleClass="accent" />
                      </content>
                   </ScrollPane>
-                  <AnchorPane layoutY="-2.0" maxWidth="1.7976931348623157E308" prefHeight="32.0" prefWidth="1024.0" styleClass="menuBar" />
+                  <AnchorPane layoutY="-2.0" maxWidth="1.7976931348623157E308" prefHeight="32.0" prefWidth="1024.0" styleClass="menuBar">
+                     <children>
+                        <Label layoutX="457.0" layoutY="7.0" style="-fx-font-size: 14px;" styleClass="nmlTxt" stylesheets="@styles.css" text="Current Market Time" />
+                        <Label layoutX="491.0" layoutY="29.0" styleClass="nmlTxt" text="Label" />
+                     </children></AnchorPane>
                   <AnchorPane layoutX="-9.0" layoutY="70.0" style="-fx-border-color: transparent; -fx-background-color: transparent;">
                      <children>
                         <Button fx:id="btnSetText" contentDisplay="CENTER" layoutX="9.0" layoutY="135.0" mnemonicParsing="false" onAction="#setText" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Chart Data">

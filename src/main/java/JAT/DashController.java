@@ -12,6 +12,7 @@ import java.util.Properties;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -19,6 +20,7 @@ import java.awt.geom.Rectangle2D;
 
 import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -56,6 +58,8 @@ import javafx.util.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
+import com.jat.OHLCData;
+
 import javax.sound.sampled.Port.Info;
 
 
@@ -162,6 +166,7 @@ public class DashController {
     private int selectedDuration = 1;  // Default value
     private AlpacaController ac;
     private OHLCChart chart;
+    private PlotHandler ph;
     //private JFreeChart chart;
     @FXML
     public void initialize() {
@@ -386,10 +391,8 @@ public class DashController {
         int endYear = endParse.getYear();
         int endMonth = endParse.getMonthValue();
         int endDay = endParse.getDayOfMonth();
-        /*OHLCSeries series = ac.getBarsData(this, sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
-        JFreeChart updatedChart = chartHandler.newCChart(series);
-        updatedChart.setTitle(sym);
-        this.chart = updatedChart;*/
+        ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
+        this.chart.setSeries(series);
 
         
 
