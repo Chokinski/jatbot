@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -19,19 +20,23 @@ import java.util.Arrays;
 import java.util.List;
 
 import java.util.Properties;
+
+import javafx.scene.chart.XYChart;
 import net.jacobpeterson.alpaca.model.endpoint.assets.Asset;
 import net.jacobpeterson.alpaca.model.endpoint.assets.enums.AssetClass;
 import net.jacobpeterson.alpaca.model.endpoint.assets.enums.AssetStatus;
+import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.Bar;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
-
+import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.StockBar;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.StockBarsResponse;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.enums.BarAdjustment;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.enums.BarFeed;
+import com.jat.OHLCData;
 
 
 public class AlpacaController {
     public static AlpacaAPI alpaca;
-
+    private OkHttpClient okClient;
 
     /**
      * Connects to the Alpaca API using the properties specified in the
@@ -43,6 +48,7 @@ public class AlpacaController {
 
     public AlpacaController() {
         this.connect();
+        this.okClient = new OkHttpClient();
     }
 
     public String[] loadProperties() {
@@ -222,7 +228,6 @@ public class AlpacaController {
             JATbot.botLogger.error("Error getting assets: " + exception.getMessage());
         }
     }
-
     public void logRecentData(String sym) {
         try {
             // Get 'sym' one hour, split-adjusted bars from 1/11/2023 market open
@@ -250,40 +255,64 @@ public class AlpacaController {
         }
     }
 
-    public void getBarsData(DashController dc, String sym, int stYr,int stMo,int stDay,int endYr,int endMo,int endDay ) {
+/**
+ * Represents a series of Open, High, Low, Close (OHLC) data for a specific symbol.
+ */
+public XYChart.Series<LocalDate, Number> getBarsData(DashController dc, String sym, int stYr, int stMo, int stDay,
+        int endYr, int endMo, int endDay, BarTimePeriod barPeriod, int duration) {
+    XYChart.Series<LocalDate, Number> series = new XYChart.Series<>();
 
-        try {
-                StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(
-                    sym,
-                    ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-                    ZonedDateTime.of(endYr, endMo, endDay, 12+4, 0, 0, 0, ZoneId.of("America/New_York")),
-                    5000,
-                    null,
-                    4,
-                    BarTimePeriod.HOUR, null, BarFeed.IEX);
-                barsResponses.getBars().forEach(bar -> {
-                ZonedDateTime timestamp = bar.getTimestamp();
-                Double open = bar.getOpen();
-                Double high = bar.getHigh();
-                Double low = bar.getLow();
-                Double close = bar.getClose();
-                long tradeCount = bar.getTradeCount();
-                Double vwap = bar.getVwap();
-                long volume = bar.getVolume();
-                String barData = String.format("Timestamp: %s, Open: %s, High: %s, Low: %s, Close: %s, TradeCount: %d, Vwap: %s, Volume: %d",
-                timestamp, open, high, low, close, tradeCount, vwap, volume);
-            dc.updateTokenDisplay(sym + " Bar: " + barData);
-            JATbot.botLogger.info(sym + " Bar: {}", barData);
-        });
-            } catch (AlpacaClientException e) {
-                // TODO Auto-generated catch block
-                JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+    try {
+        JATbot.botLogger.info("Start time: {}",
+                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")));
+        JATbot.botLogger.info("End time: {}",
+                ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")));
+        StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(sym,
+                ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
+                ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")), 10000, null,
+                duration, barPeriod, BarAdjustment.SPLIT, BarFeed.IEX);
+        barsResponses.getBars().forEach(bar -> {
+            ZonedDateTime timestamp = bar.getTimestamp();
+            LocalDate date = timestamp.toLocalDate(); // Convert ZonedDateTime to LocalDate
+
+            double open = bar.getOpen().doubleValue();
+            double high = bar.getHigh().doubleValue();
+            double low = bar.getLow().doubleValue();
+            double close = bar.getClose().doubleValue();
+            long tradeCount = bar.getTradeCount();
+            double vwap = bar.getVwap().doubleValue();
+            long volume = bar.getVolume();
+
+            // Check if a bar with the same values already exists in the dataset
+            boolean barExists = false;
+            for (int i = 0; i < series.getData().size(); i++) {
+                XYChart.Data<LocalDate, Number> data = series.getData().get(i);
+                if (data.getXValue().equals(date) && (double) data.getYValue() == close) {
+                    barExists = true;
+                    break;
+                }
             }
-        }
+            if (!barExists) {
+                series.getData().add(new XYChart.Data<>(date, close));
+                String barData = String.format(
+                        "Timestamp: %s, Open: %s, High: %s, Low: %s, Close: %s, TradeCount: %d, Vwap: %s, Volume: %d",
+                        timestamp, open, high, low, close, tradeCount, vwap, volume);
+                JATbot.botLogger.info(sym + " Bar: {}", barData);
+                dc.updateTokenDisplay(barData);
+            } else {
+                JATbot.botLogger.info("Bar already exists for this period: Timestamp: {}, Date: {}", timestamp, date);
+            }
+        });
+    } catch (AlpacaClientException e) {
+        JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+    }
+    return series;
+}
 
+        
 
-    public static OkHttpClient getOkHttpClient() {
-        return new OkHttpClient();
+    public OkHttpClient getOkHttpClient() {
+        return okClient;
     }
 
 }

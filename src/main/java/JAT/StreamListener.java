@@ -24,7 +24,7 @@ public class StreamListener implements MarketDataListener {
 // Add a 'MarketDataListener' that simply prints market data information
         MarketDataListener marketDataListener = (messageType, message) ->
         onMessage(messageType, message);
-
+        
 
         AlpacaController ac = new AlpacaController();
         this.alpacaAPIStocks = ac.connect();
@@ -61,7 +61,6 @@ public class StreamListener implements MarketDataListener {
         }
         return null;
     }
-
 
     public void disconnectStream() {
         alpacaAPIStocks.stockMarketDataStreaming().disconnect();
@@ -104,6 +103,6 @@ public class StreamListener implements MarketDataListener {
     public String[] getMessages(MarketDataMessageType msgType, MarketDataMessage msg){
         return new String[]{msgType.name(), msg.toString()};
     }
-    
+
 
 }

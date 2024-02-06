@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -15,37 +16,48 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import java.awt.geom.Rectangle2D;
+
+import javafx.scene.Scene;
+import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import net.jacobpeterson.alpaca.AlpacaAPI;
+import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
 import net.jacobpeterson.alpaca.model.properties.DataAPIType;
+import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
 import java.util.concurrent.atomic.AtomicInteger;
-
+import com.jat.PlotHandler;
+import com.jat.OHLCChart;
 import javax.sound.sampled.Port.Info;
 
-import org.jfree.chart.JFreeChart;
-import org.jfree.fx.FXGraphics2D;
 
 
 
@@ -56,42 +68,33 @@ import org.jfree.fx.FXGraphics2D;
  */
 public class DashController {
 
-    @FXML
-    private VBox vbDash;
+    @FXML private VBox vbDash;
     
-    @FXML
-    private AnchorPane gradientSeparator;
+    @FXML private AnchorPane gradientSeparator;
+    @FXML private AnchorPane nodeChart;
+    @FXML private AnchorPane nodeToggle;
+    @FXML private ScrollPane parentNode;
 
-    @FXML
-    private AnchorPane chart;
+    @FXML private MenuButton menuChart;
 
-    @FXML
-    private MenuButton menuChart;
+    @FXML private javafx.scene.canvas.Canvas chartCanvas;
 
-    @FXML
-    private javafx.scene.canvas.Canvas chartCanvas;
+    @FXML private Label lblAPIstatus;
+    
+    @FXML private Label lblCryptoStreamStatus;
+    
+    @FXML private Label lblStockStreamStatus;
+    @FXML private Label lblChecking;
 
-    @FXML
-    private Label lblAPIstatus;
-    @FXML
-    private Label lblCryptoStreamStatus;
-    @FXML
-    private Label lblStockStreamStatus;
-    @FXML
-    private Label lblChecking;
+    @FXML private Button btnCheckStatus;
+    @FXML private Button btnTryLogin;
+    @FXML private Button btnDisconnect;
+    @FXML private Button btnReconnect;
+    @FXML private Button btnGetCrypto;
+    @FXML private Button btnGetStock;
+    @FXML private Button btnLogData;
 
-    @FXML
-    private Button btnCheckStatus;
-    @FXML
-    private Button btnTryLogin;
-    @FXML
-    private Button btnDisconnect;
-    @FXML
-    private Button btnReconnect;
-    @FXML
-    private Button btnGetCrypto;
-    @FXML
-    private Button btnGetStock;
+    @FXML private Slider slideQuantity;
 
     @FXML
     private ToggleButton tbtnDef1D;
@@ -117,6 +120,8 @@ public class DashController {
     @FXML
     private ToggleButton tbtnHourly;
     @FXML
+    private ToggleButton tbtnToggleStream;
+    @FXML
     private Button btnSetTExt;
 
     @FXML
@@ -135,27 +140,74 @@ public class DashController {
     @FXML
     private TextField tfSymboltoGet;
 
+    @FXML
+    private DatePicker dpStartDate;
 
-    private ChartHandler chartHandler = new ChartHandler();
+    @FXML
+    private DatePicker dpEndDate;
+
+    // Variables to store the initial position of a drag event
+    private double dragStartX;
+    private double dragStartY;
+
+    // Variables to store the current translation of the chart
+    private double translateX = 0.0;
+    private double translateY = 0.0;
+
+    // Variables to store the current scale of the chart
+    private double scaleX = 1.0;
+    private double scaleY = 1.0;
+    private String streamChoice = "Stocks";
+    private BarTimePeriod selectedTimePeriod = BarTimePeriod.DAY;  // Default value
+    private int selectedDuration = 1;  // Default value
     private AlpacaController ac;
-
+    private OHLCChart chart;
+    //private JFreeChart chart;
     @FXML
     public void initialize() {
         try {
+        PlotHandler ph = new PlotHandler();
+        ph.showOHLCChart(parentNode, nodeChart, true, 2000, 1000);
+        OHLCChart chart = ph.getOHLCChart();
+        chart.addBarSpacingControl(slideQuantity);
+        nodeChart.setMouseTransparent(true);
         // initialize Controller
         this.ac = new AlpacaController();
         this.streamListener = new StreamListener();
+        
+        
+        /*this.chart = chartHandler.newCChart(null);
+                // Handle the scroll event for zooming
+                chartCanvas.setOnScroll(event -> {
+                    double scaleFactor = (event.getDeltaY() > 0) ? 1.1 : 1/1.1; // or some other factor
+                    scaleX *= scaleFactor;
+                    scaleY *= scaleFactor;
+                    redrawChart();
+                });
+        
+                // Handle the mouse press event for starting the panning
+                chartCanvas.setOnMousePressed(event -> {
+                    dragStartX = event.getX();
+                    dragStartY = event.getY();
+                });
+        
+                // Handle the mouse drag event for panning
+                chartCanvas.setOnMouseDragged(event -> {
+                    translateX += event.getX() - dragStartX;
+                    translateY += event.getY() - dragStartY;
+                    dragStartX = event.getX();
+                    dragStartY = event.getY();
+                    redrawChart();
+                });*/
+        
+        // Redraw the chart when the canvas size changes
+        chartCanvas.widthProperty().addListener(obs -> redrawChart());
+        chartCanvas.heightProperty().addListener(obs -> redrawChart());
+
+        
+                // Initial draw
+                redrawChart();
         startGradientAnimation();
-        JFreeChart chart = chartHandler.newCChart();
-        FXGraphics2D graphics2d = new FXGraphics2D(chartCanvas.getGraphicsContext2D());
-        ChangeListener<Number> redrawChart = new ChangeListener<>() {
-            @Override
-            public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-                graphics2d.clearRect(0, 0, (int)chartCanvas.getWidth(), (int)chartCanvas.getHeight());
-                Rectangle2D rectangle2D = new Rectangle2D.Double(0, 0, chartCanvas.getWidth(), chartCanvas.getHeight());
-                chart.draw(graphics2d, rectangle2D, null);
-            }
-        };
         // Add the strings to the ListView when the scene is loaded
         Platform.runLater(() -> {
             lblChecking.setText("");
@@ -170,16 +222,22 @@ public class DashController {
                 ac.logDayTradeCount(), ac.logDayTradeLimit(),
                 ac.logEquity(), ac.logInitialMargin(),
                 ac.logLastEquity(), ac.logLastMaintenanceMargin(),
-                "");
-        });
-            chartCanvas.widthProperty().addListener(redrawChart);
-            chartCanvas.heightProperty().addListener(redrawChart);
-            redrawChart.changed(null, null, null);
+                "");        });
     }
     catch (Exception e) {
         JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
     }
 }
+    private void redrawChart() {
+        GraphicsContext gc = chartCanvas.getGraphicsContext2D();
+        gc.clearRect(0, 0, chartCanvas.getWidth(), chartCanvas.getHeight());
+        gc.save();
+        gc.translate(translateX, translateY);
+        gc.scale(scaleX, scaleY);
+        Rectangle2D drawArea = new Rectangle2D.Double(0, 0, chartCanvas.getWidth(), chartCanvas.getHeight());
+        //chart.draw(new FXGraphics2D(gc), drawArea);
+        gc.restore();
+    }
     private StreamListener streamListener;
 
     private double xOffset;
@@ -190,6 +248,18 @@ public class DashController {
 
         streamListener.disconnectAlpacaAPI();
         
+    }
+
+    @FXML
+    void onDragged(MouseEvent event) {
+        mainWindow.setX(event.getScreenX() - xOffset);
+        mainWindow.setY(event.getScreenY() - yOffset);
+    }
+
+    @FXML
+    void onPressed(MouseEvent event) {
+        xOffset = event.getSceneX();
+        yOffset = event.getSceneY();
     }
     
     @FXML
@@ -207,7 +277,11 @@ public class DashController {
     void onReconnect(ActionEvent event) {
 
         streamListener.disconnectStream();
-        streamListener.connectCryptoStream();
+        if ("Stocks".equals(this.streamChoice)) {
+            streamListener.connectStockStream(); // Connect the stock stream when the button is not selected
+        } else {
+            streamListener.connectCryptoStream();
+        }
         onCheckStatus(event);
 
     }
@@ -300,21 +374,27 @@ public class DashController {
         streamListener.listenToCoin(Arrays.asList(tfSymboltoGet.getText()));
     }
     @FXML
-    void onDragged(MouseEvent event) {
-        mainWindow.setX(event.getScreenX() - xOffset);
-        mainWindow.setY(event.getScreenY() - yOffset);
-    }
-
-    @FXML
-    void onPressed(MouseEvent event) {
-        xOffset = event.getSceneX();
-        yOffset = event.getSceneY();
-    }
-
-    @FXML
     void setText(ActionEvent event) {
         String sym = tfSymboltoGet.getText();
-        ac.getBarsData(this, sym, 2023, 12, 30, 2024, 1, 15);
+        String startDate = dpStartDate.getValue().toString();
+        LocalDate startParse = LocalDate.parse(startDate);  
+        int startYear = startParse.getYear();
+        int startMonth = startParse.getMonthValue();
+        int startDay = startParse.getDayOfMonth();
+        String endDate = dpEndDate.getValue().toString();
+        LocalDate endParse = LocalDate.parse(endDate);
+        int endYear = endParse.getYear();
+        int endMonth = endParse.getMonthValue();
+        int endDay = endParse.getDayOfMonth();
+        /*OHLCSeries series = ac.getBarsData(this, sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
+        JFreeChart updatedChart = chartHandler.newCChart(series);
+        updatedChart.setTitle(sym);
+        this.chart = updatedChart;*/
+
+        
+
+        //drawChart(chartCanvas.getGraphicsContext2D(), updatedChart);
+        
     }
 
 
@@ -323,16 +403,134 @@ public class DashController {
     public void setMainWindow(Stage mainWindow) {
         this.mainWindow = mainWindow;
     }
+  
+    public void animateBackgroundColor() {
+        // Find the node with the id nodeToggle
+        AnchorPane nodeToggle = (AnchorPane) vbDash.lookup("#nodeToggle");
 
+        // Create a new Timeline
+        Timeline timeline = new Timeline();
+
+        // Define the start and end colors
+        Color startColor = Color.web("#f6f6f492");
+        Color endColor = Color.web("#331872");
+
+        // Create the key frames
+        KeyFrame startFrame = new KeyFrame(Duration.ZERO,
+                new KeyValue(nodeToggle.backgroundProperty(),
+                        new Background(new BackgroundFill(startColor, CornerRadii.EMPTY, Insets.EMPTY))));
+        KeyFrame endFrame = new KeyFrame(Duration.seconds(3),
+                new KeyValue(nodeToggle.backgroundProperty(),
+                        new Background(new BackgroundFill(endColor, CornerRadii.EMPTY, Insets.EMPTY))));
+
+        // Add the key frames to the timeline
+        timeline.getKeyFrames().addAll(startFrame, endFrame);
+
+        // Create a PauseTransition
+        PauseTransition pause = new PauseTransition(Duration.millis(500)); // 500 milliseconds delay
+
+        // Set the action to start the timeline after the pause
+        pause.setOnFinished(event -> timeline.play());
+
+        // Start the pause
+        pause.play();
+    }
     public void startGradientAnimation() {
         Timeline timeline = new Timeline(
-            new KeyFrame(Duration.ZERO, new KeyValue(gradientSeparator.backgroundProperty(), new Background(new BackgroundFill(LinearGradient.valueOf("to bottom, #2E3436 0%, #F6F6F4 50%, #2E3436 100%"), CornerRadii.EMPTY, Insets.EMPTY)))),
-            new KeyFrame(Duration.millis(500), new KeyValue(gradientSeparator.backgroundProperty(), new Background(new BackgroundFill(LinearGradient.valueOf("to bottom, #F6F6F4 0%, #2E3436 50%, #F6F6F4 100%"), CornerRadii.EMPTY, Insets.EMPTY))))
+            new KeyFrame(Duration.ZERO, new KeyValue(gradientSeparator.backgroundProperty(), createGradient(0))),
+            new KeyFrame(Duration.seconds(4), new KeyValue(gradientSeparator.backgroundProperty(), createGradient(50))),
+            new KeyFrame(Duration.seconds(8), new KeyValue(gradientSeparator.backgroundProperty(), createGradient(100)))
         );
         timeline.setAutoReverse(true);
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
-
     }
+
+    private Background createGradient(int stripePercentage) {
+    double stripePosition = stripePercentage / 100.0;
+
+    LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
+            new Stop(stripePosition, Color.web("#6931ec")),
+            new Stop(stripePosition, Color.web("#2E3436")),
+            new Stop(1.0, Color.web("#F6F6F4"))
+    );
+
+    return new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY));
+}
+
+
+    @FXML
+    public void onToggleStream(ActionEvent event) {
+        ToggleButton selectedButton = (ToggleButton) event.getSource();
+        String buttonId = selectedButton.getId();
+    
+        switch (buttonId) {
+            case "tbtnToggleStream":
+                if (selectedButton.isSelected()) {
+                    animateBackgroundColor();
+                    this.streamChoice = "Crypto";
+                
+                } else {
+                    this.streamChoice = "Stocks";
+                    JATbot.botLogger.info("Stream disconnected");
+                }
+                break;
+            default:
+                break;
+            // Add more cases if you have more toggle buttons
+        }
+    }
+
+    @FXML
+    public void onTimePeriodToggle(ActionEvent event) {
+    ToggleButton selectedButton = (ToggleButton) event.getSource();
+    String buttonId = selectedButton.getId();
+
+    switch (buttonId) {
+        case "tbtnDef1D":
+            selectedTimePeriod = BarTimePeriod.DAY;
+            selectedDuration =  1;
+            JATbot.botLogger.info("1D selected");
+            break;
+        case "tbtnDef1MIN":
+            selectedTimePeriod = BarTimePeriod.MINUTE;
+            JATbot.botLogger.info("1MIN selected");
+            break;
+        case "tbtnDef1MON":
+            selectedTimePeriod = BarTimePeriod.MONTH;
+            JATbot.botLogger.info("1MON selected");
+            break;
+        case "tbtnDef1W":
+            selectedTimePeriod = BarTimePeriod.WEEK;
+            JATbot.botLogger.info("1W selected");
+            break;
+        case "tbtnDef1Y":
+            selectedTimePeriod = BarTimePeriod.MONTH;
+            JATbot.botLogger.info("1Y selected");
+            break;
+        case "tbtnDef4H":
+            selectedTimePeriod = BarTimePeriod.HOUR;
+            selectedDuration = 4;
+            JATbot.botLogger.info("4H selected");
+            break;  
+        case "tbtnDef4MON":
+            selectedTimePeriod = BarTimePeriod.MONTH;
+            selectedDuration = 4;
+            JATbot.botLogger.info("4MON selected");
+            break;
+        case "tbtnHourly":
+            selectedTimePeriod = BarTimePeriod.HOUR;
+            selectedDuration = 1;
+            JATbot.botLogger.info("Hourly selected");
+            break;
+        default:
+            break;
+        // Add more cases if you have more toggle buttons
+    }
+}
+@FXML
+public void onLogData(ActionEvent event) {
+}
+
     
 }
