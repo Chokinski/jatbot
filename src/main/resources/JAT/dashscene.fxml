@@ -75,8 +75,8 @@
                   </ScrollPane>
                   <AnchorPane layoutY="-2.0" maxWidth="1.7976931348623157E308" prefHeight="32.0" prefWidth="1024.0" styleClass="menuBar">
                      <children>
-                        <Label layoutX="457.0" layoutY="7.0" style="-fx-font-size: 14px;" styleClass="nmlTxt" stylesheets="@styles.css" text="Current Market Time" />
-                        <Label layoutX="491.0" layoutY="29.0" styleClass="nmlTxt" text="Label" />
+                        <Label layoutX="439.0" layoutY="4.0" style="-fx-font-size: 14px;" styleClass="nmlTxt" stylesheets="@styles.css" text="Current Market Time" />
+                        <Label fx:id="lblMarketTime" layoutX="446.0" layoutY="24.0" prefHeight="15.0" prefWidth="115.0" styleClass="nmlTxt" />
                      </children></AnchorPane>
                   <AnchorPane layoutX="-9.0" layoutY="70.0" style="-fx-border-color: transparent; -fx-background-color: transparent;">
                      <children>

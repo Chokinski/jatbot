@@ -4,7 +4,9 @@ import java.awt.Graphics2D;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -47,6 +49,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import net.jacobpeterson.alpaca.AlpacaAPI;
+import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
 import net.jacobpeterson.alpaca.model.properties.DataAPIType;
 import javafx.animation.FillTransition;
@@ -55,6 +58,10 @@ import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.animation.PauseTransition;
 import javafx.util.Duration;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
@@ -89,6 +96,7 @@ public class DashController {
     
     @FXML private Label lblStockStreamStatus;
     @FXML private Label lblChecking;
+    @FXML private Label lblMarketTime;
 
     @FXML private Button btnCheckStatus;
     @FXML private Button btnTryLogin;
@@ -173,7 +181,7 @@ public class DashController {
         try {
         PlotHandler ph = new PlotHandler();
         ph.showOHLCChart(parentNode, nodeChart, true, 2000, 1000);
-        OHLCChart chart = ph.getOHLCChart();
+        this.chart = ph.getOHLCChart();
         chart.addBarSpacingControl(slideQuantity);
         nodeChart.setMouseTransparent(true);
         // initialize Controller
@@ -382,24 +390,65 @@ public class DashController {
     void setText(ActionEvent event) {
         String sym = tfSymboltoGet.getText();
         String startDate = dpStartDate.getValue().toString();
-        LocalDate startParse = LocalDate.parse(startDate);  
-        int startYear = startParse.getYear();
-        int startMonth = startParse.getMonthValue();
-        int startDay = startParse.getDayOfMonth();
         String endDate = dpEndDate.getValue().toString();
-        LocalDate endParse = LocalDate.parse(endDate);
-        int endYear = endParse.getYear();
-        int endMonth = endParse.getMonthValue();
-        int endDay = endParse.getDayOfMonth();
-        ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
-        this.chart.setSeries(series);
-
-        
-
-        //drawChart(chartCanvas.getGraphicsContext2D(), updatedChart);
-        
+    
+        try {
+            LocalDate startParse = LocalDate.parse(startDate);
+            LocalDate endParse = LocalDate.parse(endDate);
+    
+            int startYear = startParse.getYear();
+            int startMonth = startParse.getMonthValue();
+            int startDay = startParse.getDayOfMonth();
+    
+            int endYear = endParse.getYear();
+            int endMonth = endParse.getMonthValue();
+            int endDay = endParse.getDayOfMonth();
+    
+            // Debugging statements
+            JATbot.botLogger.info("Start Date: " + startParse);
+            JATbot.botLogger.info("End Date: " + endParse);
+            JATbot.botLogger.info("Start Year: " + startYear);
+            JATbot.botLogger.info("Start Month: " + startMonth);
+            JATbot.botLogger.info("Start Day: " + startDay);
+            JATbot.botLogger.info("End Year: " + endYear);
+            JATbot.botLogger.info("End Month: " + endMonth);
+            JATbot.botLogger.info("End Day: " + endDay);
+            
+    
+            ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
+            this.chart.setSeries(series);
+        } catch (DateTimeParseException e) {
+            System.err.println("Error parsing date: " + e.getMessage());
+            // Handle the parsing error appropriately, e.g., show an error message to the user
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle other potential exceptions
+        }
+    }
+    // Method to update the label with the market time
+    public void updateMarketTimeLabel() {
+        Clock marketTime = ac.getMarketTime();
+        if (marketTime != null) {
+            String formattedTime = formatMarketTime(marketTime); // Format the market time as needed
+            Platform.runLater(() -> lblMarketTime.setText(formattedTime)); // Update label on JavaFX Application Thread
+        }
     }
 
+    // Method to format the market time as needed
+    private String formatMarketTime(Clock clock) {
+        // Format the clock time as needed (e.g., using SimpleDateFormat)
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        return dateFormat.format(clock.getTimestamp());
+    }
+
+    // Other code...
+
+    // Method to start updating the market time label periodically
+    public void startMarketTimeUpdate() {
+        // Create a scheduled executor to periodically update the market time label
+        ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+        executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 1, TimeUnit.SECONDS); // Update every second
+    }
 
         private Stage mainWindow;
 

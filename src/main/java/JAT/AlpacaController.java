@@ -27,6 +27,7 @@ import javafx.scene.chart.XYChart;
 import net.jacobpeterson.alpaca.model.endpoint.assets.Asset;
 import net.jacobpeterson.alpaca.model.endpoint.assets.enums.AssetClass;
 import net.jacobpeterson.alpaca.model.endpoint.assets.enums.AssetStatus;
+import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.Bar;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.stock.historical.bar.StockBar;
@@ -211,6 +212,18 @@ public class AlpacaController {
         return currency;
     }
 
+    public Clock getMarketTime() {
+        try {
+            // Get the market 'Clock' and print it out
+            Clock clock = alpaca.clock().get();
+            JATbot.botLogger.info("Market Clock: {}", clock);
+            return clock;
+        } catch (AlpacaClientException exception) {
+            exception.printStackTrace();
+            return null;
+        }
+    }
+
     public Order placeTrade() {
         try {
             Order newOrder = alpaca.orders().requestMarketOrder(null, null, OrderSide.BUY, null);
@@ -263,28 +276,38 @@ public class AlpacaController {
 public ObservableList<OHLCData> getBarsData(String sym, int stYr, int stMo, int stDay,
                                             int endYr, int endMo, int endDay, BarTimePeriod barPeriod, int duration) {
     ObservableList<OHLCData> ohlcDataList = FXCollections.observableArrayList();
-
+    
     try {
-        StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(sym,
+        StockBarsResponse barsResponses = alpaca.stockMarketData().getBars(
+            sym,
             ZonedDateTime.of(stYr, stMo, stDay, 9, 30, 0, 0, ZoneId.of("America/New_York")),
-            ZonedDateTime.of(endYr, endMo, endDay, 12 + 4, 0, 0, 0, ZoneId.of("America/New_York")), 10000, null,
-            duration, barPeriod, BarAdjustment.SPLIT, BarFeed.IEX);
+            ZonedDateTime.of(endYr, endMo, endDay, 16, 0, 0, 0, ZoneId.of("America/New_York")), // Closing time assumed as 4 PM (16:00)
+            10000, // Limiting to 10000 bars
+            null,
+            duration,
+            barPeriod,
+            BarAdjustment.SPLIT,
+            BarFeed.IEX
+        );
 
         barsResponses.getBars().forEach(bar -> {
             ZonedDateTime timestamp = bar.getTimestamp();
             LocalDate date = timestamp.toLocalDate();
 
-            double open = bar.getOpen().doubleValue();
-            double high = bar.getHigh().doubleValue();
-            double low = bar.getLow().doubleValue();
-            double close = bar.getClose().doubleValue();
-            long volume = bar.getVolume();
+            // Ensure the date is valid
+            if (date.toEpochDay() < Integer.MAX_VALUE) {
+                double open = bar.getOpen().doubleValue();
+                double high = bar.getHigh().doubleValue();
+                double low = bar.getLow().doubleValue();
+                double close = bar.getClose().doubleValue();
+                long volume = bar.getVolume();
 
-            OHLCData ohlcData = new OHLCData(date, open, high, low, close, volume);
-            ohlcDataList.add(ohlcData);
+                OHLCData ohlcData = new OHLCData(date, open, high, low, close, volume);
+                ohlcDataList.add(ohlcData);
+            }
         });
     } catch (AlpacaClientException e) {
-        JATbot.botLogger.info("Error getting bars data: {}", e.getMessage());
+        JATbot.botLogger.error("Error getting bars data: {}", e.getMessage());
     }
 
     return ohlcDataList;
