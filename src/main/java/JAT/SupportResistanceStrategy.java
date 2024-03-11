@@ -35,16 +35,28 @@ public class SupportResistanceStrategy {
     }
 
     public void identifySupportResistanceLevels() {
+        int checkLeft = 10;
+        int checkRight = 10;
         for (int i = 1; i < barsData.size() - 1; i++) {
-            OHLCData currentBar = barsData.get(i);
-            OHLCData previousBar = barsData.get(i - 1);
-            OHLCData nextBar = barsData.get(i + 1);
-
-            if (currentBar.getHigh() > previousBar.getHigh() && currentBar.getHigh() > nextBar.getHigh()) {
-                resistanceLevels.add(currentBar.getHigh());
-            } else if (currentBar.getLow() < previousBar.getLow() && currentBar.getLow() < nextBar.getLow()) {
-                supportLevels.add(currentBar.getLow());
+            if (i - checkLeft < 0 || i + checkRight >= barsData.size() - 1) {
+                continue; 
+            };    
+            for (int l = i - checkLeft; l < i; l++) {
+                if (barsData.get(i).getLow() < barsData.get(l).getLow() 
+                &&  barsData.get(i).getLow() < barsData.get(i + 1).getLow()) 
+                {
+                    supportLevels.add(barsData.get(i).getLow());
+                }
             }
+
+            for (int r = i + 1; r < i + checkRight; r++) {
+                if (barsData.get(i).getHigh() > barsData.get(r).getHigh() 
+                &&  barsData.get(i).getHigh() > barsData.get(i - 1).getHigh()) 
+                {
+                    resistanceLevels.add(barsData.get(i).getHigh());
+                }
+            }
+
         }
     }
 

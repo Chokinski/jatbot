@@ -30,7 +30,7 @@ public class Backtesting {
     public void run(String symbol) {
         barsData = getData(symbol);
         this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData);
-        executeTrades();
+
     }
 
     public ObservableList<OHLCData> getData(String sym) {
@@ -40,52 +40,6 @@ public class Backtesting {
                 BarTimePeriod.HOUR, 4);
     }
 
-    public void executeTrades() {
-        boolean uptrend = true;
-        for (OHLCData bar : barsData) {
-            uptrend = bar.getClose() > lastTradeClosePrice * (1 + trendThreshold);
-            double threshold = determineThreshold(bar.getClose(), uptrend);
-            
-            SRstrat.executeTrades(uptrend);
-            
-            if (uptrend && bar.getClose() > threshold && bar.getClose() != lastTradeClosePrice) {
-                if (SRstrat.orderConfirm(bar.getClose(), uptrend)) {
-                    lastTradeClosePrice = bar.getClose();
-                    // Call the strategy's method to handle the order confirmation
-                }
-            } else if (!uptrend && bar.getClose() < threshold && bar.getClose() != lastTradeClosePrice) {
-                if (SRstrat.orderConfirm(bar.getClose(), uptrend)) {
-                    lastTradeClosePrice = bar.getClose();
-                    // Call the strategy's method to handle the order confirmation
-                }
-            }
-        }
-    }
-
-    private double determineThreshold(double closePrice, boolean uptrend) {
-        // Calculate the average true range (ATR) to determine threshold dynamically
-        double averageTrueRange = calculateAverageTrueRange(barsData);
-        
-        // Calculate the threshold based on ATR and trend direction
-        return uptrend ? closePrice - (2 * averageTrueRange) : closePrice + (2 * averageTrueRange);
-    }
-    
-    private double calculateAverageTrueRange(List<OHLCData> data) {
-        double sumATR = 0;
-    
-        for (int i = 1; i < data.size(); i++) {
-            double trueRange = calculateTrueRange(data.get(i - 1), data.get(i));
-            sumATR += trueRange;
-        }
-    
-        return sumATR / data.size();
-    }
-    
-    private double calculateTrueRange(OHLCData previousBar, OHLCData currentBar) {
-        return Math.max(currentBar.getHigh() - currentBar.getLow(),
-                Math.max(Math.abs(currentBar.getHigh() - previousBar.getClose()),
-                        Math.abs(currentBar.getLow() - previousBar.getClose())));
-    }
 
     public void outputResults() {
         System.out.println("----------Backtesting Results----------\n");
