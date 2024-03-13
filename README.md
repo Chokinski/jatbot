@@ -1,4 +1,5 @@
-> This is the Pre-Deployment Live Branch
+> This is the Pre-Deployment Main Branch
+> Please note development may halt or be painstakingly slow. As such, do not attempt to use this program in it's current state until further notice.
 
 <p align="center">
   <img src="https://github.com/Chokinski/jatbot/blob/2f5085264dfff325c20875f3832d38b8ad0ff085/src/main/resources/JAT/maaain.png" alt="Logo" width="540" height="540">
