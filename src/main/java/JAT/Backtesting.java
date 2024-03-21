@@ -1,5 +1,5 @@
 package JAT;
-
+                         
 import com.jat.OHLCData;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 import java.time.LocalDate;
@@ -18,6 +18,7 @@ public class Backtesting {
     public Backtesting(AlpacaController ac, double initialCapital) {
         this.ac = ac;
         this.initialCapital = initialCapital;
+        main();
     }
 
     public static void main(String[] args) {
@@ -30,7 +31,6 @@ public class Backtesting {
     public void run(String symbol) {
         barsData = getData(symbol);
         this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData);
-
     }
 
     public ObservableList<OHLCData> getData(String sym) {
