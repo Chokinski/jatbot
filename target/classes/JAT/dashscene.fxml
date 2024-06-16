@@ -80,24 +80,24 @@
                      </children></AnchorPane>
                   <AnchorPane layoutX="-9.0" layoutY="70.0" style="-fx-border-color: transparent; -fx-background-color: transparent;">
                      <children>
-                        <Button fx:id="btnSetText" contentDisplay="CENTER" layoutX="9.0" layoutY="135.0" mnemonicParsing="false" onAction="#setText" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Chart Data">
+                        <Button fx:id="btnSetText" contentDisplay="CENTER" layoutX="9.0" layoutY="95.0" mnemonicParsing="false" onAction="#setText" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Chart Data">
                            <font>
                               <Font name="Sitka Display Bold" size="12.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnCheckStatus" contentDisplay="CENTER" layoutX="9.0" layoutY="93.0" mnemonicParsing="false" onAction="#onCheckStatus" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Check Status">
+                        <Button fx:id="btnCheckStatus" contentDisplay="CENTER" layoutX="9.0" layoutY="53.0" mnemonicParsing="false" onAction="#onCheckStatus" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Check Status">
                            <font>
                               <Font name="Sitka Display Bold" size="12.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnReconnect" contentDisplay="CENTER" layoutX="9.0" layoutY="51.0" mnemonicParsing="false" onAction="#onReconnect" prefHeight="44.0" prefWidth="157.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Reconnect Stream">
+                        <Button fx:id="btnDisconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="9.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDisconnectStream" prefHeight="44.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Disconnect" wrapText="true">
                            <font>
-                              <Font name="Sitka Display Bold" size="12.0" />
+                              <Font name="Sitka Display Bold" size="10.0" />
                            </font>
                         </Button>
-                        <Button fx:id="btnDisconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="9.0" layoutY="9.0" mnemonicParsing="false" onAction="#onDisconnectStream" prefHeight="44.0" prefWidth="159.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Disconnect Stream">
+                        <Button fx:id="btnReconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="85.0" layoutY="11.0" mnemonicParsing="false" onAction="#onReconnect" prefHeight="44.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Reconnect" wrapText="true">
                            <font>
-                              <Font name="Sitka Display Bold" size="12.0" />
+                              <Font name="Sitka Display Bold" size="10.0" />
                            </font>
                         </Button>
                      </children>
@@ -143,35 +143,40 @@
                         <content>
                           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="117.0">
                                  <children>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="10.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Crypto Stream:">
+                                    <Label focusTraversable="false" layoutX="2.0" layoutY="28.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Crypto:">
                                        <font>
                                           <Font name="Sitka Display" size="10.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="lblCryptoStreamStatus" layoutX="69.0" layoutY="12.0" prefHeight="14.0" prefWidth="87.0" stylesheets="@styles.css">
+                                    <Label fx:id="lblCryptoStreamStatus" layoutX="33.0" layoutY="28.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
                                        <font>
                                           <Font name="Sitka Display" size="10.0" />
                                        </font>
                                     </Label>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="30.0" prefHeight="15.0" prefWidth="79.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Stock   Stream:">
-                                       <font>
-                                          <Font name="Lucida Sans Unicode" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label alignment="CENTER" focusTraversable="false" layoutX="44.0" layoutY="55.0" prefHeight="15.0" prefWidth="31.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="API:">
+                                    <Label focusTraversable="false" layoutX="2.0" layoutY="48.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Stock:">
                                        <font>
                                           <Font name="Sitka Display" size="10.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="lblChecking" layoutX="43.0" layoutY="89.0" prefHeight="17.0" prefWidth="69.0" styleClass="mainPanels" stylesheets="@styles.css" text="Checking..." />
-                                    <Label fx:id="lblStockStreamStatus" layoutX="70.0" layoutY="30.0" prefHeight="17.0" prefWidth="84.0" stylesheets="@styles.css">
+                                    <Label focusTraversable="false" layoutX="2.0" layoutY="68.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="API:">
                                        <font>
                                           <Font name="Sitka Display" size="10.0" />
                                        </font>
                                     </Label>
-                                    <Label fx:id="lblAPIstatus" layoutX="70.0" layoutY="54.0" prefHeight="17.0" prefWidth="84.0" stylesheets="@styles.css">
+                                    <Label fx:id="lblChecking" layoutX="43.0" layoutY="90.0" prefHeight="17.0" prefWidth="69.0" styleClass="mainPanels" stylesheets="@styles.css" text="Checking..." />
+                                    <Label fx:id="lblStockStreamStatus" layoutX="33.0" layoutY="48.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
                                        <font>
                                           <Font name="Sitka Display" size="10.0" />
+                                       </font>
+                                    </Label>
+                                    <Label fx:id="lblAPIstatus" layoutX="33.0" layoutY="68.0" prefHeight="17.0" prefWidth="87.0" stylesheets="@styles.css">
+                                       <font>
+                                          <Font name="Sitka Display" size="10.0" />
+                                       </font>
+                                    </Label>
+                                    <Label focusTraversable="false" layoutX="2.0" layoutY="8.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Asset Streams">
+                                       <font>
+                                          <Font name="Sitka Heading Bold" size="10.0" />
                                        </font>
                                     </Label>
                                  </children>
@@ -217,7 +222,12 @@
                                           <Font name="Sitka Display" size="9.0" />
                                        </font>
                                     </TextField>
-                                    <Button fx:id="btnLogData" contentDisplay="CENTER" layoutX="49.0" layoutY="73.0" minWidth="38.0" mnemonicParsing="false" onAction="#onLogData" prefHeight="16.0" prefWidth="53.0" text="Log Data">
+                                    <Button fx:id="btnLogData" contentDisplay="CENTER" layoutX="49.0" layoutY="60.0" minWidth="38.0" mnemonicParsing="false" onAction="#onLogData" prefHeight="16.0" prefWidth="53.0" text="Log Data">
+                                       <font>
+                                          <Font name="Sitka Display Bold" size="9.0" />
+                                       </font>
+                                    </Button>
+                                    <Button fx:id="btnBacktest" contentDisplay="CENTER" layoutX="49.0" layoutY="82.0" minWidth="38.0" mnemonicParsing="false" onAction="#onBacktest" prefHeight="16.0" prefWidth="53.0" text="Backtest">
                                        <font>
                                           <Font name="Sitka Display Bold" size="9.0" />
                                        </font>

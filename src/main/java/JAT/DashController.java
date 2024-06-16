@@ -10,7 +10,7 @@ import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
-
+import javafx.animation.*;
 import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -52,6 +52,7 @@ import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
 import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
 import net.jacobpeterson.alpaca.model.properties.DataAPIType;
+import javafx.animation.Animation;
 import javafx.animation.FillTransition;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -105,6 +106,7 @@ public class DashController {
     @FXML private Button btnGetCrypto;
     @FXML private Button btnGetStock;
     @FXML private Button btnLogData;
+    @FXML private Button btnBacktest;
 
     @FXML private Slider slideQuantity;
 
@@ -172,21 +174,26 @@ public class DashController {
     private String streamChoice = "Stocks";
     private BarTimePeriod selectedTimePeriod = BarTimePeriod.DAY;  // Default value
     private int selectedDuration = 1;  // Default value
-    private AlpacaController ac;
+    private AlpacaController ac = new AlpacaController();
     private OHLCChart chart;
-    private PlotHandler ph;
+    private PlotHandler ph = new PlotHandler();
+    private Backtesting bt = new Backtesting(ac, 500);
     //private JFreeChart chart;
+
     @FXML
     public void initialize() {
         try {
-        PlotHandler ph = new PlotHandler();
-        ph.showOHLCChart(parentNode, nodeChart, true, 2000, 1000);
-        this.chart = ph.getOHLCChart();
-        chart.addBarSpacingControl(slideQuantity);
-        nodeChart.setMouseTransparent(true);
-        // initialize Controller
-        this.ac = new AlpacaController();
-        this.streamListener = new StreamListener();
+            this.streamListener = new StreamListener();
+            
+            
+            startMarketTimeUpdate();
+            
+            nodeChart.setMouseTransparent(true);
+            // initialize Controller
+            
+            
+
+            
         
         
         /*this.chart = chartHandler.newCChart(null);
@@ -213,16 +220,18 @@ public class DashController {
                     redrawChart();
                 });*/
         
-        // Redraw the chart when the canvas size changes
-        chartCanvas.widthProperty().addListener(obs -> redrawChart());
-        chartCanvas.heightProperty().addListener(obs -> redrawChart());
+
 
         
-                // Initial draw
-                redrawChart();
-        startGradientAnimation();
-        // Add the strings to the ListView when the scene is loaded
-        Platform.runLater(() -> {
+            // Initial draw
+            redrawChart();
+            startGradientAnimation();
+            animateBackgroundColor();
+                        // Redraw the chart when the canvas size changes
+                        chartCanvas.widthProperty().addListener(obs -> redrawChart());
+                        chartCanvas.heightProperty().addListener(obs -> redrawChart());
+            // Add the strings to the ListView when the scene is loaded
+            Platform.runLater(() -> {
             lblChecking.setText("");
             lvDataDisplay.getItems().addAll("");
             lvAccTypes.getItems().addAll(
@@ -386,6 +395,8 @@ public class DashController {
 
         streamListener.listenToCoin(Arrays.asList(tfSymboltoGet.getText()));
     }
+
+    //Sets the text of the button
     @FXML
     void setText(ActionEvent event) {
         String sym = tfSymboltoGet.getText();
@@ -416,7 +427,9 @@ public class DashController {
             
     
             ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth, endDay, selectedTimePeriod, selectedDuration);
-            this.chart.setSeries(series);
+            this.ph.showOHLCChart(this.parentNode,this.nodeChart, true,0,  series);
+            this.chart = ph.getOHLCChart();
+            chart.setTitle(sym.toString());
         } catch (DateTimeParseException e) {
             System.err.println("Error parsing date: " + e.getMessage());
             // Handle the parsing error appropriately, e.g., show an error message to the user
@@ -431,6 +444,11 @@ public class DashController {
         if (marketTime != null) {
             String formattedTime = formatMarketTime(marketTime); // Format the market time as needed
             Platform.runLater(() -> lblMarketTime.setText(formattedTime)); // Update label on JavaFX Application Thread
+        }
+        else {
+            String formattedTime = formatMarketTime(marketTime); // Format the market time as needed
+            Platform.runLater(() -> lblMarketTime.setText(formattedTime)); // Update label on JavaFX Application Thread
+
         }
     }
 
@@ -456,37 +474,6 @@ public class DashController {
         this.mainWindow = mainWindow;
     }
   
-    public void animateBackgroundColor() {
-        // Find the node with the id nodeToggle
-        AnchorPane nodeToggle = (AnchorPane) vbDash.lookup("#nodeToggle");
-
-        // Create a new Timeline
-        Timeline timeline = new Timeline();
-
-        // Define the start and end colors
-        Color startColor = Color.web("#f6f6f492");
-        Color endColor = Color.web("#331872");
-
-        // Create the key frames
-        KeyFrame startFrame = new KeyFrame(Duration.ZERO,
-                new KeyValue(nodeToggle.backgroundProperty(),
-                        new Background(new BackgroundFill(startColor, CornerRadii.EMPTY, Insets.EMPTY))));
-        KeyFrame endFrame = new KeyFrame(Duration.seconds(3),
-                new KeyValue(nodeToggle.backgroundProperty(),
-                        new Background(new BackgroundFill(endColor, CornerRadii.EMPTY, Insets.EMPTY))));
-
-        // Add the key frames to the timeline
-        timeline.getKeyFrames().addAll(startFrame, endFrame);
-
-        // Create a PauseTransition
-        PauseTransition pause = new PauseTransition(Duration.millis(500)); // 500 milliseconds delay
-
-        // Set the action to start the timeline after the pause
-        pause.setOnFinished(event -> timeline.play());
-
-        // Start the pause
-        pause.play();
-    }
     public void startGradientAnimation() {
         Timeline timeline = new Timeline(
             new KeyFrame(Duration.ZERO, new KeyValue(gradientSeparator.backgroundProperty(), createGradient(0))),
@@ -497,7 +484,33 @@ public class DashController {
         timeline.setCycleCount(Timeline.INDEFINITE);
         timeline.play();
     }
-
+    
+    public void animateBackgroundColor() {
+        // Find the node with the id nodeToggle
+        AnchorPane nodeToggle = (AnchorPane) vbDash.lookup("#nodeToggle");
+    
+        // Create a timeline for color animation
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(nodeToggle.backgroundProperty(), createGradient(0))),
+                new KeyFrame(Duration.seconds(4), new KeyValue(nodeToggle.backgroundProperty(), createGradient(50))),
+                new KeyFrame(Duration.seconds(8), new KeyValue(nodeToggle.backgroundProperty(), createGradient(100)))
+        );
+        timeline.setAutoReverse(true);
+        timeline.setCycleCount(Timeline.INDEFINITE);
+        timeline.play();
+    }
+    
+    private Background createGradient(double stripePercentage) {
+        double stripePosition = stripePercentage / 100.0;
+    
+        LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+                new Stop(stripePosition, Color.web("#f6f6f492")),
+                new Stop(stripePosition, Color.web("#331872")),
+                new Stop(1.0, Color.web("#f6f6f492"))
+        );
+    
+        return new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY));
+    }
     private Background createGradient(int stripePercentage) {
     double stripePosition = stripePercentage / 100.0;
 
@@ -582,6 +595,19 @@ public class DashController {
 }
 @FXML
 public void onLogData(ActionEvent event) {
+}
+
+@FXML
+public void onBacktest(ActionEvent event) throws IOException {
+    String sym = tfSymboltoGet.getText();
+    bt.run(sym);
+    ObservableList<OHLCData> series = bt.getData(sym);
+    this.ph.showOHLCChart(this.parentNode,this.nodeChart, true,0,  series);
+    this.chart = ph.getOHLCChart();
+
+    // Get the results from passResults() and add them to lvDataDisplay
+    String[] results = bt.passResults();
+    lvDataDisplay.getItems().addAll(results);
 }
 
     

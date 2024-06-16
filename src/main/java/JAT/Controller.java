@@ -24,7 +24,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 
 
-
+// This controller belongs to the login scene
 
 public class Controller {    
 
@@ -79,9 +79,7 @@ public class Controller {
                 tfKey_ID.setText(alpacaProperties.getProperty("key_id"));
                 tfSec_ID.setText(alpacaProperties.getProperty("secret_key"));
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        } catch (IOException e) {e.printStackTrace();}
 
 
     }

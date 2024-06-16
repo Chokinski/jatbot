@@ -1,0 +1,9 @@
+target/classes/module-info.class
+target/classes/JAT/AlpacaController.class
+target/classes/JAT/Backtesting.class
+target/classes/JAT/Controller.class
+target/classes/JAT/DashController.class
+target/classes/JAT/HiddenDivergenceStrategy.class
+target/classes/JAT/Indicator.class
+target/classes/JAT/JATbot.class
+target/classes/JAT/JATbot.class

@@ -2,6 +2,13 @@ package JAT;
                          
 import com.jat.OHLCData;
 import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
+
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.collections.ObservableList;
@@ -30,40 +37,74 @@ public class Backtesting {
     public static void main(String[] args) {
         AlpacaController ac = new AlpacaController();
         Backtesting backtesting = new Backtesting(ac, 500);
+
         backtesting.run("AAPL");
-        backtesting.run("TSLA");
+        /*backtesting.run("TSLA");
         backtesting.run("GME");
         backtesting.run("AMD");
+        backtesting.run("SPY");
+        backtesting.run("NVDA");
+
+
+        backtesting.run("META");
+        backtesting.run("ADBE");
+        backtesting.run("BA");
+        backtesting.run("AMZN");
+        backtesting.run("ATVI");
+        backtesting.run("NFLX");
+        backtesting.run("MSFT");
+        backtesting.run("GOOGL");*/
+        
+        
         
     }
 
     public void run(String symbol) {
         barsData = getData(symbol);
-        this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData,1);
-        outputResults();
+        this.SRstrat = new SupportResistanceStrategy(symbol, initialCapital, barsData);
+        System.out.println("\n\nRunning backtest for " + symbol);
+        
+        try {
+            outputResults(passResults());
+            writeResultsUsingStandardOutput(barsData);
+        } catch (IOException e) {
+            JATbot.botLogger.error("Error writing results to file");
+
+        }
     }
 
     public ObservableList<OHLCData> getData(String sym) {
         return ac.getBarsData(sym,
-                LocalDate.of(2024, 1, 1).getYear(), LocalDate.of(2024, 1, 1).getMonthValue(), LocalDate.of(2024, 1, 1).getDayOfMonth(),
-                LocalDate.of(2024, 3, 24).getYear(), LocalDate.of(2024, 3, 24).getMonthValue(), LocalDate.of(2024, 3, 24).getDayOfMonth(),
+                LocalDate.of(2021, 1, 1).getYear(), LocalDate.of(2021, 1, 1).getMonthValue(),
+                LocalDate.of(2021, 1, 1).getDayOfMonth(),
+                LocalDate.of(2024, 3, 25).getYear(), LocalDate.of(2024, 3, 25).getMonthValue(),
+                LocalDate.of(2024, 3, 25).getDayOfMonth(),
                 BarTimePeriod.MINUTE, 30);
     }
 
 
-    public void outputResults() {
-        System.out.println("----------Backtesting Results----------\n");
-        System.out.println("Initial Capital: $" + initialCapital);
-        System.out.println("Net Profit: $" + SRstrat.getNetProfit());
-        System.out.println("ROI: " + SRstrat.getROI() + "%");
-        System.out.println("Total Trades: " + SRstrat.getTotalTrades());
-        System.out.println("Win Rate: " + SRstrat.getWinRate() + "%");
-        System.out.println("Profit Factor: " + SRstrat.getProfitFactor());
-        System.out.println("Average Profit: $" + SRstrat.getAverageProfit());
-        System.out.println("Average Loss: $" + SRstrat.getAverageLoss());
-        System.out.println("Expectancy: $" + SRstrat.getExpectancy());
-        System.out.println("Max Drawdown: " + SRstrat.getMaxDrawdown());
-        System.out.println("Sharpe Ratio: " + SRstrat.getSharpeRatio());
-        //SRstrat.printTradesSummary();
+    public void outputResults(String[] results) {
+        for (String result : results) {
+            System.out.println(result);
+        }
+        SRstrat.printTradesSummary();
+    }
+    public void writeResultsUsingStandardOutput(ObservableList<OHLCData> data) throws IOException {
+        try(FileOutputStream fileOutputStream = new FileOutputStream("data.txt")){
+            BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"));
+            JATbot.botLogger.info("Writing results to file path: data.txt/src/main/java/JAT/data.txt");
+            for (OHLCData l : data) {
+
+                writer.write(l + "\n");
+            }
+            writer.close();
+        }
+        catch (FileNotFoundException e) {
+            JATbot.botLogger.error("File not found");
+        }
+    }
+
+    public String[] passResults() {
+        return SRstrat.getFormattedResults();
     }
 }
