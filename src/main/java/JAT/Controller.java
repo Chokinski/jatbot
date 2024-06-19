@@ -113,15 +113,18 @@ public class Controller {
                 // Load the properties file
                 tfKey_ID.setText(ac.loadProperties()[0]);
                 tfSec_ID.setText(ac.loadProperties()[1]);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("dashscene.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
                 Parent root = loader.load();
                 DashController dashController = loader.getController();
                 dashController.setMainWindow(mainWindow);
                 Scene scene = new Scene(root);
                 scene.setFill(null);    
                 mainWindow.setScene(scene);
+                mainWindow.setResizable(true);
             } catch (IOException e) {
-                JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
+                
+                JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}",e.getMessage());
+                //JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
             }
         } else {
             try {
@@ -148,8 +151,9 @@ public class Controller {
                 dashController.setMainWindow(mainWindow);
                 Scene scene = new Scene(root);
                 mainWindow.setScene(scene);
+                mainWindow.setResizable(true);
             } catch (IOException e) {
-                JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
+                JATbot.botLogger.error("Invalid credentials...\n\nPrinting stack: \n{}",e.getMessage());
             }
         }
     }

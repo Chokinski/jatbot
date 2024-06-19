@@ -64,228 +64,269 @@
 
 <VBox focusTraversable="true" prefHeight="702.0" prefWidth="1064.0" style="-fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.DashController">
    <children>
-      <VBox fx:id="vbDash" alignment="CENTER" fillWidth="false" focusTraversable="true" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="702.0" prefWidth="1025.0" style="-fx-background-color: transparent;" styleClass="mainWindow" stylesheets="@styles.css">
+      <VBox fx:id="vbDash" alignment="CENTER" fillWidth="false" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="702.0" minWidth="1025.0" onMouseDragged="#onDragged" onMousePressed="#onPressed" style="-fx-background-color: transparent;" styleClass="mainWindow" stylesheets="@styles.css">
         <children>
-          <AnchorPane focusTraversable="true" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="578.0" prefWidth="1024.0" styleClass="root" stylesheets="@styles.css">
+          <AnchorPane focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1028.0" styleClass="root" stylesheets="@styles.css">
             <children>
-                  <ScrollPane fx:id="parentNode" layoutX="162.0" layoutY="79.0">
-                     <content>
-                        <AnchorPane fx:id="nodeChart" focusTraversable="true" prefHeight="535.0" prefWidth="708.0" styleClass="accent" />
-                     </content>
-                  </ScrollPane>
-                  <AnchorPane layoutY="-2.0" maxWidth="1.7976931348623157E308" prefHeight="32.0" prefWidth="1024.0" styleClass="menuBar">
+                  <AnchorPane layoutY="-2.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="80.0" minWidth="1025.0" prefHeight="80.0" prefWidth="1025.0" styleClass="menuBar">
                      <children>
                         <Label layoutX="439.0" layoutY="4.0" style="-fx-font-size: 14px;" styleClass="nmlTxt" stylesheets="@styles.css" text="Current Market Time" />
-                        <Label fx:id="lblMarketTime" layoutX="446.0" layoutY="24.0" prefHeight="15.0" prefWidth="115.0" styleClass="nmlTxt" />
-                     </children></AnchorPane>
-                  <AnchorPane layoutX="-9.0" layoutY="70.0" style="-fx-border-color: transparent; -fx-background-color: transparent;">
-                     <children>
-                        <Button fx:id="btnSetText" contentDisplay="CENTER" layoutX="9.0" layoutY="95.0" mnemonicParsing="false" onAction="#setText" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Chart Data">
-                           <font>
-                              <Font name="Sitka Display Bold" size="12.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="btnCheckStatus" contentDisplay="CENTER" layoutX="9.0" layoutY="53.0" mnemonicParsing="false" onAction="#onCheckStatus" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Check Status">
-                           <font>
-                              <Font name="Sitka Display Bold" size="12.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="btnDisconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="9.0" layoutY="11.0" mnemonicParsing="false" onAction="#onDisconnectStream" prefHeight="44.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Disconnect" wrapText="true">
-                           <font>
-                              <Font name="Sitka Display Bold" size="10.0" />
-                           </font>
-                        </Button>
-                        <Button fx:id="btnReconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="85.0" layoutY="11.0" mnemonicParsing="false" onAction="#onReconnect" prefHeight="44.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Reconnect" wrapText="true">
-                           <font>
-                              <Font name="Sitka Display Bold" size="10.0" />
-                           </font>
-                        </Button>
+                        <Label fx:id="lblMarketTime" alignment="CENTER" contentDisplay="CENTER" layoutX="453.0" layoutY="24.0" prefHeight="15.0" prefWidth="100.0" styleClass="nmlTxt" text="--:--" textAlignment="CENTER" />
                      </children>
                   </AnchorPane>
-                  <AnchorPane layoutX="868.0" layoutY="385.0" prefHeight="222.0" prefWidth="156.0" styleClass="accent" stylesheets="@styles.css">
+                  <ScrollPane fx:id="parentNode" layoutX="157.0" layoutY="79.0" prefWidth="715.0">
+                     <content>
+                        <AnchorPane fx:id="nodeChart" focusTraversable="true" prefHeight="535.0" prefWidth="708.0">
+                           <styleClass>
+                              <String fx:value="accent" />
+                              <String fx:value="nmlTxt" />
+                           </styleClass>
+                        </AnchorPane>
+                     </content>
+                  </ScrollPane>
+                  <AnchorPane layoutX="-9.0" layoutY="69.0" prefHeight="538.0" prefWidth="178.0">
                      <children>
-                        <ScrollPane layoutX="61.0" prefHeight="222.0" prefWidth="95.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children>
-                  </AnchorPane>
-                  <Separator layoutY="79.0" prefHeight="5.0" prefWidth="990.0" />
-                  <SplitPane dividerPositions="0.5454545454545454" layoutX="868.0" layoutY="80.0" prefHeight="306.0" prefWidth="156.0" snapToPixel="false">
-                    <items>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="275.0" prefWidth="35.0">
+                        <AnchorPane prefHeight="141.0" prefWidth="174.0" style="-fx-border-color: transparent; -fx-background-color: transparent;">
                            <children>
-                              <ListView fx:id="lvAccTypes" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="99.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <Button fx:id="btnSetText" contentDisplay="CENTER" layoutX="9.0" layoutY="95.0" mnemonicParsing="false" onAction="#setText" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Chart Data" AnchorPane.leftAnchor="10.0">
+                                 <font>
+                                    <Font name="Sitka Display Bold" size="12.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnCheckStatus" contentDisplay="CENTER" layoutX="9.0" layoutY="53.0" mnemonicParsing="false" onAction="#onCheckStatus" prefHeight="44.0" prefWidth="157.0" styleClass="btnAccent" stylesheets="@styles.css" text="Check Status" AnchorPane.leftAnchor="10.0">
+                                 <font>
+                                    <Font name="Sitka Display Bold" size="12.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </Button>
+                              <Button fx:id="btnDisconnect" contentDisplay="CENTER" focusTraversable="false" graphicTextGap="2.0" layoutX="10.0" layoutY="15.0" onAction="#onDisconnectStream" prefHeight="40.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Disconnect" wrapText="true">
+                                 <font>
+                                    <Font name="Sitka Display Bold" size="10.0" />
+                                 </font>
+                              </Button>
+                              <Button fx:id="btnReconnect" contentDisplay="CENTER" graphicTextGap="2.0" layoutX="85.0" layoutY="15.0" mnemonicParsing="false" onAction="#onReconnect" prefHeight="40.0" prefWidth="79.0" style="-fx-border-color: transparent;" styleClass="btnAccent" stylesheets="@styles.css" text="Reconnect" wrapText="true">
+                                 <font>
+                                    <Font name="Sitka Display Bold" size="10.0" />
+                                 </font>
+                                 <padding>
+                                    <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                 </padding>
+                              </Button>
                            </children>
                         </AnchorPane>
-                      <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="272.0" prefWidth="143.0">
+                        <AnchorPane layoutX="8.0" layoutY="381.0" prefHeight="157.0" prefWidth="158.0">
                            <children>
-                              <ListView fx:id="lvAccValues" layoutX="1.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="119.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                              <ScrollPane prefHeight="171.0" prefWidth="289.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                 <content>
+                                    <ListView fx:id="lvDataDisplay" prefHeight="142.0" prefWidth="158.0">
+                                       <styleClass>
+                                          <String fx:value="root" />
+                                          <String fx:value="accent" />
+                                          <String fx:value="mainPanels" />
+                                       </styleClass>
+                                    </ListView>
+                                 </content>
+                              </ScrollPane>
                            </children>
                         </AnchorPane>
-                    </items>
-                  </SplitPane>
-                  <AnchorPane layoutX="-1.0" layoutY="450.0" prefHeight="157.0" prefWidth="158.0">
-                     <children>
-                        <ScrollPane prefHeight="171.0" prefWidth="289.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                           <content>
-                              <ListView fx:id="lvDataDisplay" prefHeight="142.0" prefWidth="405.0">
-                                 <styleClass>
-                                    <String fx:value="root" />
-                                    <String fx:value="accent" />
-                                    <String fx:value="mainPanels" />
-                                 </styleClass>
-                              </ListView>
-                           </content>
-                        </ScrollPane>
-                     </children>
-                  </AnchorPane>
-                  <Accordion layoutY="249.0" prefHeight="201.0" prefWidth="156.0" style="-fx-border-color: linear-gradient(to top, #383F42 5%, #583d96, #6931ec);">
-                    <panes>
-                      <TitledPane alignment="CENTER" animated="false" contentDisplay="CENTER" focusTraversable="false" prefHeight="89.0" prefWidth="114.0" styleClass="mainPanels" text="Connections">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="117.0">
-                                 <children>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="28.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Crypto:">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lblCryptoStreamStatus" layoutX="33.0" layoutY="28.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="48.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Stock:">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="68.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="API:">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lblChecking" layoutX="43.0" layoutY="90.0" prefHeight="17.0" prefWidth="69.0" styleClass="mainPanels" stylesheets="@styles.css" text="Checking..." />
-                                    <Label fx:id="lblStockStreamStatus" layoutX="33.0" layoutY="48.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label fx:id="lblAPIstatus" layoutX="33.0" layoutY="68.0" prefHeight="17.0" prefWidth="87.0" stylesheets="@styles.css">
-                                       <font>
-                                          <Font name="Sitka Display" size="10.0" />
-                                       </font>
-                                    </Label>
-                                    <Label focusTraversable="false" layoutX="2.0" layoutY="8.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Asset Streams">
-                                       <font>
-                                          <Font name="Sitka Heading Bold" size="10.0" />
-                                       </font>
-                                    </Label>
-                                 </children>
-                                 <styleClass>
-                                    <String fx:value="root" />
-                                    <String fx:value="accent" />
-                                 </styleClass>
-                              </AnchorPane>
-                        </content>
-                           <font>
-                              <Font name="Sitka Heading Bold" size="12.0" />
-                           </font>
-                      </TitledPane>
-                      <TitledPane animated="false" prefHeight="47.0" prefWidth="156.0" styleClass="mainPanels" text="WatchData">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="root">
-                                 <children>
-                                    <GridPane layoutX="39.0" layoutY="34.0">
-                                       <columnConstraints>
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
-                                          <ColumnConstraints hgrow="SOMETIMES" maxWidth="44.0" minWidth="10.0" prefWidth="37.0" />
-                                       </columnConstraints>
-                                       <rowConstraints>
-                                          <RowConstraints />
-                                          <RowConstraints />
-                                          <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
-                                       </rowConstraints>
+                        <Accordion layoutX="9.0" layoutY="180.0" prefHeight="201.0" prefWidth="157.0" style="-fx-border-color: linear-gradient(to top, #383F42 5%, #583d96, #6931ec);">
+                          <panes>
+                            <TitledPane alignment="CENTER" animated="false" contentDisplay="CENTER" focusTraversable="false" prefHeight="89.0" prefWidth="114.0" styleClass="mainPanels" text="Connections">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="117.0">
                                        <children>
-                                          <Button fx:id="btnGetStock" contentDisplay="CENTER" minWidth="38.0" mnemonicParsing="false" onAction="#onGetStock" prefHeight="7.0" prefWidth="38.0" text="Stock">
+                                          <Label focusTraversable="false" layoutX="2.0" layoutY="28.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Crypto:">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="lblCryptoStreamStatus" layoutX="33.0" layoutY="28.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label focusTraversable="false" layoutX="2.0" layoutY="48.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Stock:">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label focusTraversable="false" layoutX="2.0" layoutY="68.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="API:">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="lblChecking" layoutX="43.0" layoutY="90.0" prefHeight="17.0" prefWidth="69.0" styleClass="mainPanels" stylesheets="@styles.css" text="Checking..." />
+                                          <Label fx:id="lblStockStreamStatus" layoutX="33.0" layoutY="48.0" prefHeight="15.0" prefWidth="87.0" stylesheets="@styles.css">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label fx:id="lblAPIstatus" layoutX="33.0" layoutY="68.0" prefHeight="17.0" prefWidth="87.0" stylesheets="@styles.css">
+                                             <font>
+                                                <Font name="Sitka Display" size="10.0" />
+                                             </font>
+                                          </Label>
+                                          <Label focusTraversable="false" layoutX="2.0" layoutY="8.0" prefHeight="15.0" prefWidth="81.0" style="-fx-background-color: transparent;" styleClass="nmlTxt" stylesheets="@styles.css" text="Asset Streams">
+                                             <font>
+                                                <Font name="Sitka Heading Bold" size="10.0" />
+                                             </font>
+                                          </Label>
+                                       </children>
+                                       <styleClass>
+                                          <String fx:value="root" />
+                                          <String fx:value="accent" />
+                                       </styleClass>
+                                    </AnchorPane>
+                              </content>
+                                 <font>
+                                    <Font name="Sitka Heading Bold" size="12.0" />
+                                 </font>
+                            </TitledPane>
+                            <TitledPane animated="false" prefHeight="47.0" prefWidth="156.0" styleClass="mainPanels" text="WatchData">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" styleClass="root">
+                                       <children>
+                                          <GridPane layoutX="39.0" layoutY="34.0">
+                                             <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="40.0" minWidth="10.0" prefWidth="40.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="44.0" minWidth="10.0" prefWidth="37.0" />
+                                             </columnConstraints>
+                                             <rowConstraints>
+                                                <RowConstraints />
+                                                <RowConstraints />
+                                                <RowConstraints minHeight="10.0" vgrow="SOMETIMES" />
+                                             </rowConstraints>
+                                             <children>
+                                                <Button fx:id="btnGetStock" contentDisplay="CENTER" minWidth="38.0" mnemonicParsing="false" onAction="#onGetStock" prefHeight="7.0" prefWidth="38.0" text="Stock">
+                                                   <font>
+                                                      <Font name="Sitka Display Bold" size="9.0" />
+                                                   </font>
+                                                </Button>
+                                                <Button fx:id="btnGetCrypto" contentDisplay="CENTER" minWidth="39.0" mnemonicParsing="false" onAction="#onGetCrypto" prefHeight="16.0" prefWidth="39.0" text="Crypto" GridPane.columnIndex="1">
+                                                   <font>
+                                                      <Font name="Sitka Display Bold" size="9.0" />
+                                                   </font>
+                                                </Button>
+                                             </children>
+                                          </GridPane>
+                                          <TextField fx:id="tfSymboltoGet" layoutX="27.0" layoutY="14.0">
+                                             <font>
+                                                <Font name="Sitka Display" size="9.0" />
+                                             </font>
+                                          </TextField>
+                                          <Button fx:id="btnLogData" contentDisplay="CENTER" layoutX="49.0" layoutY="60.0" minWidth="38.0" mnemonicParsing="false" onAction="#onLogData" prefHeight="16.0" prefWidth="53.0" text="Log Data">
                                              <font>
                                                 <Font name="Sitka Display Bold" size="9.0" />
                                              </font>
                                           </Button>
-                                          <Button fx:id="btnGetCrypto" contentDisplay="CENTER" minWidth="39.0" mnemonicParsing="false" onAction="#onGetCrypto" prefHeight="16.0" prefWidth="39.0" text="Crypto" GridPane.columnIndex="1">
+                                          <Button fx:id="btnBacktest" contentDisplay="CENTER" layoutX="49.0" layoutY="82.0" minWidth="38.0" mnemonicParsing="false" onAction="#onBacktest" prefHeight="16.0" prefWidth="53.0" text="Backtest">
                                              <font>
                                                 <Font name="Sitka Display Bold" size="9.0" />
                                              </font>
                                           </Button>
                                        </children>
-                                    </GridPane>
-                                    <TextField fx:id="tfSymboltoGet" layoutX="27.0" layoutY="14.0">
-                                       <font>
-                                          <Font name="Sitka Display" size="9.0" />
-                                       </font>
-                                    </TextField>
-                                    <Button fx:id="btnLogData" contentDisplay="CENTER" layoutX="49.0" layoutY="60.0" minWidth="38.0" mnemonicParsing="false" onAction="#onLogData" prefHeight="16.0" prefWidth="53.0" text="Log Data">
-                                       <font>
-                                          <Font name="Sitka Display Bold" size="9.0" />
-                                       </font>
-                                    </Button>
-                                    <Button fx:id="btnBacktest" contentDisplay="CENTER" layoutX="49.0" layoutY="82.0" minWidth="38.0" mnemonicParsing="false" onAction="#onBacktest" prefHeight="16.0" prefWidth="53.0" text="Backtest">
-                                       <font>
-                                          <Font name="Sitka Display Bold" size="9.0" />
-                                       </font>
-                                    </Button>
-                                 </children>
-                              </AnchorPane>
-                        </content>
-                           <font>
-                              <Font name="Sitka Heading Bold" size="12.0" />
-                           </font>
-                      </TitledPane>
-                      <TitledPane animated="false" prefHeight="114.0" prefWidth="156.0" styleClass="mainPanels" text="Retry login">
-                        <content>
-                          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    </AnchorPane>
+                              </content>
+                                 <font>
+                                    <Font name="Sitka Heading Bold" size="12.0" />
+                                 </font>
+                            </TitledPane>
+                            <TitledPane animated="false" prefHeight="114.0" prefWidth="156.0" styleClass="mainPanels" text="Retry login">
+                              <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                       <children>
+                                          <TextField fx:id="tfKey_ID" layoutX="9.0" layoutY="14.0" prefHeight="22.0" prefWidth="138.0" promptText="Paste key...">
+                                             <font>
+                                                <Font name="Sitka Display" size="13.0" />
+                                             </font>
+                                          </TextField>
+                                          <PasswordField fx:id="tfSec_ID" layoutX="8.0" layoutY="40.0" prefHeight="22.0" prefWidth="140.0" promptText="Paste secret...">
+                                             <font>
+                                                <Font name="Sitka Display" size="13.0" />
+                                             </font>
+                                          </PasswordField>
+                                          <Button fx:id="btnTryLogin" layoutX="58.0" layoutY="67.0" mnemonicParsing="false" onAction="#onBtnRetryLogin" styleClass="btnAccent" stylesheets="@styles.css" text="Login">
+                                             <font>
+                                                <Font name="Sitka Display" size="11.0" />
+                                             </font>
+                                          </Button>
+                                       </children>
+                                       <styleClass>
+                                          <String fx:value="root" />
+                                          <String fx:value="accent" />
+                                       </styleClass>
+                                    </AnchorPane>
+                              </content>
+                            </TitledPane>
+                          </panes>
+                        </Accordion>
+                        <AnchorPane fx:id="gradientSeparator1" layoutX="165.0" layoutY="11.0" prefHeight="526.0" prefWidth="6.0" styleClass="separatorVPanel" />
+                        <Label fx:id="lblTimeStatus" alignment="CENTER" contentDisplay="CENTER" layoutX="9.0" layoutY="164.0" prefHeight="15.0" prefWidth="157.0" styleClass="nmlTxt" text="--:--" textAlignment="CENTER" />
+                        <Label fx:id="lblMarketIndicator" contentDisplay="CENTER" layoutX="53.0" layoutY="147.0" prefHeight="15.0" prefWidth="42.0" styleClass="nmlTxt" text="Market is" textAlignment="CENTER" />
+                        <Label fx:id="lblMarketIndicator1" contentDisplay="CENTER" layoutX="96.0" layoutY="147.0" prefHeight="15.0" prefWidth="66.0" styleClass="nmlTxt" text="idk you tell me" textAlignment="CENTER" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane layoutX="865.0" layoutY="79.0">
+                     <children>
+                        <AnchorPane layoutX="5.0" layoutY="306.0" maxWidth="-Infinity" prefHeight="222.0" prefWidth="155.0" styleClass="accent" stylesheets="@styles.css">
+                           <children>
+                              <ScrollPane prefHeight="222.0" prefWidth="156.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                           </children>
+                        </AnchorPane>
+                        <SplitPane dividerPositions="0.5454545454545454" layoutX="5.0" layoutY="1.0" prefHeight="306.0" prefWidth="154.0" snapToPixel="false">
+                          <items>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="275.0" prefWidth="35.0">
                                  <children>
-                                    <TextField fx:id="tfKey_ID" layoutX="9.0" layoutY="14.0" prefHeight="22.0" prefWidth="138.0" promptText="Paste key...">
-                                       <font>
-                                          <Font name="Sitka Display" size="13.0" />
-                                       </font>
-                                    </TextField>
-                                    <PasswordField fx:id="tfSec_ID" layoutX="8.0" layoutY="40.0" prefHeight="22.0" prefWidth="140.0" promptText="Paste secret...">
-                                       <font>
-                                          <Font name="Sitka Display" size="13.0" />
-                                       </font>
-                                    </PasswordField>
-                                    <Button fx:id="btnTryLogin" layoutX="58.0" layoutY="67.0" mnemonicParsing="false" onAction="#onBtnRetryLogin" styleClass="btnAccent" stylesheets="@styles.css" text="Login">
-                                       <font>
-                                          <Font name="Sitka Display" size="11.0" />
-                                       </font>
-                                    </Button>
+                                    <ListView fx:id="lvAccTypes" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="99.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
-                                 <styleClass>
-                                    <String fx:value="root" />
-                                    <String fx:value="accent" />
-                                 </styleClass>
                               </AnchorPane>
-                        </content>
-                      </TitledPane>
-                    </panes>
-                  </Accordion>
-                  <AnchorPane fx:id="gradientSeparator" layoutX="155.0" layoutY="81.0" prefHeight="526.0" prefWidth="6.0" styleClass="separatorVPanel" />
-                  <AnchorPane fx:id="gradientSeparator" layoutX="865.0" layoutY="79.0" prefHeight="526.0" prefWidth="6.0" styleClass="separatorVPanel" />
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="272.0" prefWidth="143.0">
+                                 <children>
+                                    <ListView fx:id="lvAccValues" layoutX="1.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="272.0" prefWidth="119.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                 </children>
+                              </AnchorPane>
+                          </items>
+                        </SplitPane>
+                        <AnchorPane fx:id="gradientSeparator" prefHeight="526.0" prefWidth="6.0" styleClass="separatorVPanel" />
+                     </children>
+                  </AnchorPane>
+                  <AnchorPane layoutX="-1.0" layoutY="605.0">
+                     <children>
+                        <AnchorPane layoutY="1.0" maxWidth="1.7976931348623157E308" prefHeight="80.0" prefWidth="1025.0" styleClass="footer" />
+                        <AnchorPane fx:id="gradientSeparator" prefHeight="7.0" prefWidth="1025.0" styleClass="separatorHPanel" />
+                        <ImageView fitHeight="80.0" fitWidth="81.0" layoutX="483.0" layoutY="1.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@maaain.png" />
+                           </image>
+                        </ImageView>
+                     </children>
+                  </AnchorPane>
                   <AnchorPane layoutX="-6.0" layoutY="76.0" prefWidth="1030.0" style="-fx-background-color: TRANSPARENT;">
                      <children>
-                        <ToolBar focusTraversable="false" layoutX="4.0" layoutY="-27.0" prefHeight="23.0" prefWidth="1031.0" style="-fx-background-radius: 10 15 6 10; -fx-background-color: #383F42;" styleClass="whitePanel">
+                        <Separator layoutX="50.0" layoutY="2.0" prefHeight="7.0" prefWidth="978.0" />
+                        <ToolBar focusTraversable="false" layoutX="4.0" layoutY="-27.0" prefHeight="32.0" prefWidth="1030.0" style="-fx-background-radius: 10 15 6 10; -fx-background-color: #383F42;" styleClass="whitePanel">
                            <items>
-                              <AnchorPane prefHeight="22.0" prefWidth="162.0">
+                              <AnchorPane prefHeight="0.0" prefWidth="162.0">
                                  <children>
-                                    <AnchorPane fx:id="nodeToggle" layoutX="26.0" layoutY="4.0" prefHeight="32.0" prefWidth="130.0" style="-fx-background-color: #f6f6f492; -fx-background-radius: 10 15 6 10;">
+                                    <AnchorPane fx:id="nodeToggle" blendMode="SRC_ATOP" layoutY="-5.0" prefHeight="32.0" prefWidth="130.0" style="-fx-background-color: #f6f6f4; -fx-background-radius: 15 6 15 6; -fx-border-width: 2px; -fx-opacity: 100%;">
                                        <children>
-                                          <ToggleButton fx:id="tbtnToggleStream" layoutX="9.0" layoutY="4.0" mnemonicParsing="false" onAction="#onToggleStream" prefHeight="25.0" prefWidth="58.0" styleClass="btnAccent" stylesheets="@styles.css" text="Crypto">
+                                          <ToggleButton fx:id="tbtnToggleStream" layoutX="16.0" layoutY="3.0" mnemonicParsing="false" onAction="#onToggleStream" prefHeight="25.0" prefWidth="57.0" style="-fx-opacity: 100%;" styleClass="tglAccent" stylesheets="@styles.css" text="Crypto">
                                              <font>
                                                 <Font name="Comic Sans MS" size="12.0" />
                                              </font>
                                           </ToggleButton>
                                        </children>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
+                                       <cursor>
+                                          <Cursor fx:constant="SW_RESIZE" />
+                                       </cursor>
                                     </AnchorPane>
-                                 </children></AnchorPane>
+                                 </children>
+                              </AnchorPane>
                               <MenuButton fx:id="menuChart" alignment="CENTER" contentDisplay="CENTER" focusTraversable="false" mnemonicParsing="false" prefHeight="22.0" prefWidth="65.0" style="-fx-fill: #f6f6f4; -fx-background-color: #331872;" stylesheets="@styles.css" text="Chart" textFill="WHITE">
                                 <items>
                                   <MenuItem mnemonicParsing="false" styleClass="btnAccent" text="Stocks" />
@@ -306,7 +347,7 @@
                                     <Font name="Sitka Display Bold" size="9.0" />
                                  </font>
                               </MenuButton>
-                              <AnchorPane prefHeight="22.0" prefWidth="79.0" />
+                              <AnchorPane cache="true" prefHeight="22.0" prefWidth="79.0" />
                               <ToggleButton fx:id="tbtnDef1MIN" mnemonicParsing="false" onAction="#onTimePeriodToggle" prefHeight="22.0" prefWidth="42.0" styleClass="btnAccent" stylesheets="@styles.css" text="1m">
                                  <font>
                                     <Font name="Comic Sans MS" size="10.0" />
@@ -342,7 +383,7 @@
                                     <Font name="Comic Sans MS" size="10.0" />
                                  </font>
                               </ToggleButton>
-                              <ToggleButton fx:id="tbtnDef1Y" mnemonicParsing="false" onAction="#onTimePeriodToggle" prefHeight="22.0" prefWidth="42.0" styleClass="btnAccent" stylesheets="@styles.css" text="1Y">
+                              <ToggleButton fx:id="tbtnDef1Y" layoutX="604.0" layoutY="10.0" mnemonicParsing="false" onAction="#onTimePeriodToggle" prefHeight="22.0" prefWidth="42.0" styleClass="btnAccent" stylesheets="@styles.css" text="1Y">
                                  <font>
                                     <Font name="Comic Sans MS" size="10.0" />
                                  </font>
@@ -352,19 +393,12 @@
                         </ToolBar>
                      </children>
                      <cursor>
-                        <Cursor fx:constant="CLOSED_HAND" />
+                        <Cursor fx:constant="DISAPPEAR" />
                      </cursor>
                      <effect>
                         <DropShadow />
                      </effect>
                   </AnchorPane>
-                  <AnchorPane layoutX="-1.0" layoutY="606.0" maxWidth="1.7976931348623157E308" prefHeight="80.0" prefWidth="1025.0" styleClass="footer" />
-                  <AnchorPane fx:id="gradientSeparator" layoutX="-1.0" layoutY="605.0" prefHeight="7.0" prefWidth="1025.0" styleClass="separatorHPanel" />
-                  <ImageView fitHeight="80.0" fitWidth="81.0" layoutX="482.0" layoutY="606.0" pickOnBounds="true" preserveRatio="true">
-                     <image>
-                        <Image url="@maaain.png" />
-                     </image>
-                  </ImageView>
             </children>
                <VBox.margin>
                   <Insets />

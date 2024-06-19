@@ -38,12 +38,35 @@
 
 .btnAccent {
     -fx-background-color:#331872;
-    -fx-text-fill: #f6f6f492;
+    -fx-text-fill: #f6f6f4;
     -fx-font-family: 'Montserrat', sans-serif;
     -fx-transition: all 0.3s ease;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
 }
+
+.tglAccent
+
+{
+    -fx-background-color:#331872;
+    -fx-text-fill: #f6f6f492;
+    -fx-font-family: 'Montserrat', sans-serif;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+    
+
+}
+
+.nodeToggle {
+    -fx-background-color: #f6f6f492;
+    -fx-background-radius: 10 15 6 10;
+    -fx-transition: all 0.3s ease;
+}
+
+.nodeToggle.stockState {
+    -fx-background-color: #331872;
+    -fx-background-radius: 15 10 10 6;
+}
+
 
 .nmlTxt {
     -fx-text-fill: #f6f6f492;
@@ -60,7 +83,7 @@
 
 
 .btnAccent:hover {
-    -fx-transform: scale(1.05) translate(0, -5px);
+    -fx-transform: scale(1.05) translate(0, -1px);
     -fx-background-color: linear-gradient(to bottom, #6931ec, #583d96);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 0);
     -fx-text-fill: #ffffffe0;
@@ -104,8 +127,15 @@
 }
 
 .chart-plot-background {
-    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66)
+    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66);
+    -fx-tick-label-fill: #f6f6f492;
 }
+
+.axis-label {
+
+    -fx-tick-label-fill: #f6f6f492;
+}
+
 
 .slider:horizontal {>.track {
     -fx-fill: #F6F6F4;
