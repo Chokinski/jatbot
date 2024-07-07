@@ -121,6 +121,8 @@ public class Controller {
                 scene.setFill(null);    
                 mainWindow.setScene(scene);
                 mainWindow.setResizable(true);
+                mainWindow.centerOnScreen();
+
             } catch (IOException e) {
                 
                 JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}",e.getMessage());
@@ -152,6 +154,8 @@ public class Controller {
                 Scene scene = new Scene(root);
                 mainWindow.setScene(scene);
                 mainWindow.setResizable(true);
+                mainWindow.centerOnScreen();
+
             } catch (IOException e) {
                 JATbot.botLogger.error("Invalid credentials...\n\nPrinting stack: \n{}",e.getMessage());
             }

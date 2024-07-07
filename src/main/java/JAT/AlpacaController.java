@@ -1,6 +1,7 @@
 package JAT;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.model.endpoint.account.Account;
+//net.jacobpeterson.alpaca.openapi.trader.api.AccountsApi;
 import net.jacobpeterson.alpaca.model.endpoint.account.enums.AccountStatus;
 import net.jacobpeterson.alpaca.model.endpoint.orders.Order;
 import net.jacobpeterson.alpaca.model.endpoint.orders.enums.OrderSide;
@@ -87,21 +88,21 @@ public class AlpacaController {
     public String logAccID() {
         String accID = getAccount().getId();
         JATbot.botLogger.info("Account ID: {}", accID);
-        System.out.println("Account ID Logged" + "\n\n\n");
+        JATbot.botLogger.info("Account ID Logged" + "\n");
         return accID;
     }
 
     public String logAccCash() {
         String cash = getAccount().getCash();
         JATbot.botLogger.info("Account Cash: {}", cash);
-        System.out.println("Cash Logged" + "\n\n\n");
+        JATbot.botLogger.info("Cash Logged" + "\n");
         return cash;
     }
 
     public String logPortValue() {
         String portValue = getAccount().getPortfolioValue();
         JATbot.botLogger.info("Portfolio Value: {}", portValue);
-        System.out.println("Portfolio Value Logged" + "\n\n\n");
+        JATbot.botLogger.info("Portfolio Value Logged" + "\n");
         return portValue;
 
     }
@@ -109,7 +110,7 @@ public class AlpacaController {
     public String logAccStatus() {
         AccountStatus status = getAccount().getStatus();
         JATbot.botLogger.info("Account Status: {}", status);
-        System.out.println("Account Status Logged" + "\n\n\n");
+        JATbot.botLogger.info("Account Status Logged" + "\n");
 
         return status.toString();
 
@@ -118,7 +119,7 @@ public class AlpacaController {
     public String logCreateDate() {
         ZonedDateTime creation = getAccount().getCreatedAt();
         JATbot.botLogger.info("Date Created: {}", creation);
-        System.out.println("Date Created" + "\n\n\n");
+        JATbot.botLogger.info("Date Created" + "\n");
         String creationString = creation.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
         return creationString;
 
@@ -127,7 +128,7 @@ public class AlpacaController {
     public String logBuyingPower() {
         String tradeableFunds = getAccount().getBuyingPower();
         JATbot.botLogger.info("Tradeable Funds: {}", tradeableFunds);
-        System.out.println("Tradeable Funds Logged" + "\n\n\n");
+        JATbot.botLogger.info("Tradeable Funds Logged" + "\n");
         return tradeableFunds;
 
     }
@@ -135,14 +136,14 @@ public class AlpacaController {
     public String logLongMarketValue() {
         String longMarketValue = getAccount().getLongMarketValue();
         JATbot.botLogger.info("Long Market Value: {}", longMarketValue);
-        System.out.println("Long Market Value Logged" + "\n\n\n");
+        JATbot.botLogger.info("Long Market Value Logged" + "\n");
         return longMarketValue;
 
     }
     public String logDayTradeLimit() {
         int dayTradeLimit = getAccount().getDaytradeCount();
         JATbot.botLogger.info("Day Trade Limit: {}", dayTradeLimit);
-        System.out.println("Day Trade Limit Logged" + "\n\n\n");
+        JATbot.botLogger.info("Day Trade Limit Logged" + "\n");
         return Integer.toString(dayTradeLimit);
 
     }
@@ -150,7 +151,7 @@ public class AlpacaController {
     public String logShortMarketValue() {
         String shortMarketValue = getAccount().getShortMarketValue();
         JATbot.botLogger.info("Short Market Value: {}", shortMarketValue);
-        System.out.println("Short Market Value Logged" + "\n\n\n");
+        JATbot.botLogger.info("Short Market Value Logged" + "\n");
         return shortMarketValue;
 
     }
@@ -158,7 +159,7 @@ public class AlpacaController {
     public String logEquity() {
         String equity = getAccount().getEquity();
         JATbot.botLogger.info("Equity: {}", equity);
-        System.out.println("Equity Logged" + "\n\n\n");
+        JATbot.botLogger.info("Equity Logged" + "\n");
         return equity;
 
     }
@@ -166,7 +167,7 @@ public class AlpacaController {
     public String logLastEquity() {
         String lastEquity = getAccount().getLastEquity();
         JATbot.botLogger.info("Last Equity: {}", lastEquity);
-        System.out.println("Last Equity Logged" + "\n\n\n");
+        JATbot.botLogger.info("Last Equity Logged" + "\n");
         return lastEquity;
 
     }
@@ -174,7 +175,7 @@ public class AlpacaController {
     public String logInitialMargin() {
         String initialMargin = getAccount().getInitialMargin();
         JATbot.botLogger.info("Initial Margin: {}", initialMargin);
-        System.out.println("Initial Margin Logged" + "\n\n\n");
+        JATbot.botLogger.info("Initial Margin Logged" + "\n");
         return initialMargin;
 
     }
@@ -182,7 +183,7 @@ public class AlpacaController {
     public String logMaintenanceMargin() {
         String maintenanceMargin = getAccount().getMaintenanceMargin();
         JATbot.botLogger.info("Maintenance Margin: {}", maintenanceMargin);
-        System.out.println("Maintenance Margin Logged" + "\n\n\n");
+        JATbot.botLogger.info("Maintenance Margin Logged" + "\n");
         return maintenanceMargin;
 
     }
@@ -190,7 +191,7 @@ public class AlpacaController {
     public String logLastMaintenanceMargin() {
         String lastMaintenanceMargin = getAccount().getLastMaintenanceMargin();
         JATbot.botLogger.info("Last Maintenance Margin: {}", lastMaintenanceMargin);
-        System.out.println("Last Maintenance Margin Logged" + "\n\n\n");
+        JATbot.botLogger.info("Last Maintenance Margin Logged" + "\n");
         return lastMaintenanceMargin;
 
     }
@@ -198,7 +199,7 @@ public class AlpacaController {
     public String logDayTradeCount() {
         int dayTradeCount = getAccount().getDaytradeCount();
         JATbot.botLogger.info("Day Trade Count: {}", dayTradeCount);
-        System.out.println("Day Trade Count Logged" + "\n\n\n");
+        JATbot.botLogger.info("Day Trade Count Logged" + "\n");
         return Integer.toString(dayTradeCount);
 
     }
@@ -206,7 +207,7 @@ public class AlpacaController {
     public String logCurrency() {
         String currency = getAccount().getCurrency();
         JATbot.botLogger.info("Currency: {}", currency);
-        System.out.println("Currency Logged" + "\n\n\n");
+        JATbot.botLogger.info("Currency Logged" + "\n");
         return currency;
     }
 
@@ -214,7 +215,6 @@ public class AlpacaController {
         try {
             // Get the market 'Clock' and print it out
             Clock clock = alpaca.clock().get();
-            JATbot.botLogger.info("Market Clock: {}", clock);
             return clock;
         } catch (AlpacaClientException exception) {
             exception.printStackTrace();
@@ -222,7 +222,7 @@ public class AlpacaController {
         }
     }
 
-    public Order placeTrade() {
+    public Order placeTrade(String sym, int vol, OrderSide side) {
         try {
             Order newOrder = alpaca.orders().requestMarketOrder(null, null, OrderSide.BUY, null);
             return newOrder;
@@ -231,6 +231,10 @@ public class AlpacaController {
         }
         return null;
     }
+
+
+    
+
 
     public void getAssets() {
 

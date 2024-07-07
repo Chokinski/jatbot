@@ -8,7 +8,8 @@ module JAT {
     requires transitive java.desktop;
     requires java.base;
     requires transitive commons.math3;
-    requires ctfxplotsplus;
+    requires transitive ctfxplotsplus;
+    
 
     opens JAT to javafx.fxml;
     exports JAT;

@@ -1,11 +1,9 @@
 package JAT;
 
-
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.time.Instant;
+import javafx.scene.shape.Circle;
 import java.time.LocalDate;
-import java.time.ZoneId;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -17,11 +15,7 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
-import java.awt.geom.Rectangle2D;
-
-
-import javafx.scene.canvas.GraphicsContext;
-
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
@@ -33,6 +27,7 @@ import javafx.scene.control.Slider;
 
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 
 import javafx.scene.layout.AnchorPane;
@@ -45,7 +40,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.paint.CycleMethod;
 import javafx.scene.paint.LinearGradient;
 import javafx.scene.paint.Stop;
-
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
@@ -65,7 +60,6 @@ import com.jat.PlotHandler;
 import com.jat.OHLCChart;
 import com.jat.OHLCData;
 
-
 /**
  * The DashController class is responsible for controlling the dashboard view of
  * the application.
@@ -76,38 +70,55 @@ import com.jat.OHLCData;
 public class DashController {
 
     @FXML
-    private VBox vbDash;
+    private Button btnBacktest;
+
+    @FXML
+    private Button btnCheckStatus;
+
+    @FXML
+    private Button btnDisconnect;
+
+    @FXML
+    private Button btnGetCrypto;
+
+    @FXML
+    private Button btnGetStock;
+
+    @FXML
+    private Button btnLogData;
+
+    @FXML
+    private Button btnReconnect;
+
+    @FXML
+    private Button btnSetText;
+
+    @FXML
+    private Button btnTryLogin;
+
+    @FXML
+    private Button btnBuy;
+
+    @FXML
+    private Button btnSell;
+
+    @FXML
+    private DatePicker dpEndDate;
+
+    @FXML
+    private DatePicker dpStartDate;
 
     @FXML
     private AnchorPane gradientSeparator;
-    @FXML
-    private AnchorPane nodeChart;
-    @FXML
-    private AnchorPane nodeToggle;
-    @FXML
-    private ScrollPane parentNode;
-
-    @FXML
-    private MenuButton menuChart;
-
-    @FXML
-    private javafx.scene.canvas.Canvas chartCanvas;
 
     @FXML
     private Label lblAPIstatus;
 
     @FXML
-    private Label lblCryptoStreamStatus;
-
-    @FXML
-    private Label lblStockStreamStatus;
-    @FXML
     private Label lblChecking;
-    @FXML
-    private Label lblMarketTime;
 
     @FXML
-    private Label lblTimeStatus;
+    private Label lblCryptoStreamStatus;
 
     @FXML
     private Label lblMarketIndicator;
@@ -116,21 +127,34 @@ public class DashController {
     private Label lblMarketIndicator1;
 
     @FXML
-    private Button btnCheckStatus;
+    private Label lblMarketTime;
+
     @FXML
-    private Button btnTryLogin;
+    private Label lblStockStreamStatus;
+
     @FXML
-    private Button btnDisconnect;
+    private Label lblTimeStatus;
+
     @FXML
-    private Button btnReconnect;
+    private ListView<String> lvAccTypes;
+
     @FXML
-    private Button btnGetCrypto;
+    private ListView<String> lvAccValues;
+
     @FXML
-    private Button btnGetStock;
+    private ListView<String> lvDataDisplay;
+
     @FXML
-    private Button btnLogData;
+    private MenuButton menuChart;
+
     @FXML
-    private Button btnBacktest;
+    private AnchorPane nodeChart;
+
+    @FXML
+    private AnchorPane nodeToggle;
+
+    @FXML
+    private ScrollPane parentNode;
 
     @FXML
     private Slider slideQuantity;
@@ -155,20 +179,12 @@ public class DashController {
 
     @FXML
     private ToggleButton tbtnDef4MON;
-    
-    @FXML
-    private ToggleButton tbtnHourly;
-    @FXML
-    private ToggleButton tbtnToggleStream;
-    @FXML
-    private Button btnSetTExt;
 
     @FXML
-    private ListView<String> lvAccTypes;
+    private ToggleButton tbtnHourly;
+
     @FXML
-    private ListView<String> lvAccValues;
-    @FXML
-    private ListView<String> lvDataDisplay;
+    private ToggleButton tbtnToggleStream;
 
     @FXML
     private TextField tfKey_ID;
@@ -178,24 +194,26 @@ public class DashController {
 
     @FXML
     private TextField tfSymboltoGet;
+    @FXML
+    private TextField tfVol;
+    @FXML
+    private VBox vbDash;
+    @FXML
+    private ImageView maxControl;
 
     @FXML
-    private DatePicker dpStartDate;
+    private AnchorPane exitControl;
 
-    @FXML
-    private DatePicker dpEndDate;
-    
-    
     private double xOffset;
     private double yOffset;
     // Variables to store the initial position of a drag event
     private double dragStartX;
     private double dragStartY;
-    
+
     // Variables to store the current translation of the chart
     private double translateX = 0.0;
     private double translateY = 0.0;
-    
+
     // Variables to store the current scale of the chart
     private double scaleX = 1.0;
     private double scaleY = 1.0;
@@ -206,22 +224,28 @@ public class DashController {
     private AlpacaController ac = new AlpacaController();
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
-    private Backtesting bt = new Backtesting(ac, 500);
+
     // private JFreeChart chart;
 
     @FXML
     public void initialize() throws IOException {
         try {
             this.streamListener = new StreamListener();
-            
-            
+            vbDash.setPrefSize(1044, 702);
+            vbDash.setMinSize(1044, 702);
+            vbDash.setMaxSize(1044, 702);
+
         } catch (Exception e) {
             JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
         }
-        
+
         // Add the strings to the ListView when the scene is loaded
-        
+
         Platform.runLater(() -> {
+            vbDash.setPrefSize(1044, 702);
+            vbDash.setMinSize(1044, 702);
+            vbDash.setMaxSize(1044, 702);
+            this.mainWindow.setFullScreenExitHint("tryhard...");
             ac = new AlpacaController();
             lblChecking.setText("");
             lvDataDisplay.getItems().addAll("");
@@ -229,34 +253,24 @@ public class DashController {
                     "Account ID", "Portfolio Value", "Account Created", "Account Status",
                     "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",
                     "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
-                    lvAccValues.getItems().addAll(ac.logAccID(), ac.logPortValue(),
+            lvAccValues.getItems().addAll(ac.logAccID(), ac.logPortValue(),
                     ac.logCreateDate(), ac.logAccStatus(),
                     ac.logAccCash(), ac.logBuyingPower(),
                     ac.logDayTradeCount(), ac.logDayTradeLimit(),
                     ac.logEquity(), ac.logInitialMargin(),
                     ac.logLastEquity(), ac.logLastMaintenanceMargin(),
                     "");
-                    //nodeChart.setMouseTransparent(true);
-                    //redrawChart();
-                    
-                    // Redraw the chart when the canvas size changes
-                    //chartCanvas.widthProperty().addListener(obs -> redrawChart());
-                    //chartCanvas.heightProperty().addListener(obs -> redrawChart());
-                    startGradientAnimation();
-                    animateBackgroundColor();
-                    startMarketTimeUpdate();});
+            // nodeChart.setMouseTransparent(true);
+            // redrawChart();
 
-    }
+            // Redraw the chart when the canvas size changes
+            // chartCanvas.widthProperty().addListener(obs -> redrawChart());
+            // chartCanvas.heightProperty().addListener(obs -> redrawChart());
+            startGradientAnimation();
 
-    private void redrawChart() {
-        GraphicsContext gc = chartCanvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, chartCanvas.getWidth(), chartCanvas.getHeight());
-        gc.save();
-        gc.translate(translateX, translateY);
-        gc.scale(scaleX, scaleY);
-        Rectangle2D drawArea = new Rectangle2D.Double(0, 0, chartCanvas.getWidth(), chartCanvas.getHeight());
-        // chart.draw(new FXGraphics2D(gc), drawArea);
-        gc.restore();
+            startMarketTimeUpdate();
+        });
+
     }
 
     @FXML
@@ -279,11 +293,57 @@ public class DashController {
     }
 
     @FXML
+    void onMaximize(MouseEvent event) {
+        Platform.runLater(() -> {
+            Screen screen = Screen.getPrimary();
+            Rectangle2D bounds = screen.getVisualBounds();
+            if (vbDash.getPrefWidth() == 1044 && vbDash.getPrefHeight() == 702) {
+                // Set vbDash to fullscreen
+                vbDash.setPrefWidth(bounds.getWidth());
+                vbDash.setPrefHeight(bounds.getHeight());
+                vbDash.setMinSize(bounds.getWidth(), bounds.getHeight());
+                vbDash.setMaxSize(bounds.getWidth(), bounds.getHeight());
+
+                // Set anchors to make vbDash fill the entire window
+                AnchorPane.setTopAnchor(vbDash, 0.0);
+                AnchorPane.setBottomAnchor(vbDash, 0.0);
+                AnchorPane.setLeftAnchor(vbDash, 0.0);
+                AnchorPane.setRightAnchor(vbDash, 0.0);
+
+                this.mainWindow.setFullScreen(true);
+
+                vbDash.getScene().setOnDragDetected(event1 -> event1.consume());
+            } else if (vbDash.getPrefWidth() == bounds.getWidth() && vbDash.getPrefHeight() == bounds.getHeight()) {
+                this.mainWindow.setFullScreen(false);
+                // Reset vbDash to default size
+                vbDash.setPrefWidth(1044);
+                vbDash.setPrefHeight(702);
+                vbDash.setMinSize(1044, 702);
+                vbDash.setMaxSize(1044, 702);
+                vbDash.getScene().setOnDragDetected(null);
+
+                this.mainWindow.centerOnScreen();
+                // Remove anchors to revert vbDash to its preferred size
+                AnchorPane.setTopAnchor(vbDash, null);
+                AnchorPane.setBottomAnchor(vbDash, null);
+                AnchorPane.setLeftAnchor(vbDash, null);
+                AnchorPane.setRightAnchor(vbDash, null);
+
+            }
+
+            // Request layout update
+            vbDash.getScene().getWindow().sizeToScene(); // Optional: Force the window to resize
+            vbDash.requestLayout(); // Force a layout update
+        });
+    }
+
+    @FXML
     void onBtnRetryLogin(ActionEvent event) {
 
         String keyID = tfKey_ID.getText();
         String secretKey = tfSec_ID.getText();
         // connect to Alpaca
+
         ac.connect();
         this.onReconnect(event);
 
@@ -388,40 +448,53 @@ public class DashController {
         streamListener.listenToCoin(Arrays.asList(tfSymboltoGet.getText()));
     }
 
+    private ObservableList<OHLCData> getUserDate(ActionEvent event) {
+        String sym = tfSymboltoGet.getText();
+        String startDate = dpStartDate.getValue().toString();
+        String endDate = dpEndDate.getValue().toString();
+        LocalDate startParse = LocalDate.parse(startDate);
+        LocalDate endParse = LocalDate.parse(endDate);
+
+        int startYear = startParse.getYear();
+        int startMonth = startParse.getMonthValue();
+        int startDay = startParse.getDayOfMonth();
+
+        int endYear = endParse.getYear();
+        int endMonth = endParse.getMonthValue();
+        int endDay = endParse.getDayOfMonth();
+
+        /*
+         * Debugging statements
+         * JATbot.botLogger.info("Start Date: " + startParse+"\nEnd Date: " + endParse+
+         * "\nStart Year: " + startYear+"\nStart Month: " + startMonth+"\nStart Day: " +
+         * startDay +
+         * "\nEnd Year: " + endYear+"\nEnd Month: " + endMonth+"\nEnd Day: " + endDay);
+         */
+        // Retrieve new data series
+        ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth,
+                endDay, selectedTimePeriod, selectedDuration);
+        return series;
+    }
+
     // Sets the text of the button
     @FXML
     void setText(ActionEvent event) {
         String sym = tfSymboltoGet.getText();
-        String startDate = dpStartDate.getValue().toString();
-        String endDate = dpEndDate.getValue().toString();
 
         try {
-            LocalDate startParse = LocalDate.parse(startDate);
-            LocalDate endParse = LocalDate.parse(endDate);
 
-            int startYear = startParse.getYear();
-            int startMonth = startParse.getMonthValue();
-            int startDay = startParse.getDayOfMonth();
+            // Clear existing chart from nodeChart if it exists
+            if (chart != null) {
+                nodeChart.getChildren().remove(chart);
+            }
 
-            int endYear = endParse.getYear();
-            int endMonth = endParse.getMonthValue();
-            int endDay = endParse.getDayOfMonth();
+            ObservableList<OHLCData> series = getUserDate(event);
 
-            // Debugging statements
-            JATbot.botLogger.info("Start Date: " + startParse);
-            JATbot.botLogger.info("End Date: " + endParse);
-            JATbot.botLogger.info("Start Year: " + startYear);
-            JATbot.botLogger.info("Start Month: " + startMonth);
-            JATbot.botLogger.info("Start Day: " + startDay);
-            JATbot.botLogger.info("End Year: " + endYear);
-            JATbot.botLogger.info("End Month: " + endMonth);
-            JATbot.botLogger.info("End Day: " + endDay);
-
-            ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth,
-                    endDay, selectedTimePeriod, selectedDuration);
+            // Create and show new OHLC chart
             this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
             this.chart = ph.getOHLCChart();
-            chart.setTitle(sym.toString());
+            this.chart.setTitle(sym);
+
         } catch (DateTimeParseException e) {
             System.err.println("Error parsing date: " + e.getMessage());
             // Handle the parsing error appropriately, e.g., show an error message to the
@@ -434,24 +507,22 @@ public class DashController {
 
     // Method to update the label with the market time
     public void updateMarketTimeLabel() {
-        //System.out.println("\nInside updateMarrkeTimeLabel.");
+        // System.out.println("\nInside updateMarrkeTimeLabel.");
         Clock clock = ac.getMarketTime();
         String formattedTime = formatMarketTime(clock); // Format the market time as needed
         Platform.runLater(() -> {
             lblMarketTime.setText(formattedTime);
-            if(clock.getIsOpen()) {
+            if (clock.getIsOpen() == true) {
                 lblMarketIndicator1.setText("OPEN");
                 lblMarketIndicator1.setTextFill(Color.GREEN);
                 lblTimeStatus.setText("Closes at: " + formattoHHMM(clock.getNextClose()));
-            } else {
+            } else if (clock.getIsOpen() == false) {
                 lblMarketIndicator1.setText("CLOSED");
                 lblMarketIndicator1.setTextFill(Color.RED);
                 lblTimeStatus.setText("Opens at: " + formattoHHMM(clock.getNextOpen()));
             }
         }); // Update label on JavaFX Application Thread
-        
 
-        
     }
 
     // Method to format the market time as needed
@@ -460,7 +531,7 @@ public class DashController {
         ZonedDateTime cur = clock.getTimestamp();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = formatter.format(cur);
-        //System.out.println("\n\n\nReceived and formatted to: " + formattedTime);
+        // System.out.println("\n\n\nReceived and formatted to: " + formattedTime);
         return formattedTime;
     }
 
@@ -474,7 +545,7 @@ public class DashController {
 
     // Method to start updating the market time label periodically
     public void startMarketTimeUpdate() {
-        //System.out.println("\nStarting market time update.");
+        // System.out.println("\nStarting market time update.");
         // Create a scheduled executor to periodically update the market time label
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
         executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 1, TimeUnit.SECONDS); // Update every second
@@ -498,18 +569,18 @@ public class DashController {
         timeline.play();
     }
 
-    public void animateBackgroundColor() {
-        // Find the node with the id nodeToggle
-        AnchorPane nodeToggle = (AnchorPane) vbDash.lookup("#nodeToggle");
+    @FXML
 
-        // Create a timeline for color animation
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(nodeToggle.backgroundProperty(), createGradient(0))),
-                new KeyFrame(Duration.seconds(4), new KeyValue(nodeToggle.backgroundProperty(), createGradient(50))),
-                new KeyFrame(Duration.seconds(8), new KeyValue(nodeToggle.backgroundProperty(), createGradient(100))));
-        timeline.setAutoReverse(true);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
+    public void onSell(ActionEvent event) {
+
+
+    
+    }
+
+    @FXML
+
+    public void onBuy(ActionEvent event) {
+
     }
 
     private Background createGradient(double stripePercentage) {
@@ -534,6 +605,46 @@ public class DashController {
         return new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY));
     }
 
+    public void animateBackgroundColor(boolean isCryptoSelected) {
+        // Find the node with the id nodeToggle
+        AnchorPane nodeToggle = (AnchorPane) vbDash.lookup("#nodeToggle");
+
+        // Define initial and final colors and radii based on stream choice
+        Color initialColor;
+        Color finalColor;
+        CornerRadii initialRadii;
+        CornerRadii finalRadii;
+
+        if (isCryptoSelected) {
+            // Transition to Crypto state
+            initialColor = Color.web("#f6f6f492");
+            finalColor = Color.web("#331872");
+            initialRadii = new CornerRadii(10, 15, 6, 10, false);
+            finalRadii = new CornerRadii(15, 10, 10, 6, false);
+        } else {
+            // Transition to Stocks state
+            initialColor = Color.web("#331872");
+            finalColor = Color.web("#f6f6f492");
+            initialRadii = new CornerRadii(15, 10, 10, 6, false);
+            finalRadii = new CornerRadii(10, 15, 6, 10, false);
+        }
+
+        // Create initial and final BackgroundFills
+        BackgroundFill startFill = new BackgroundFill(initialColor, initialRadii, Insets.EMPTY);
+        BackgroundFill endFill = new BackgroundFill(finalColor, finalRadii, Insets.EMPTY);
+
+        // Create a timeline for color and radius animation
+        Timeline timeline = new Timeline(
+                new KeyFrame(Duration.ZERO, new KeyValue(nodeToggle.backgroundProperty(), new Background(startFill))),
+                new KeyFrame(Duration.seconds(2),
+                        new KeyValue(nodeToggle.backgroundProperty(), new Background(endFill))));
+
+        timeline.setAutoReverse(false); // Set to false for a one-way transition
+        timeline.setCycleCount(1); // Play only once
+
+        timeline.play();
+    }
+
     @FXML
     public void onToggleStream(ActionEvent event) {
         ToggleButton selectedButton = (ToggleButton) event.getSource();
@@ -542,12 +653,13 @@ public class DashController {
         switch (buttonId) {
             case "tbtnToggleStream":
                 if (selectedButton.isSelected()) {
-                    animateBackgroundColor();
+                    animateBackgroundColor(true); // Transition to Crypto state
+                    selectedButton.setText("Crypto");
                     this.streamChoice = "Crypto";
-
                 } else {
+                    animateBackgroundColor(false); // Transition to Stocks state
+                    selectedButton.setText("Stocks");
                     this.streamChoice = "Stocks";
-                    
                 }
                 break;
             default:
@@ -611,14 +723,43 @@ public class DashController {
     @FXML
     public void onBacktest(ActionEvent event) throws IOException {
         String sym = tfSymboltoGet.getText();
-        bt.run(sym);
-        ObservableList<OHLCData> series = bt.getData(sym);
-        this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
-        this.chart = ph.getOHLCChart();
 
-        // Get the results from passResults() and add them to lvDataDisplay
-        String[] results = bt.passResults();
-        lvDataDisplay.getItems().addAll(results);
+        try {
+            // Create a new instance of Backtesting
+            Backtesting bt = new Backtesting(ac, 500);
+
+            // Get backtesting data for the symbol
+            ObservableList<OHLCData> series = getUserDate(event);
+
+            // Run backtesting for the symbol
+            bt.run(sym);
+
+            // Clear existing chart from nodeChart if it exists
+            if (chart != null) {
+                nodeChart.getChildren().remove(chart);
+            }
+
+            // Show the OHLC chart with backtesting results
+            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
+            this.chart = ph.getOHLCChart();
+            this.chart.setTitle(sym);
+
+            // Get the results from passResults() and add them to lvDataDisplay
+            String[] results = bt.passResults();
+            ObservableList<String> current = lvDataDisplay.getItems();
+            lvDataDisplay.getItems().clear();
+            lvDataDisplay.getItems().addAll(results);
+            lvDataDisplay.getItems().addAll(current);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            // Handle exceptions, e.g., display an error message
+        }
     }
 
+    @FXML
+    public void onExit(MouseEvent event) {
+        Platform.exit();
+
+    }
 }

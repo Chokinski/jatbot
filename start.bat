@@ -1,1 +1,1 @@
-java --module-path "C:\Program Files\Java\javafx-sdk-21.0.2\lib" --add-modules javafx.controls,javafx.fxml -jar "jatbot.jar"
+java --module-path "C:\Program Files\Java\javafx-sdk-21.0.2\lib" --add-modules javafx.controls,javafx.fxml -jar "E:\desktop\codeproject\repos\jatbot\jatbot\jatbot.jar"

@@ -82,7 +82,6 @@ public class Backtesting {
                 BarTimePeriod.MINUTE, 30);
     }
 
-
     public void outputResults(String[] results) {
         for (String result : results) {
             System.out.println(result);
