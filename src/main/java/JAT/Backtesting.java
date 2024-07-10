@@ -12,7 +12,8 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import javafx.collections.ObservableList;
-import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
+
+import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
 
 /*
  * This Backtesting class must be instance based
@@ -74,12 +75,17 @@ public class Backtesting {
     }
 
     public ObservableList<OHLCData> getData(String sym) {
-        return ac.getBarsData(sym,
-                LocalDate.of(2021, 1, 1).getYear(), LocalDate.of(2021, 1, 1).getMonthValue(),
-                LocalDate.of(2021, 1, 1).getDayOfMonth(),
-                LocalDate.of(2024, 3, 25).getYear(), LocalDate.of(2024, 3, 25).getMonthValue(),
-                LocalDate.of(2024, 3, 25).getDayOfMonth(),
-                BarTimePeriod.MINUTE, 30);
+        try {
+            return ac.getBarsData(sym,
+                    2021,1,1,
+                    2024,
+                    1,1,
+                    "D");
+        } catch (ApiException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return null;
     }
 
     public void outputResults(String[] results) {

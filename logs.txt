@@ -1,0 +1,44 @@
+
+E:\desktop\codeproject\repos\jatbot\jatbot>java --module-path "C:\Program Files\Java\javafx-sdk-21.0.2\lib" --add-modules javafx.controls,javafx.fxml -jar "E:\desktop\codeproject\repos\jatbot\jatbot\jatbot.jar"
+SLF4J(I): Connected with provider of type [org.slf4j.simple.SimpleServiceProvider]
+Exception in Application start method
+java.lang.RuntimeException: Exception in Application start method
+        at javafx.graphics@21.0.2/com.sun.javafx.application.LauncherImpl.launchApplication1(LauncherImpl.java:893)
+        at javafx.graphics@21.0.2/com.sun.javafx.application.LauncherImpl.lambda$launchApplication$2(LauncherImpl.java:196)
+        at java.base/java.lang.Thread.run(Thread.java:1583)
+Caused by: javafx.fxml.LoadException:
+file:/E:/desktop/codeproject/repos/jatbot/jatbot/jatbot.jar!/JAT/mainscene.fxml:14
+
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader.constructLoadException(FXMLLoader.java:2722)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader$ValueElement.processAttribute(FXMLLoader.java:946)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader$InstanceDeclarationElement.processAttribute(FXMLLoader.java:983)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader$Element.processStartElement(FXMLLoader.java:230)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader$ValueElement.processStartElement(FXMLLoader.java:757)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader.processStartElement(FXMLLoader.java:2853)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2649)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader.loadImpl(FXMLLoader.java:2563)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader.load(FXMLLoader.java:2531)
+        at JAT.JATbot.start(JATbot.java:72)
+        at javafx.graphics@21.0.2/com.sun.javafx.application.LauncherImpl.lambda$launchApplication1$9(LauncherImpl.java:839)
+        at javafx.graphics@21.0.2/com.sun.javafx.application.PlatformImpl.lambda$runAndWait$12(PlatformImpl.java:483)
+        at javafx.graphics@21.0.2/com.sun.javafx.application.PlatformImpl.lambda$runLater$10(PlatformImpl.java:456)
+        at java.base/java.security.AccessController.doPrivileged(AccessController.java:400)
+        at javafx.graphics@21.0.2/com.sun.javafx.application.PlatformImpl.lambda$runLater$11(PlatformImpl.java:455)
+        at javafx.graphics@21.0.2/com.sun.glass.ui.InvokeLaterDispatcher$Future.run(InvokeLaterDispatcher.java:95)
+        at javafx.graphics@21.0.2/com.sun.glass.ui.win.WinApplication._runLoop(Native Method)
+        at javafx.graphics@21.0.2/com.sun.glass.ui.win.WinApplication.lambda$runLoop$3(WinApplication.java:185)
+        ... 1 more
+Caused by: java.lang.reflect.InvocationTargetException
+        at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:74)
+        at java.base/java.lang.reflect.Constructor.newInstanceWithCaller(Constructor.java:502)
+        at java.base/java.lang.reflect.Constructor.newInstance(Constructor.java:486)
+        at javafx.fxml@21.0.2/javafx.fxml.FXMLLoader$ValueElement.processAttribute(FXMLLoader.java:941)
+        ... 17 more
+Caused by: java.lang.IllegalArgumentException: No enum constant net.jacobpeterson.alpaca.model.util.apitype.TraderAPIEndpointType.IEX
+        at java.base/java.lang.Enum.valueOf(Enum.java:293)
+        at net.jacobpeterson.alpaca.model.util.apitype.TraderAPIEndpointType.valueOf(TraderAPIEndpointType.java:8)
+        at JAT.AlpacaController.connect(AlpacaController.java:67)
+        at JAT.AlpacaController.<init>(AlpacaController.java:46)
+        at JAT.Controller.<init>(Controller.java:58)
+        at java.base/jdk.internal.reflect.DirectConstructorHandleAccessor.newInstance(DirectConstructorHandleAccessor.java:62)
+        ... 20 more

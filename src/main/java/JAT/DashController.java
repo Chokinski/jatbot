@@ -1,13 +1,14 @@
 package JAT;
 
 import java.io.IOException;
-import javafx.scene.shape.Circle;
-import java.time.LocalDate;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDate;
+import java.time.OffsetDateTime;
+
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.Set;
 
 import javafx.application.Platform;
 
@@ -43,8 +44,7 @@ import javafx.scene.paint.Stop;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 
-import net.jacobpeterson.alpaca.model.endpoint.clock.Clock;
-import net.jacobpeterson.alpaca.model.endpoint.marketdata.common.historical.bar.enums.BarTimePeriod;
+import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
@@ -218,7 +218,7 @@ public class DashController {
     private double scaleX = 1.0;
     private double scaleY = 1.0;
     private String streamChoice = "Stocks";
-    private BarTimePeriod selectedTimePeriod = BarTimePeriod.DAY; // Default value
+    private String selectedTimePeriod = "1D"; // Default value
     private int selectedDuration = 1; // Default value
     private StreamListener streamListener;
     private AlpacaController ac = new AlpacaController();
@@ -434,7 +434,7 @@ public class DashController {
 
     @FXML
     void onGetStock(ActionEvent event) {
-        streamListener.listenToStock(Arrays.asList(tfSymboltoGet.getText()));
+        streamListener.listenToStock(Set.of(tfSymboltoGet.getText()));
     }
 
     public void updateTokenDisplay(String text) {
@@ -445,10 +445,10 @@ public class DashController {
 
     @FXML
     void onGetCrypto() {
-        streamListener.listenToCoin(Arrays.asList(tfSymboltoGet.getText()));
+        streamListener.listenToCoin(Set.of(tfSymboltoGet.getText()));
     }
 
-    private ObservableList<OHLCData> getUserDate(ActionEvent event) {
+    private ObservableList<OHLCData> getUserDate(ActionEvent event) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException{
         String sym = tfSymboltoGet.getText();
         String startDate = dpStartDate.getValue().toString();
         String endDate = dpEndDate.getValue().toString();
@@ -472,7 +472,7 @@ public class DashController {
          */
         // Retrieve new data series
         ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth,
-                endDay, selectedTimePeriod, selectedDuration);
+                endDay,selectedTimePeriod);
         return series;
     }
 
@@ -528,14 +528,14 @@ public class DashController {
     // Method to format the market time as needed
     private String formatMarketTime(Clock clock) {
         // System.out.println("\n\nInside formatter....");
-        ZonedDateTime cur = clock.getTimestamp();
+        OffsetDateTime cur = clock.getTimestamp();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = formatter.format(cur);
         // System.out.println("\n\n\nReceived and formatted to: " + formattedTime);
         return formattedTime;
     }
 
-    private String formattoHHMM(ZonedDateTime time) {
+    private String formattoHHMM(OffsetDateTime time) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
         String formattedTime = formatter.format(time);
         return formattedTime;
@@ -675,39 +675,36 @@ public class DashController {
 
         switch (buttonId) {
             case "tbtnDef1D":
-                selectedTimePeriod = BarTimePeriod.DAY;
+                selectedTimePeriod = "D";
                 selectedDuration = 1;
                 JATbot.botLogger.info("1D selected");
                 break;
             case "tbtnDef1MIN":
-                selectedTimePeriod = BarTimePeriod.MINUTE;
+                selectedTimePeriod = "T";
                 JATbot.botLogger.info("1MIN selected");
                 break;
             case "tbtnDef1MON":
-                selectedTimePeriod = BarTimePeriod.MONTH;
+                selectedTimePeriod = "M";
                 JATbot.botLogger.info("1MON selected");
                 break;
             case "tbtnDef1W":
-                selectedTimePeriod = BarTimePeriod.WEEK;
+                selectedTimePeriod = "W";
                 JATbot.botLogger.info("1W selected");
                 break;
             case "tbtnDef1Y":
-                selectedTimePeriod = BarTimePeriod.MONTH;
+                selectedTimePeriod = "12Month";
                 JATbot.botLogger.info("1Y selected");
                 break;
             case "tbtnDef4H":
-                selectedTimePeriod = BarTimePeriod.HOUR;
-                selectedDuration = 4;
+                selectedTimePeriod = "4Hour";
                 JATbot.botLogger.info("4H selected");
                 break;
             case "tbtnDef4MON":
-                selectedTimePeriod = BarTimePeriod.MONTH;
-                selectedDuration = 4;
+                selectedTimePeriod = "4Month";
                 JATbot.botLogger.info("4MON selected");
                 break;
             case "tbtnHourly":
-                selectedTimePeriod = BarTimePeriod.HOUR;
-                selectedDuration = 1;
+                selectedTimePeriod = "H";
                 JATbot.botLogger.info("Hourly selected");
                 break;
             default:
