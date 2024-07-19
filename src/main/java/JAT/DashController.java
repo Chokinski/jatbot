@@ -1,60 +1,28 @@
 package JAT;
-
 import java.io.IOException;
-
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
-
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Arrays;
 import java.util.Set;
-
 import javafx.application.Platform;
-
+import javafx.scene.control.*;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.control.Button;
-import javafx.scene.control.DatePicker;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.MenuButton;
-import javafx.scene.control.PasswordField;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Slider;
-
-import javafx.scene.control.TextField;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
-
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.CornerRadii;
-
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
+import javafx.scene.layout.*;
+import javafx.scene.paint.*;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
-
-import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
-
-import javafx.animation.KeyFrame;
-import javafx.animation.KeyValue;
-import javafx.animation.Timeline;
-import javafx.animation.PauseTransition;
+import javafx.animation.*;
 import javafx.util.Duration;
-
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
@@ -218,7 +186,7 @@ public class DashController {
     private double scaleX = 1.0;
     private double scaleY = 1.0;
     private String streamChoice = "Stocks";
-    private String selectedTimePeriod = "1D"; // Default value
+    private String selectedTimePeriod = "1Day"; // Default value
     private int selectedDuration = 1; // Default value
     private StreamListener streamListener;
     private AlpacaController ac = new AlpacaController();
@@ -675,24 +643,24 @@ public class DashController {
 
         switch (buttonId) {
             case "tbtnDef1D":
-                selectedTimePeriod = "D";
+                selectedTimePeriod = "1Day";
                 selectedDuration = 1;
                 JATbot.botLogger.info("1D selected");
                 break;
             case "tbtnDef1MIN":
-                selectedTimePeriod = "T";
+                selectedTimePeriod = "1Min";
                 JATbot.botLogger.info("1MIN selected");
                 break;
             case "tbtnDef1MON":
-                selectedTimePeriod = "M";
+                selectedTimePeriod = "1M";
                 JATbot.botLogger.info("1MON selected");
                 break;
             case "tbtnDef1W":
-                selectedTimePeriod = "W";
+                selectedTimePeriod = "1Week";
                 JATbot.botLogger.info("1W selected");
                 break;
             case "tbtnDef1Y":
-                selectedTimePeriod = "12Month";
+                selectedTimePeriod = "12M";
                 JATbot.botLogger.info("1Y selected");
                 break;
             case "tbtnDef4H":
@@ -700,11 +668,11 @@ public class DashController {
                 JATbot.botLogger.info("4H selected");
                 break;
             case "tbtnDef4MON":
-                selectedTimePeriod = "4Month";
+                selectedTimePeriod = "4M";
                 JATbot.botLogger.info("4MON selected");
                 break;
             case "tbtnHourly":
-                selectedTimePeriod = "H";
+                selectedTimePeriod = "1Hour";
                 JATbot.botLogger.info("Hourly selected");
                 break;
             default:
