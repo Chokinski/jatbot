@@ -255,8 +255,8 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 .axis {
     -fx-minor-tick-visible: true;
     -fx-minor-tick-length: 3.0px;
-    -fx-tick-label-fill: #bdbdbd;
-    -fx-tick-mark-stroke: #bdbdbd;
+    -fx-tick-label-fill: #ffffff;
+    -fx-tick-mark-stroke: #ffffff;
     -fx-tick-label-gap: 10.0px;
 }
 

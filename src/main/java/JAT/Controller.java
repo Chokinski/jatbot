@@ -58,7 +58,7 @@ public class Controller {
     AlpacaController ac = new AlpacaController();
     public boolean rememberMe;
     Properties properties = new Properties();
-    InputStream jatConfig = getClass().getResourceAsStream("/JAT/JATconfig.properties");
+    final InputStream jatConfig = getClass().getResourceAsStream("/JAT/JATconfig.properties");
     private double yOffset;
     private double xOffset;
     @FXML
@@ -72,8 +72,8 @@ public class Controller {
             if (checked) {
                 // Load the keys from the alpaca.properties file
                 Properties alpacaProperties = new Properties();
-                try (InputStream alpacaIn = getClass().getResourceAsStream("/JAT/alpaca.properties")) {
-                    alpacaProperties.load(alpacaIn);
+                try (jatConfig) {
+                    alpacaProperties.load(jatConfig);
                 }
     
                 tfKey_ID.setText(alpacaProperties.getProperty("key_id"));
@@ -133,10 +133,8 @@ public class Controller {
                 String keyID = tfKey_ID.getText();
                 String secretKey = tfSec_ID.getText();
 
-                // Load the properties file
-                InputStream in = getClass().getResourceAsStream("/JAT/alpaca.properties");
-                properties.load(in);
-                in.close();
+                properties.load(jatConfig);
+                jatConfig.close();
 
                 // Set the new values
                 properties.setProperty("key_id", keyID);

@@ -47,7 +47,7 @@ public class AlpacaController {
     }
 
     public String[] loadProperties() {
-        try (InputStream alpacaIn = getClass().getResourceAsStream("/JAT/alpaca.properties")){
+        try (InputStream alpacaIn = getClass().getResourceAsStream("/JAT/JATconfig.properties")){
             Properties properties = new Properties();
             properties.load(alpacaIn);
             String keyID = properties.getProperty("key_id");
@@ -56,9 +56,9 @@ public class AlpacaController {
             String source = properties.getProperty("source");
             return new String[]{keyID, secretKey, type, source};
         } catch (FileNotFoundException exception) {
-            JATbot.botLogger.error("Erorr loading properties, File/Path Not Found:" + exception.getMessage());
+            JATbot.botLogger.error("\nErorr loading properties, File/Path Not Found:" + exception.getMessage());
         } catch (IOException exception) {
-            JATbot.botLogger.error("Erorr loading properties, IO exception:" + exception.getMessage());
+            JATbot.botLogger.error("\nErorr loading properties, IO exception:" + exception.getMessage());
     }
     return null;
 }

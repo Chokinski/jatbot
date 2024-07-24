@@ -20,8 +20,7 @@ public class SupportResistanceStrategy {
 
     private List<OHLCData> barsData;
 
-    public SupportResistanceStrategy(String symbol, double initialCapital, List<OHLCData> barsData) {
-        this.symbol = symbol;
+    public SupportResistanceStrategy(double initialCapital, List<OHLCData> barsData) {
         this.barsData = barsData;
         this.accountBalance = initialCapital;
         this.initialCapital = initialCapital;

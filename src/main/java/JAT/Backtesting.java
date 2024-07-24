@@ -62,7 +62,7 @@ public class Backtesting {
 
     public void run(String symbol) {
         barsData = getData(symbol);
-        this.SRstrat = new SupportResistanceStrategy(symbol, initialCapital, barsData);
+        this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData);
         System.out.println("\n\nRunning backtest for " + symbol);
         
         try {
@@ -99,7 +99,7 @@ public class Backtesting {
             BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"));
             JATbot.botLogger.info("Writing results to file path: data.txt/src/main/java/JAT/data.txt");
             for (OHLCData l : data) {
-
+                System.out.println("\nWriting data to file: " + l);
                 writer.write(l + "\n");
             }
             writer.close();
