@@ -6,13 +6,17 @@ import net.jacobpeterson.alpaca.model.util.apitype.MarketDataWebsocketSourceType
 import net.jacobpeterson.alpaca.model.util.apitype.TraderAPIEndpointType;
 import okhttp3.OkHttpClient;
 
-import java.io.FileNotFoundException;
+import java.io.BufferedReader;
+
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
-import java.time.ZonedDateTime;
+
 import java.time.format.DateTimeFormatter;
 
 import java.util.List;
@@ -26,13 +30,25 @@ import net.jacobpeterson.alpaca.openapi.trader.ApiException;
 
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
+import java.nio.ByteBuffer;
+import java.nio.channels.AsynchronousFileChannel;
+import java.nio.channels.CompletionHandler;
+
+
+import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import com.jat.OHLCData;
 
 
 public class AlpacaController {
     public static AlpacaAPI alpaca;
     private OkHttpClient okClient;
-
+    Path jatDir = Paths.get(System.getProperty("user.home"), "JAT");
+    final Path jatConfigPath = Paths.get(System.getProperty("user.home"), "JAT", "JATconfig.properties");
+    
     /**
      * Connects to the Alpaca API using the properties specified in the
      * "alpaca.properties" file.
@@ -40,32 +56,164 @@ public class AlpacaController {
      * If an IO exception occurs while loading the properties, an IOException is
      * thrown.
      */
-
+    
     public AlpacaController() {
         this.okClient = new OkHttpClient();
         this.connect();
     }
-
+    
     public String[] loadProperties() {
-        try (InputStream alpacaIn = getClass().getResourceAsStream("/JAT/JATconfig.properties")){
-            Properties properties = new Properties();
-            properties.load(alpacaIn);
+        //check if JAT directory exists, if not create it
+        if (!Files.exists(jatDir)) {
+            try {Files.createDirectory(jatDir);}
+            catch (IOException e) {JATbot.botLogger.error("Error creating JAT directory: " + e.getMessage());}
+        }
+        Properties properties = new Properties();
+
+        try (BufferedReader reader = Files.newBufferedReader(jatConfigPath)) {
+            String line;
+            StringBuilder sb = new StringBuilder();
+
+            // Read the file line by line and skip the line containing "jarPath"
+            while ((line = reader.readLine()) != null) {
+                if (!line.startsWith("jarPath")) {
+                    sb.append(line).append(System.lineSeparator());
+                }
+            }
+
+            // Load properties from the filtered content
+            properties.load(new java.io.StringReader(sb.toString()));
+            if (!properties.containsKey("key_id") || !properties.containsKey("secret_key") || !properties.containsKey("type") || !properties.containsKey("source") || !properties.containsKey("remMe")) {
+                JATbot.botLogger.error("Error loading properties: key_id, secret_key, type, or source not found");
+
+                properties = writeProps(jatConfigPath, properties);
+            }
             String keyID = properties.getProperty("key_id");
             String secretKey = properties.getProperty("secret_key");
             String type = properties.getProperty("type");
             String source = properties.getProperty("source");
-            return new String[]{keyID, secretKey, type, source};
-        } catch (FileNotFoundException exception) {
-            JATbot.botLogger.error("\nErorr loading properties, File/Path Not Found:" + exception.getMessage());
-        } catch (IOException exception) {
-            JATbot.botLogger.error("\nErorr loading properties, IO exception:" + exception.getMessage());
+            String remMe = properties.getProperty("remMe");
+
+            return new String[]{keyID, secretKey, type, source,remMe};
+        } catch (IOException e) {
+            JATbot.botLogger.error("\nError loading properties, IO exception: " + e.getMessage());
+        }
+
+        return null;
     }
-    return null;
+
+    public Properties writeProps(Path config, Properties props) {
+// Default values for the properties
+String defaultKeyID = "PKIUYM93AMQV3N07CB98";
+String defaultSecretKey = "6BZJEPXFWxcldcpXazine3Kewsj1hyklumDriqJa";
+String defaultType = "PAPER";
+String defaultSource = "IEX";
+String defaultRemMe = "true"; // Replace with the actual default value if any
+
+Map<String, String> defaultValues = new HashMap<>();
+defaultValues.put("key_id", defaultKeyID);
+defaultValues.put("secret_key", defaultSecretKey);
+defaultValues.put("type", defaultType);
+defaultValues.put("source", defaultSource);
+defaultValues.put("remMe", defaultRemMe);
+
+// Set the properties if they don't already exist
+for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
+    props.putIfAbsent(entry.getKey(), entry.getValue());
 }
+        try {
+            // Read the existing content of the file
+            StringBuilder sb = new StringBuilder();
+            if (Files.exists(config)) {
+                try (BufferedReader reader = Files.newBufferedReader(config)) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("jarPath")) {
+                            sb.append(line).append(System.lineSeparator());
+                        }
+                    }
+                }
+            }
+
+            // Append the new properties to the StringBuilder
+            for (String key : props.stringPropertyNames()) {
+                sb.append(key).append("=").append(props.getProperty(key)).append(System.lineSeparator());
+            }
+
+            // Convert the StringBuilder content to a ByteBuffer
+            ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+
+            // Write the buffer to the file asynchronously
+            try (AsynchronousFileChannel aChannel = AsynchronousFileChannel.open(config, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+                CompletableFuture<Void> writeFuture = new CompletableFuture<>();
+                aChannel.write(buffer, 0, null, new CompletionHandler<Integer, Void>() {
+                    @Override
+                    public void completed(Integer result, Void attachment) {
+                        writeFuture.complete(null);
+                    }
+
+                    @Override
+                    public void failed(Throwable exc, Void attachment) {
+                        writeFuture.completeExceptionally(exc);
+                    }
+                });
+                writeFuture.get();
+            }
+
+            return props;
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            JATbot.botLogger.error("Error writing properties: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        return null;
+    }
+    // New method to modify a single property
+    public void modifyProperty(Path config, String key, String value) {
+        Properties props = new Properties();
+        try (BufferedReader reader = Files.newBufferedReader(config)) {
+            props.load(reader);
+        } catch (IOException e) {
+            JATbot.botLogger.error("Error loading properties: " + e.getMessage());
+        }
+
+        props.setProperty(key, value);
+
+        try {
+            // Convert the properties to a StringBuilder
+            StringBuilder sb = new StringBuilder();
+            for (String propKey : props.stringPropertyNames()) {
+                sb.append(propKey).append("=").append(props.getProperty(propKey)).append(System.lineSeparator());
+            }
+
+            // Convert the StringBuilder content to a ByteBuffer
+            ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+
+            // Write the buffer to the file asynchronously
+            try (AsynchronousFileChannel aChannel = AsynchronousFileChannel.open(config, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
+                CompletableFuture<Void> writeFuture = new CompletableFuture<>();
+                aChannel.write(buffer, 0, null, new CompletionHandler<Integer, Void>() {
+                    @Override
+                    public void completed(Integer result, Void attachment) {
+                        writeFuture.complete(null);
+                    }
+
+                    @Override
+                    public void failed(Throwable exc, Void attachment) {
+                        writeFuture.completeExceptionally(exc);
+                    }
+                });
+                writeFuture.get();
+            }
+        } catch (IOException | InterruptedException | ExecutionException e) {
+            JATbot.botLogger.error("Error writing properties: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     public AlpacaAPI connect() {
         String[] props = loadProperties();
         alpaca = new AlpacaAPI(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]), MarketDataWebsocketSourceType.valueOf(props[3]));
-            return alpaca;
+        return alpaca;
             
 }
 

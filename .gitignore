@@ -99,7 +99,7 @@ javafx-sdk-21.0.2/legal/javafx.web/libxslt.md
 javafx-sdk-21.0.2/legal/javafx.web/LICENSE
 javafx-sdk-21.0.2/legal/javafx.web/webkit.md
 target/classes/module-info.class
-target/classes/JAT/alpaca.properties
+target/classes/JAT/JATconfig.properties
 target/classes/JAT/AlpacaController.class
 target/classes/JAT/Backtesting.class
 target/classes/JAT/Controller.class
@@ -107,4 +107,4 @@ target/classes/JAT/DashController.class
 target/classes/JAT/dashscene.fxml
 target/classes/JAT/JATconfig.properties
 target/classes/JAT/styles.css
-
+src/main/resources/JAT/JATconfig.properties

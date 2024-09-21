@@ -1,16 +1,11 @@
 package JAT;
                          
 import com.jat.OHLCData;
-import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
+
 import java.io.IOException;
-import java.time.LocalDate;
-import java.util.List;
+
+import java.util.concurrent.ExecutionException;
 import javafx.collections.ObservableList;
 
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
@@ -21,9 +16,6 @@ import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
  * 
  * 
  */
-
-
-
 public class Backtesting {
     private ObservableList<OHLCData> barsData;
     private double initialCapital;
@@ -39,7 +31,8 @@ public class Backtesting {
         AlpacaController ac = new AlpacaController();
         Backtesting backtesting = new Backtesting(ac, 500);
 
-        backtesting.run("AAPL");
+        backtesting.run("NVDA");
+        //OHLCParser.parseFile(null);
         /*backtesting.run("TSLA");
         backtesting.run("GME");
         backtesting.run("AMD");
@@ -55,32 +48,31 @@ public class Backtesting {
         backtesting.run("NFLX");
         backtesting.run("MSFT");
         backtesting.run("GOOGL");*/
-        
-        
-        
     }
 
     public void run(String symbol) {
         barsData = getData(symbol);
-        this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData);
+        this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData, symbol);
         System.out.println("\n\nRunning backtest for " + symbol);
         
         try {
+            OHLCParser.writeResultsUsingStandardOutput(barsData);
+            
             outputResults(passResults());
-            writeResultsUsingStandardOutput(barsData);
-        } catch (IOException e) {
+            OHLCParser.parseFile(null);
+        } catch (IOException| ExecutionException | InterruptedException e) {
             JATbot.botLogger.error("Error writing results to file");
-
+            
         }
     }
 
     public ObservableList<OHLCData> getData(String sym) {
         try {
             return ac.getBarsData(sym,
-                    2021,1,1,
+                    2023,1,1,
                     2024,
-                    1,1,
-                    "D");
+                    07,9,
+                    "30Min");
         } catch (ApiException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
@@ -92,22 +84,10 @@ public class Backtesting {
         for (String result : results) {
             System.out.println(result);
         }
-        SRstrat.printTradesSummary();
+        //SRstrat.printTradesSummary();
     }
-    public void writeResultsUsingStandardOutput(ObservableList<OHLCData> data) throws IOException {
-        try(FileOutputStream fileOutputStream = new FileOutputStream("data.txt")){
-            BufferedWriter writer = new BufferedWriter(new FileWriter("data.txt"));
-            JATbot.botLogger.info("Writing results to file path: data.txt/src/main/java/JAT/data.txt");
-            for (OHLCData l : data) {
-                System.out.println("\nWriting data to file: " + l);
-                writer.write(l + "\n");
-            }
-            writer.close();
-        }
-        catch (FileNotFoundException e) {
-            JATbot.botLogger.error("File not found");
-        }
-    }
+
+
 
     public String[] passResults() {
         return SRstrat.getFormattedResults();

@@ -9,6 +9,7 @@ module JAT {
     requires java.base;
     requires transitive commons.math3;
     requires transitive ctfxplotsplus;
+    requires java.sql;
     
 
     opens JAT to javafx.fxml;

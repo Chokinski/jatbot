@@ -99,7 +99,7 @@ public class JATbot extends Application {
                 e.printStackTrace();
             }
         }
-
+        
           /*AlpacaController.logCreateDate();
           AlpacaController.logPortValue();
           AlpacaController.logStatus();

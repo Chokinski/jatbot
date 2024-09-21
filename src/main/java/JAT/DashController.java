@@ -28,6 +28,7 @@ import com.jat.PlotHandler;
 import com.jat.OHLCChart;
 import com.jat.OHLCData;
 
+
 /**
  * The DashController class is responsible for controlling the dashboard view of
  * the application.

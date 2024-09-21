@@ -1,10 +1,10 @@
 package JAT;
 import java.io.File;
-import java.io.FileInputStream;
+
 
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+
 import java.util.Properties;
 
 
@@ -22,6 +22,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
+import java.nio.file.Path;
 
 
 // This controller belongs to the login scene
@@ -58,39 +59,37 @@ public class Controller {
     AlpacaController ac = new AlpacaController();
     public boolean rememberMe;
     Properties properties = new Properties();
-    final InputStream jatConfig = getClass().getResourceAsStream("/JAT/JATconfig.properties");
+    Path config = ac.jatConfigPath;
+
     private double yOffset;
     private double xOffset;
     @FXML
     void initialize() {
         // Load the state of the checkbox when the program starts
         try {
-            properties.load(jatConfig);
-            boolean checked = Boolean.parseBoolean(properties.getProperty("rememberMe"));
+            String[] propertiesArray = ac.loadProperties();
+            boolean checked = Boolean.parseBoolean(propertiesArray[4]);
+            JATbot.botLogger.info("Remember me: " + checked);
             chkRemember.setSelected(checked);
             rememberMe = checked; // Update the rememberMe variable
             if (checked) {
-                // Load the keys from the alpaca.properties file
-                Properties alpacaProperties = new Properties();
-                try (jatConfig) {
-                    alpacaProperties.load(jatConfig);
-                }
-    
-                tfKey_ID.setText(alpacaProperties.getProperty("key_id"));
-                tfSec_ID.setText(alpacaProperties.getProperty("secret_key"));
+                tfKey_ID.setText(propertiesArray[0]);
+                tfSec_ID.setText(propertiesArray[1]);
             }
-        } catch (IOException e) {e.printStackTrace();}
-
-
+        } catch (Exception e) {
+            e.printStackTrace();
+            
+        }
     }
     
     @FXML
     void onClose(ActionEvent event) {
         // Save the state of the checkbox when the program is closed
-        try (FileOutputStream out = new FileOutputStream(new File("src/main/resources/JAT/JATconfig.properties"))) {
-            properties.setProperty("rememberMe", String.valueOf(chkRemember.isSelected()));
-            properties.store(out, null);
-        } catch (IOException e) {
+        try {
+            // Modify the specific property using the existing method
+            ac.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
+        } catch (Exception e) {
+            JATbot.botLogger.error("Error updating rememberMe property on close: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -111,8 +110,9 @@ public class Controller {
         if (rememberMe) {
             try {
                 // Load the properties file
-                tfKey_ID.setText(ac.loadProperties()[0]);
-                tfSec_ID.setText(ac.loadProperties()[1]);
+                String[] propertiesArray = ac.loadProperties();
+                tfKey_ID.setText(propertiesArray[0]);
+                tfSec_ID.setText(propertiesArray[1]);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
                 Parent root = loader.load();
                 DashController dashController = loader.getController();
@@ -122,70 +122,46 @@ public class Controller {
                 mainWindow.setScene(scene);
                 mainWindow.setResizable(true);
                 mainWindow.centerOnScreen();
-
+    
             } catch (IOException e) {
-                
-                JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}",e.getMessage());
-                //JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
+                JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}", e.getMessage());
             }
         } else {
             try {
                 String keyID = tfKey_ID.getText();
                 String secretKey = tfSec_ID.getText();
-
-                properties.load(jatConfig);
-                jatConfig.close();
-
-                // Set the new values
-                properties.setProperty("key_id", keyID);
-                properties.setProperty("secret_key", secretKey);
-
-                // Save the properties file
-                try (FileOutputStream out = new FileOutputStream(new File("src/main/resources/JAT/alpaca.properties"))) {
-                    properties.store(out, null);
-                }
-
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("dashscene.fxml"));
-                Parent root = loader.load();
-                DashController dashController = loader.getController();
-                dashController.setMainWindow(mainWindow);
-                Scene scene = new Scene(root);
-                mainWindow.setScene(scene);
-                mainWindow.setResizable(true);
-                mainWindow.centerOnScreen();
-
+    
+                Properties props = new Properties();
+                props.setProperty("key_id", keyID);
+                props.setProperty("secret_key", secretKey);
+    
+                ac.writeProps(config, props);
+    
+                loadscene();
+    
             } catch (IOException e) {
-                JATbot.botLogger.error("Invalid credentials...\n\nPrinting stack: \n{}",e.getMessage());
+                JATbot.botLogger.error("Invalid credentials...\n\nPrinting stack: \n{}", e.getMessage());
             }
         }
     }
-
+    
     @FXML
     void onRememberMe(ActionEvent event) {
         try {
-            // Load the properties file
-            InputStream in = getClass().getResourceAsStream("/JAT/JATconfig.properties");
-            properties.load(in);
-
-            // Set the new value
-            properties.setProperty("rememberMe", String.valueOf(chkRemember.isSelected()));
-
-            // Save the properties file
-            try (FileOutputStream out = new FileOutputStream(new File("src/main/resources/JAT/JATconfig.properties"))) {
-                properties.store(out, null);
-            }
-        } catch (IOException e) {
-            JATbot.botLogger.error("Login Failed.. Printing stack: \n{}",e.getMessage());
+            // Modify the specific property
+            ac.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
+        } catch (Exception e) {
+            JATbot.botLogger.error("Error updating rememberMe property: " + e.getMessage());
         }
     }
-
+    
 
     @FXML
     void onDragged(MouseEvent event) {
         mainWindow.setX(event.getScreenX() - xOffset);
         mainWindow.setY(event.getScreenY() - yOffset);
     }
-
+    
     @FXML
     void onPressed(MouseEvent event) {
         xOffset = event.getSceneX();
@@ -193,18 +169,28 @@ public class Controller {
     }
     
     private Stage mainWindow;
-
+    
     public void setMainWindow(Stage mainWindow) {
         this.mainWindow = mainWindow;
     }
-
+    public void loadscene() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
+        Parent root = loader.load();
+        DashController dashController = loader.getController();
+        dashController.setMainWindow(mainWindow);
+        Scene scene = new Scene(root);
+        mainWindow.setScene(scene);
+        mainWindow.setResizable(true);
+        mainWindow.centerOnScreen();
+    }
+    
     /*
-     * if (alpacaAPI.stockMarketDataStreaming().isValid()) 
-     * { stockvalidlabel green text valid else red text invalid }
-     * if (alpacaAPI.stockMarketDataStreaming().isConnected())
-     * if alpacaAPI {APIlabel text green connected else red disconnected}
-     * 
-     */
+    * if (alpacaAPI.stockMarketDataStreaming().isValid()) 
+    * { stockvalidlabel green text valid else red text invalid }
+    * if (alpacaAPI.stockMarketDataStreaming().isConnected())
+    * if alpacaAPI {APIlabel text green connected else red disconnected}
+    * 
+    */
 }
 
 
