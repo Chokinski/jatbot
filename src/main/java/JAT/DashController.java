@@ -159,6 +159,9 @@ public class DashController {
     private TextField tfKey_ID;
 
     @FXML
+    private TextField tfDur;
+
+    @FXML
     private PasswordField tfSec_ID;
 
     @FXML
@@ -172,6 +175,8 @@ public class DashController {
 
     @FXML
     private AnchorPane exitControl;
+    @FXML 
+    private ChoiceBox cbPD;
 
     private double xOffset;
     private double yOffset;
@@ -222,13 +227,14 @@ public class DashController {
                     "Account ID", "Portfolio Value", "Account Created", "Account Status",
                     "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",
                     "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
-            lvAccValues.getItems().addAll(ac.logAccID(), ac.logPortValue(),
-                    ac.logCreateDate(), ac.logAccStatus(),
-                    ac.logAccCash(), ac.logBuyingPower(),
-                    ac.logDayTradeCount(), ac.logDayTradeLimit(),
-                    ac.logEquity(), ac.logInitialMargin(),
-                    ac.logLastEquity(), ac.logLastMaintenanceMargin(),
+            lvAccValues.getItems().addAll(ac.getAccID(), ac.getPortValue(),
+                    ac.getCreateDate(), ac.getAccStatus(),
+                    ac.getAccCash(), ac.getBuyingPower(),
+                    ac.getDayTradeCount(), ac.getDayTradeLimit(),
+                    ac.getEquity(), ac.getInitialMargin(),
+                    ac.getLastEquity(), ac.getLastMaintenanceMargin(),
                     "");
+            cbPD.getItems().addAll("Min", "Day", "Week", "Month", "Year");
             // nodeChart.setMouseTransparent(true);
             // redrawChart();
 
@@ -417,7 +423,7 @@ public class DashController {
         streamListener.listenToCoin(Set.of(tfSymboltoGet.getText()));
     }
 
-    private ObservableList<OHLCData> getUserDate(ActionEvent event) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException{
+    private ObservableList<OHLCData> getUserData(ActionEvent event) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException{
         String sym = tfSymboltoGet.getText();
         String startDate = dpStartDate.getValue().toString();
         String endDate = dpEndDate.getValue().toString();
@@ -431,7 +437,7 @@ public class DashController {
         int endYear = endParse.getYear();
         int endMonth = endParse.getMonthValue();
         int endDay = endParse.getDayOfMonth();
-
+        checkChartChoices();
         /*
          * Debugging statements
          * JATbot.botLogger.info("Start Date: " + startParse+"\nEnd Date: " + endParse+
@@ -457,7 +463,7 @@ public class DashController {
                 nodeChart.getChildren().remove(chart);
             }
 
-            ObservableList<OHLCData> series = getUserDate(event);
+            ObservableList<OHLCData> series = getUserData(event);
 
             // Create and show new OHLC chart
             this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
@@ -646,40 +652,66 @@ public class DashController {
             case "tbtnDef1D":
                 selectedTimePeriod = "1Day";
                 selectedDuration = 1;
-                JATbot.botLogger.info("1D selected");
+                
                 break;
             case "tbtnDef1MIN":
                 selectedTimePeriod = "1Min";
-                JATbot.botLogger.info("1MIN selected");
+                
                 break;
             case "tbtnDef1MON":
                 selectedTimePeriod = "1M";
-                JATbot.botLogger.info("1MON selected");
+                
                 break;
             case "tbtnDef1W":
                 selectedTimePeriod = "1Week";
-                JATbot.botLogger.info("1W selected");
+                
                 break;
             case "tbtnDef1Y":
                 selectedTimePeriod = "12M";
-                JATbot.botLogger.info("1Y selected");
+                
                 break;
             case "tbtnDef4H":
                 selectedTimePeriod = "4Hour";
-                JATbot.botLogger.info("4H selected");
+                
                 break;
             case "tbtnDef4MON":
                 selectedTimePeriod = "4M";
-                JATbot.botLogger.info("4MON selected");
+                
                 break;
             case "tbtnHourly":
                 selectedTimePeriod = "1Hour";
-                JATbot.botLogger.info("Hourly selected");
+                
                 break;
             default:
                 break;
             // Add more cases if you have more toggle buttons
         }
+    }
+
+    public void checkChartChoices() {
+        String period = cbPD.getValue().toString();
+        String duration = tfDur.getText();
+        switch(period) {
+
+            case "Min":
+                selectedTimePeriod = (duration + "Min");
+                break;
+            case "Day":
+                selectedTimePeriod = (duration + "Day");
+                break;
+            case "Week":
+                selectedTimePeriod = (duration + "Week");
+                break;
+            case "Month":
+                selectedTimePeriod = (duration + "M");
+                break;
+            case "Year":
+                selectedTimePeriod = (duration + "Y");
+                break;
+        }
+
+
+        
     }
 
     @FXML
@@ -695,10 +727,10 @@ public class DashController {
             Backtesting bt = new Backtesting(ac, 500);
 
             // Get backtesting data for the symbol
-            ObservableList<OHLCData> series = getUserDate(event);
+            ObservableList<OHLCData> series = getUserData(event);
 
             // Run backtesting for the symbol
-            bt.run(sym);
+            bt.run(sym, series);
 
             // Clear existing chart from nodeChart if it exists
             if (chart != null) {

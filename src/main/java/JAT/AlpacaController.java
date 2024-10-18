@@ -139,44 +139,23 @@ for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
             for (String key : props.stringPropertyNames()) {
                 sb.append(key).append("=").append(props.getProperty(key)).append(System.lineSeparator());
             }
-
-            // Convert the StringBuilder content to a ByteBuffer
-            ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
-
-            // Write the buffer to the file asynchronously
-            try (AsynchronousFileChannel aChannel = AsynchronousFileChannel.open(config, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-                CompletableFuture<Void> writeFuture = new CompletableFuture<>();
-                aChannel.write(buffer, 0, null, new CompletionHandler<Integer, Void>() {
-                    @Override
-                    public void completed(Integer result, Void attachment) {
-                        writeFuture.complete(null);
-                    }
-
-                    @Override
-                    public void failed(Throwable exc, Void attachment) {
-                        writeFuture.completeExceptionally(exc);
-                    }
-                });
-                writeFuture.get();
-            }
+            asyncWrite(sb, config);
 
             return props;
-        } catch (IOException | InterruptedException | ExecutionException e) {
+        } catch (IOException e) {
             JATbot.botLogger.error("Error writing properties: " + e.getMessage());
             e.printStackTrace();
         }
-
         return null;
     }
+
     // New method to modify a single property
     public void modifyProperty(Path config, String key, String value) {
         Properties props = new Properties();
-        try (BufferedReader reader = Files.newBufferedReader(config)) {
-            props.load(reader);
-        } catch (IOException e) {
-            JATbot.botLogger.error("Error loading properties: " + e.getMessage());
-        }
-
+        try (BufferedReader reader = Files.newBufferedReader(config))
+            {props.load(reader);}
+        catch (IOException e) 
+            {JATbot.botLogger.error("Error loading properties: " + e.getMessage());}
         props.setProperty(key, value);
 
         try {
@@ -185,31 +164,40 @@ for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
             for (String propKey : props.stringPropertyNames()) {
                 sb.append(propKey).append("=").append(props.getProperty(propKey)).append(System.lineSeparator());
             }
+            asyncWrite(sb, config);
 
-            // Convert the StringBuilder content to a ByteBuffer
-            ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+        } catch (Exception e) {
+            JATbot.botLogger.error("Error modifying property: " + e.getMessage());
+        }
+    }
 
-            // Write the buffer to the file asynchronously
-            try (AsynchronousFileChannel aChannel = AsynchronousFileChannel.open(config, StandardOpenOption.WRITE, StandardOpenOption.CREATE)) {
-                CompletableFuture<Void> writeFuture = new CompletableFuture<>();
-                aChannel.write(buffer, 0, null, new CompletionHandler<Integer, Void>() {
-                    @Override
-                    public void completed(Integer result, Void attachment) {
-                        writeFuture.complete(null);
-                    }
+    public void asyncWrite(StringBuilder sb, Path cfg) {
 
-                    @Override
-                    public void failed(Throwable exc, Void attachment) {
-                        writeFuture.completeExceptionally(exc);
-                    }
-                });
-                writeFuture.get();
-            }
+        // Convert the StringBuilder content to a ByteBuffer
+        ByteBuffer buffer = ByteBuffer.wrap(sb.toString().getBytes());
+
+        // Write the buffer to the file asynchronously
+        try (AsynchronousFileChannel aChannel = AsynchronousFileChannel.open(cfg, StandardOpenOption.WRITE,
+                StandardOpenOption.CREATE)) {
+            CompletableFuture<Void> writeFuture = new CompletableFuture<>();
+            aChannel.write(buffer, 0, null, new CompletionHandler<Integer, Void>() {
+                @Override
+                public void completed(Integer result, Void attachment) {
+                    writeFuture.complete(null);
+                }
+
+                @Override
+                public void failed(Throwable exc, Void attachment) {
+                    writeFuture.completeExceptionally(exc);
+                }
+            });
+            writeFuture.get();
         } catch (IOException | InterruptedException | ExecutionException e) {
             JATbot.botLogger.error("Error writing properties: " + e.getMessage());
             e.printStackTrace();
         }
-    }
+    } 
+
     public AlpacaAPI connect() {
         String[] props = loadProperties();
         alpaca = new AlpacaAPI(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]), MarketDataWebsocketSourceType.valueOf(props[3]));
@@ -228,21 +216,21 @@ for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
         }
 
     }
-    public String logAccID() {
+    public String getAccID() {
         String accID = getAccount().getAccountNumber();
         //JATbot.botLogger.info("Account ID: {}", accID);
         JATbot.botLogger.info("Account ID Logged" + "\n");
         return accID;
     }
 
-    public String logAccCash() {
+    public String getAccCash() {
         String cash = getAccount().getCash();
         //JATbot.botLogger.info("Account Cash: {}", cash);
         JATbot.botLogger.info("Cash Logged" + "\n");
         return cash;
     }
 
-    public String logPortValue() {
+    public String getPortValue() {
         String portValue = getAccount().getPortfolioValue();
         //JATbot.botLogger.info("Portfolio Value: {}", portValue);
         JATbot.botLogger.info("Portfolio Value Logged" + "\n");
@@ -250,7 +238,7 @@ for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
 
     }
 
-    public String logAccStatus() {
+    public String getAccStatus() {
         AccountStatus status = getAccount().getStatus();
         //JATbot.botLogger.info("Account Status: {}", status);
         JATbot.botLogger.info("Account Status Logged" + "\n");
@@ -259,98 +247,98 @@ for (Map.Entry<String, String> entry : defaultValues.entrySet()) {
 
     }
 
-    public String logCreateDate() {
+    public String getCreateDate() {
         OffsetDateTime creation = getAccount().getCreatedAt();
         //JATbot.botLogger.info("Date Created: {}", creation);
-        JATbot.botLogger.info("Date Created" + "\n");
+        //JATbot.botLogger.info("Date Created" + "\n");
         String creationString = creation.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
         return creationString;
 
     }
 
-    public String logBuyingPower() {
+    public String getBuyingPower() {
         String tradeableFunds = getAccount().getBuyingPower();
         //JATbot.botLogger.info("Tradeable Funds: {}", tradeableFunds);
-        JATbot.botLogger.info("Tradeable Funds Logged" + "\n");
+        //JATbot.botLogger.info("Tradeable Funds Logged" + "\n");
         return tradeableFunds;
 
     }
 
-    public String logLongMarketValue() {
+    public String getLongMarketValue() {
         String longMarketValue = getAccount().getLongMarketValue();
         //JATbot.botLogger.info("Long Market Value: {}", longMarketValue);
-        JATbot.botLogger.info("Long Market Value Logged" + "\n");
+        //JATbot.botLogger.info("Long Market Value Logged" + "\n");
         return longMarketValue;
 
     }
-    public String logDayTradeLimit() {
+    public String getDayTradeLimit() {
         int dayTradeLimit = getAccount().getDaytradeCount();
         //JATbot.botLogger.info("Day Trade Limit: {}", dayTradeLimit);
-        JATbot.botLogger.info("Day Trade Limit Logged" + "\n");
+        //JATbot.botLogger.info("Day Trade Limit Logged" + "\n");
         return Integer.toString(dayTradeLimit);
 
     }
 
-    public String logShortMarketValue() {
+    public String getShortMarketValue() {
         String shortMarketValue = getAccount().getShortMarketValue();
         //JATbot.botLogger.info("Short Market Value: {}", shortMarketValue);
-        JATbot.botLogger.info("Short Market Value Logged" + "\n");
+        //JATbot.botLogger.info("Short Market Value Logged" + "\n");
         return shortMarketValue;
 
     }
 
-    public String logEquity() {
+    public String getEquity() {
         String equity = getAccount().getEquity();
         //JATbot.botLogger.info("Equity: {}", equity);
-        JATbot.botLogger.info("Equity Logged" + "\n");
+        //JATbot.botLogger.info("Equity Logged" + "\n");
         return equity;
 
     }
 
-    public String logLastEquity() {
+    public String getLastEquity() {
         String lastEquity = getAccount().getLastEquity();
         //JATbot.botLogger.info("Last Equity: {}", lastEquity);
-        JATbot.botLogger.info("Last Equity Logged" + "\n");
+        //JATbot.botLogger.info("Last Equity Logged" + "\n");
         return lastEquity;
 
     }
 
-    public String logInitialMargin() {
+    public String getInitialMargin() {
         String initialMargin = getAccount().getInitialMargin();
         //JATbot.botLogger.info("Initial Margin: {}", initialMargin);
-        JATbot.botLogger.info("Initial Margin Logged" + "\n");
+        //JATbot.botLogger.info("Initial Margin Logged" + "\n");
         return initialMargin;
 
     }
 
-    public String logMaintenanceMargin() {
+    public String getMaintenanceMargin() {
         String maintenanceMargin = getAccount().getMaintenanceMargin();
         //JATbot.botLogger.info("Maintenance Margin: {}", maintenanceMargin);
-        JATbot.botLogger.info("Maintenance Margin Logged" + "\n");
+        //JATbot.botLogger.info("Maintenance Margin Logged" + "\n");
         return maintenanceMargin;
 
     }
 
-    public String logLastMaintenanceMargin() {
+    public String getLastMaintenanceMargin() {
         String lastMaintenanceMargin = getAccount().getLastMaintenanceMargin();
         //JATbot.botLogger.info("Last Maintenance Margin: {}", lastMaintenanceMargin);
-        JATbot.botLogger.info("Last Maintenance Margin Logged" + "\n");
+        //JATbot.botLogger.info("Last Maintenance Margin Logged" + "\n");
         return lastMaintenanceMargin;
 
     }
 
-    public String logDayTradeCount() {
+    public String getDayTradeCount() {
         int dayTradeCount = getAccount().getDaytradeCount();
         //JATbot.botLogger.info("Day Trade Count: {}", dayTradeCount);
-        JATbot.botLogger.info("Day Trade Count Logged" + "\n");
+        //JATbot.botLogger.info("Day Trade Count Logged" + "\n");
         return Integer.toString(dayTradeCount);
 
     }
 
-    public String logCurrency() {
+    public String getCurrency() {
         String currency = getAccount().getCurrency();
         //JATbot.botLogger.info("Currency: {}", currency);
-        JATbot.botLogger.info("Currency Logged" + "\n");
+        //JATbot.botLogger.info("Currency Logged" + "\n");
         return currency;
     }
 

@@ -31,7 +31,7 @@ public class Backtesting {
         AlpacaController ac = new AlpacaController();
         Backtesting backtesting = new Backtesting(ac, 500);
 
-        backtesting.run("NVDA");
+        //backtesting.run("NVDA");
         //OHLCParser.parseFile(null);
         /*backtesting.run("TSLA");
         backtesting.run("GME");
@@ -50,8 +50,8 @@ public class Backtesting {
         backtesting.run("GOOGL");*/
     }
 
-    public void run(String symbol) {
-        barsData = getData(symbol);
+    public void run(String symbol, ObservableList<OHLCData> d) {
+        testOnData(d);
         this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData, symbol);
         System.out.println("\n\nRunning backtest for " + symbol);
         
@@ -79,6 +79,12 @@ public class Backtesting {
         }
         return null;
     }
+
+    public void testOnData(ObservableList<OHLCData> d){
+        barsData = d;
+    }
+
+
 
     public void outputResults(String[] results) {
         for (String result : results) {
