@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.Set;
 import javafx.application.Platform;
 import javafx.scene.control.*;
+import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -176,7 +177,7 @@ public class DashController {
     @FXML
     private AnchorPane exitControl;
     @FXML 
-    private ChoiceBox cbPD;
+    private ChoiceBox<String> cbPd;
 
     private double xOffset;
     private double yOffset;
@@ -198,6 +199,7 @@ public class DashController {
     private AlpacaController ac = new AlpacaController();
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
+    
 
     // private JFreeChart chart;
 
@@ -234,7 +236,8 @@ public class DashController {
                     ac.getEquity(), ac.getInitialMargin(),
                     ac.getLastEquity(), ac.getLastMaintenanceMargin(),
                     "");
-            cbPD.getItems().addAll("Min", "Day", "Week", "Month", "Year");
+            ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour","Daily", "Weekly", "Month", "Year");
+            cbPd.setItems(periods);
             // nodeChart.setMouseTransparent(true);
             // redrawChart();
 
@@ -689,24 +692,33 @@ public class DashController {
     }
 
     public void checkChartChoices() {
-        String period = cbPD.getValue().toString();
+        String period = cbPd.getValue().toString();
         String duration = tfDur.getText();
         switch(period) {
 
             case "Min":
                 selectedTimePeriod = (duration + "Min");
+                System.out.println(selectedTimePeriod);
+                break;
+            case "Hour":
+                selectedTimePeriod = (duration + "Hour");
+                System.out.println(selectedTimePeriod);
                 break;
             case "Day":
                 selectedTimePeriod = (duration + "Day");
+                System.out.println(selectedTimePeriod);
                 break;
             case "Week":
                 selectedTimePeriod = (duration + "Week");
+                System.out.println(selectedTimePeriod);
                 break;
             case "Month":
                 selectedTimePeriod = (duration + "M");
+                System.out.println(selectedTimePeriod);
                 break;
             case "Year":
                 selectedTimePeriod = (duration + "Y");
+                System.out.println(selectedTimePeriod);
                 break;
         }
 
@@ -745,8 +757,9 @@ public class DashController {
             // Get the results from passResults() and add them to lvDataDisplay
             String[] results = bt.passResults();
             ObservableList<String> current = lvDataDisplay.getItems();
+            current.addAll(results);
             lvDataDisplay.getItems().clear();
-            lvDataDisplay.getItems().addAll(results);
+            //lvDataDisplay.getItems().addAll(results);
             lvDataDisplay.getItems().addAll(current);
 
         } catch (Exception e) {
