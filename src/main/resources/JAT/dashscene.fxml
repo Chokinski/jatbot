@@ -439,6 +439,11 @@
                                                 <Font size="10.0" />
                                              </font>
                                           </MenuButton>
+                                          <Label fx:id="lblTimeFrameState" prefHeight="22.0" prefWidth="89.0" styleClass="nmlTxt" text="Current -">
+                                             <font>
+                                                <Font size="10.0" />
+                                             </font>
+                                          </Label>
                                           <AnchorPane cache="true" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="27.0">
                                              <children>
                                                 <Button fx:id="btnBacktest" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" onAction="#onBacktest" style="-fx-background-color: transparent;" styleClass="chartMenu" stylesheets="@styles.css">

@@ -10,10 +10,8 @@ import java.util.stream.Collectors;
 
 public class SupportResistanceStrategy {
     public Indicator indi;
-    private List<Object> trades;
-    private List<Object> completeTrades;
-    private List<Double> stopLossLevels;
-    private List<Double> takeProfitLevels;
+    private List<Trade> trades;
+    private List<Trade> completeTrades;
     private double accountBalance;
     private double initialCapital;
     private String symbol;
@@ -29,8 +27,6 @@ public class SupportResistanceStrategy {
         this.trailingStopPercent = 1.0; // Set trailing stop percentage to 1%
         trades = new ArrayList<>();
         completeTrades = new ArrayList<>();
-        stopLossLevels = new ArrayList<>();
-        takeProfitLevels = new ArrayList<>();
         executeStrategy();
     }
 
@@ -72,7 +68,7 @@ public class SupportResistanceStrategy {
     
     public void orderConfirm(double currentPrice, LocalDateTime date, boolean uptrend) {
         // Note the trade along with the portfolio balances
-        List<Object> trade = new ArrayList<>();
+        
         double riskPercentage = trades.isEmpty() ? 0.02 : 0.01; // Adjusted initial risk percentage to 2%, then 1%
         double riskAmount = accountBalance * riskPercentage;
         double positionSize = riskAmount / currentPrice;
@@ -82,76 +78,57 @@ public class SupportResistanceStrategy {
         double takeProfitLevel;
         double moneyUsed = positionSize * currentPrice; // Calculate money used in this trade
         accountBalance -= moneyUsed;
+        Trade trade = new Trade(uptrend, currentPrice, date, portfolioBalanceBefore);
         if (uptrend) {
             // Adjust stop loss and take profit levels for uptrend trades
-            trade.add(1);
             stopLossLevel = currentPrice * 0.97; // Tightened stop loss level
             takeProfitLevel = currentPrice * 1.05; // Extended take profit level
         } else {
-            trade.add(0);
+
             // Adjust stop loss and take profit levels for downtrend trades
             stopLossLevel = currentPrice * 1.05; // Extended stop loss level
             takeProfitLevel = currentPrice * 0.97; // Tightened take profit level
         }
-    
-        trade.add(currentPrice); // Entry price                                
-        trade.add(currentPrice); // Close price (initially same as entry price)
-        trade.add(0.0); // Net Gain/Loss, initially 0
-        trade.add(date); // Date
-        trade.add(portfolioBalanceBefore); // Portfolio balance before the trade
-        trade.add(accountBalance); // Portfolio balance after the trade
+        trade.setStopLoss(stopLossLevel);
+        trade.setTakeProfit(takeProfitLevel);
         trades.add(trade);
-    
-        stopLossLevels.add(stopLossLevel);
-        takeProfitLevels.add(takeProfitLevel);
-        
-        //Buy/Sell indication 0 for sell 1 for buy accessed by trade.get(0)
-        //Entry price accessed by trade.get(1)
-        //Close price accessed by trade.get(2)
-        //Net Gain/Loss accessed by trade.get(3)
-        //Date accessed by trade.get(4)
-        //Portfolio balance before the trade accessed by trade.get(5)
-        //Portfolio balance after the trade accessed by trade.get(6)
     }
     public void executeTrades(double currentPrice) {
         for (int i = 0; i < trades.size(); i++) {
-            double stopLossLevel = stopLossLevels.get(i);
-            double takeProfitLevel = takeProfitLevels.get(i);
-            double entryPrice = (double) ((List<Object>) trades.get(i)).get(1);
-            double closePrice = (double) ((List<Object>) trades.get(i)).get(2);
-            double portfolioBalanceBefore = (double) ((List<Object>) trades.get(i)).get(5); // Portfolio balance before the trade
+            Trade trade = trades.get(i);
+            double stopLossLevel = trade.getStopLoss();
+            double takeProfitLevel = trade.getTakeProfit();
+            double entryPrice = trade.getEntryPrice();
+            double closePrice = trade.getClosePrice();
 
             // Check if the trade hits stop loss or take profit
             if (currentPrice <= stopLossLevel || currentPrice >= takeProfitLevel) {
                 double tradeProfit = currentPrice - entryPrice;
                 double netGainLoss = tradeProfit * (closePrice <= entryPrice ? -1 : 1);
                 accountBalance += netGainLoss;
-                ((List<Object>) trades.get(i)).set(2, currentPrice); // Update close price
-                ((List<Object>) trades.get(i)).set(3, netGainLoss); // Update net gain/loss
-                ((List<Object>) trades.get(i)).set(6, accountBalance); // Update portfolio balance after the trade
+                trade.setClosePrice(currentPrice); // Update close price
+                trade.setNetGainLoss(netGainLoss); // Update net gain/loss
+                trade.setPortfolioBalanceAfter(accountBalance); // Update portfolio balance after the trade
 
                 // Move trade to completeTrades and remove from trades
-                completeTrades.add(trades.get(i));
+                completeTrades.add(trade);
                 trades.remove(i);
-                stopLossLevels.remove(i);
-                takeProfitLevels.remove(i);
                 i--; // Adjust index after removal
             } else {
                 // Implement trailing stop loss
                 double trailingStopLevel = entryPrice * (1 - trailingStopPercent / 100);
+                
                 if (currentPrice <= trailingStopLevel || currentPrice >= takeProfitLevel) {
                     double tradeProfit = currentPrice - entryPrice;
                     double netGainLoss = tradeProfit * (closePrice <= entryPrice ? -1 : 1);
                     accountBalance += netGainLoss;
-                    ((List<Object>) trades.get(i)).set(2, currentPrice); // Update close price
-                    ((List<Object>) trades.get(i)).set(3, netGainLoss); // Update net gain/loss
-                    ((List<Object>) trades.get(i)).set(6, accountBalance); // Update portfolio balance after the trade
+                    trade.setClosePrice(currentPrice); // Update close price
+                    trade.setNetGainLoss(netGainLoss); // Update net gain/loss
+                    trade.setPortfolioBalanceAfter(accountBalance); // Update portfolio balance after the trade
 
                     // Move trade to completeTrades and remove from trades
-                    completeTrades.add(trades.get(i));
+                    completeTrades.add(trade);
                     trades.remove(i);
-                    stopLossLevels.remove(i);
-                    takeProfitLevels.remove(i);
                     i--; // Adjust index after removal
                 }
             }
@@ -173,8 +150,8 @@ public class SupportResistanceStrategy {
 
     public double getWinRate() {
         int profitableTrades = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             if (netGainLoss > 0) {
                 profitableTrades++;
             }
@@ -185,8 +162,8 @@ public class SupportResistanceStrategy {
     public double getProfitFactor() {
         double totalProfit = 0;
         double totalLoss = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             if (netGainLoss > 0) {
                 totalProfit += netGainLoss;
             } else {
@@ -199,8 +176,8 @@ public class SupportResistanceStrategy {
     public double getAverageProfit() {
         double totalProfit = 0;
         int profitableTrades = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             if (netGainLoss > 0) {
                 totalProfit += netGainLoss;
                 profitableTrades++;
@@ -212,8 +189,8 @@ public class SupportResistanceStrategy {
     public double getAverageLoss() {
         double totalLoss = 0;
         int losingTrades = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             if (netGainLoss < 0) {
                 totalLoss += netGainLoss;
                 losingTrades++;
@@ -224,8 +201,8 @@ public class SupportResistanceStrategy {
 
     public double getExpectancy() {
         double totalExpectancy = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             totalExpectancy += netGainLoss;
         }
         return trades.size() != 0 ? totalExpectancy / trades.size() : 0;
@@ -235,8 +212,8 @@ public class SupportResistanceStrategy {
         double maxDrawdown = 0;
         double peak = initialCapital;
         double balance = initialCapital;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(3);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             balance += netGainLoss;
             if (balance > peak) {
                 peak = balance;
@@ -251,15 +228,15 @@ public class SupportResistanceStrategy {
 
     public double getSharpeRatio() {
         double totalProfit = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(2);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             totalProfit += netGainLoss;
         }
         double meanReturn = totalProfit / trades.size();
     
         double sumSquaredDifferences = 0;
-        for (Object trade : completeTrades) {
-            double netGainLoss = (double) ((List) trade).get(2);
+        for (Trade trade : completeTrades) {
+            double netGainLoss = trade.getNetGainLoss();
             sumSquaredDifferences += Math.pow(netGainLoss - meanReturn, 2);
         }
         double variance = sumSquaredDifferences / trades.size();
@@ -273,13 +250,14 @@ public class SupportResistanceStrategy {
         DecimalFormat df = new DecimalFormat("#.##");
 
         for (int i = 0; i < trades.size(); i++) {
-            int typeInt = (int) ((List<Object>) completeTrades.get(i)).get(0);
-            double entryPrice = (double) ((List<Object>) completeTrades.get(i)).get(1);
-            double closePrice = (double) ((List<Object>) completeTrades.get(i)).get(2);
-            double netGainLoss = (double) ((List<Object>) completeTrades.get(i)).get(3);
-            LocalDateTime date = (LocalDateTime) ((List<Object>) completeTrades.get(i)).get(4);
-            double portfolioBalanceBefore = (double) ((List<Object>) completeTrades.get(i)).get(5);
-            double portfolioBalanceAfter = (double) ((List<Object>) completeTrades.get(i)).get(6);
+            Trade trade = trades.get(i);
+            int typeInt = trade.isLong() ? 1 : 0;
+            double entryPrice = trade.getEntryPrice();
+            double closePrice = trade.getClosePrice();
+            double netGainLoss = trade.getNetGainLoss();
+            LocalDateTime date = trade.getDate();
+            double portfolioBalanceBefore = trade.getPortfolioBalanceBefore();
+            double portfolioBalanceAfter = trade.getPortfolioBalanceAfter();
 
             String tradeType = netGainLoss >= 0 ? "Profitable" : "Loss";
             double absoluteProfit = Math.abs(netGainLoss);
@@ -347,4 +325,7 @@ public class SupportResistanceStrategy {
             "Sharpe Ratio: " + getSharpeRatio()
         };
     }
+
+
+
 }

@@ -28,6 +28,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
 import com.jat.OHLCData;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 
 
 /**
@@ -105,6 +107,8 @@ public class DashController {
     @FXML
     private Label lblTimeStatus;
 
+    @FXML
+    private Label lblTimeFrameState;
     @FXML
     private ListView<String> lvAccTypes;
 
@@ -195,6 +199,7 @@ public class DashController {
     private String streamChoice = "Stocks";
     private String selectedTimePeriod = "1Day"; // Default value
     private int selectedDuration = 1; // Default value
+    private String selectedPeriod = "Day"; // Default value
     private StreamListener streamListener;
     private AlpacaController ac = new AlpacaController();
     private OHLCChart chart;
@@ -207,9 +212,10 @@ public class DashController {
     public void initialize() throws IOException {
         try {
             this.streamListener = new StreamListener();
-            vbDash.setPrefSize(1044, 702);
+            /*vbDash.setPrefSize(1044, 702);
             vbDash.setMinSize(1044, 702);
-            vbDash.setMaxSize(1044, 702);
+            vbDash.setMaxSize(1044, 702);*/
+            //Delete commented out if not needed
 
         } catch (Exception e) {
             JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
@@ -223,21 +229,8 @@ public class DashController {
             vbDash.setMaxSize(1044, 702);
             this.mainWindow.setFullScreenExitHint("tryhard...");
             ac = new AlpacaController();
-            lblChecking.setText("");
-            lvDataDisplay.getItems().addAll("");
-            lvAccTypes.getItems().addAll(
-                    "Account ID", "Portfolio Value", "Account Created", "Account Status",
-                    "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",
-                    "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
-            lvAccValues.getItems().addAll(ac.getAccID(), ac.getPortValue(),
-                    ac.getCreateDate(), ac.getAccStatus(),
-                    ac.getAccCash(), ac.getBuyingPower(),
-                    ac.getDayTradeCount(), ac.getDayTradeLimit(),
-                    ac.getEquity(), ac.getInitialMargin(),
-                    ac.getLastEquity(), ac.getLastMaintenanceMargin(),
-                    "");
-            ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour","Daily", "Weekly", "Month", "Year");
-            cbPd.setItems(periods);
+            addInfo();
+
             // nodeChart.setMouseTransparent(true);
             // redrawChart();
 
@@ -245,10 +238,77 @@ public class DashController {
             // chartCanvas.widthProperty().addListener(obs -> redrawChart());
             // chartCanvas.heightProperty().addListener(obs -> redrawChart());
             startGradientAnimation();
-
             startMarketTimeUpdate();
+            provideListeners();
         });
+        tfDur.textProperty().addListener(new ChangeListener<String>(){
 
+            @Override
+            public void changed(ObservableValue<? extends String> obs, String old, String newv) {
+                // TODO Auto-generated method stub
+                System.out.println(newv);
+                selectedDuration = Integer.parseInt(newv);
+                lblTimeFrameState.setText("Current - "+selectedDuration+selectedPeriod);
+
+            }
+
+        });
+    }
+
+    protected void addInfo() {
+
+        lblChecking.setText("");
+        lvDataDisplay.getItems().addAll("");
+        lvAccTypes.getItems().addAll(
+                "Account ID", "Portfolio Value", "Account Created", "Account Status",
+                "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",
+                "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
+        lvAccValues.getItems().addAll(ac.getAccID(), ac.getPortValue(),
+                ac.getCreateDate(), ac.getAccStatus(),
+                ac.getAccCash(), ac.getBuyingPower(),
+                ac.getDayTradeCount(), ac.getDayTradeLimit(),
+                ac.getEquity(), ac.getInitialMargin(),
+                ac.getLastEquity(), ac.getLastMaintenanceMargin(),
+                "");
+
+        ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour", "Daily", "Weekly", "Month",
+                "Year");
+        cbPd.setItems(periods);
+
+    }
+    protected void provideListeners(){
+        cbPd.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+
+            @Override
+            public void changed(ObservableValue<? extends String> obs, String oldp, String newp) {
+                // TODO Auto-generated method stub
+                switch(newp) {
+                    case "Min":
+                        selectedPeriod = "Min";
+                        break;
+                    case "Hour":
+                    selectedPeriod = "Hour";
+                        break;
+                    case "Day":
+                        selectedPeriod = "Day";
+                        break;
+                    case "Week":
+                        selectedPeriod = "Week";
+                        break;
+                    case "Month":
+                        selectedPeriod = "M";
+                        break;
+                    case "Year":
+                        selectedPeriod = "Y";
+                        break;
+                }
+
+                lblTimeFrameState.setText("Current - "+selectedDuration+selectedPeriod);
+
+
+            }});
+
+        
     }
 
     @FXML
@@ -440,7 +500,6 @@ public class DashController {
         int endYear = endParse.getYear();
         int endMonth = endParse.getMonthValue();
         int endDay = endParse.getDayOfMonth();
-        checkChartChoices();
         /*
          * Debugging statements
          * JATbot.botLogger.info("Start Date: " + startParse+"\nEnd Date: " + endParse+
@@ -691,40 +750,7 @@ public class DashController {
         }
     }
 
-    public void checkChartChoices() {
-        String period = cbPd.getValue().toString();
-        String duration = tfDur.getText();
-        switch(period) {
 
-            case "Min":
-                selectedTimePeriod = (duration + "Min");
-                System.out.println(selectedTimePeriod);
-                break;
-            case "Hour":
-                selectedTimePeriod = (duration + "Hour");
-                System.out.println(selectedTimePeriod);
-                break;
-            case "Day":
-                selectedTimePeriod = (duration + "Day");
-                System.out.println(selectedTimePeriod);
-                break;
-            case "Week":
-                selectedTimePeriod = (duration + "Week");
-                System.out.println(selectedTimePeriod);
-                break;
-            case "Month":
-                selectedTimePeriod = (duration + "M");
-                System.out.println(selectedTimePeriod);
-                break;
-            case "Year":
-                selectedTimePeriod = (duration + "Y");
-                System.out.println(selectedTimePeriod);
-                break;
-        }
-
-
-        
-    }
 
     @FXML
     public void onLogData(ActionEvent event) {
@@ -756,10 +782,15 @@ public class DashController {
 
             // Get the results from passResults() and add them to lvDataDisplay
             String[] results = bt.passResults();
-            ObservableList<String> current = lvDataDisplay.getItems();
+
+
+
+            ObservableList<String> current = FXCollections.observableArrayList();
+            current.addAll(lvDataDisplay.getItems());
             current.addAll(results);
             lvDataDisplay.getItems().clear();
             //lvDataDisplay.getItems().addAll(results);
+            
             lvDataDisplay.getItems().addAll(current);
 
         } catch (Exception e) {
