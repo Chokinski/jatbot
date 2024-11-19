@@ -1,10 +1,15 @@
 package JAT;
+
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import javafx.application.Platform;
 import javafx.scene.control.*;
@@ -22,15 +27,21 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.animation.*;
 import javafx.util.Duration;
+import net.jacobpeterson.alpaca.openapi.marketdata.ApiClient;
+import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
 import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
 import com.jat.OHLCData;
+
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-
 
 /**
  * The DashController class is responsible for controlling the dashboard view of
@@ -180,7 +191,7 @@ public class DashController {
 
     @FXML
     private AnchorPane exitControl;
-    @FXML 
+    @FXML
     private ChoiceBox<String> cbPd;
 
     private double xOffset;
@@ -198,13 +209,17 @@ public class DashController {
     private double scaleY = 1.0;
     private String streamChoice = "Stocks";
     private String selectedTimePeriod = "1Day"; // Default value
-    private int selectedDuration = 1; // Default value
-    private String selectedPeriod = "Day"; // Default value
+    //private int selectedDuration.set(1; // Default value
+    private IntegerProperty selectedDuration = new SimpleIntegerProperty(1); // Default value
+    private StringProperty selectedPeriod = new SimpleStringProperty("Day"); // Default value
     private StreamListener streamListener;
-    private AlpacaController ac = new AlpacaController();
+    private List<String> timeframes = new ArrayList<>(Arrays.asList("15min", "4Hour", "1Day", "1Week", "1Month"));
+    private AlpacaController ac;
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
-    
+    private AlpacaStockHandler stockHandler;
+    private ApiClient adc;
+    private List<Assets> assets;
 
     // private JFreeChart chart;
 
@@ -212,11 +227,7 @@ public class DashController {
     public void initialize() throws IOException {
         try {
             this.streamListener = new StreamListener();
-            /*vbDash.setPrefSize(1044, 702);
-            vbDash.setMinSize(1044, 702);
-            vbDash.setMaxSize(1044, 702);*/
-            //Delete commented out if not needed
-
+            
         } catch (Exception e) {
             JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
         }
@@ -224,12 +235,16 @@ public class DashController {
         // Add the strings to the ListView when the scene is loaded
 
         Platform.runLater(() -> {
+            
             vbDash.setPrefSize(1044, 702);
             vbDash.setMinSize(1044, 702);
             vbDash.setMaxSize(1044, 702);
             this.mainWindow.setFullScreenExitHint("tryhard...");
             ac = new AlpacaController();
+            adc = ac.alpaca.marketData().getInternalAPIClient();
+            AlpacaStockHandler stockHandler = new AlpacaStockHandler(adc, ac);
             addInfo();
+            
 
             // nodeChart.setMouseTransparent(true);
             // redrawChart();
@@ -240,19 +255,58 @@ public class DashController {
             startGradientAnimation();
             startMarketTimeUpdate();
             provideListeners();
+            
+            AtomicInteger count = new AtomicInteger(0);
+            assets = ac.getAssets();
+            Iterator<Assets> iterator = assets.iterator();
+            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+            Runnable fetchTask = new Runnable() {
+                @Override
+                public void run() {
+                    while (iterator.hasNext()) {
+                        Assets asset = iterator.next();
+                        if (count.get() < 200) {
+                            for (String i : timeframes){
+                                stockHandler.fetchAndWriteStockData(asset.getSymbol(), i);
+                                count.incrementAndGet();
+                            }
+                            iterator.remove();
+                            
+                        } else {
+                            // Wait for 70 seconds before continuing
+                            JATbot.botLogger.info("Reached rate limit. Waiting for 70 seconds before continuing.\n");
+    
+                            // Create a separate scheduler for the countdown
+                            ScheduledExecutorService countdownScheduler = Executors.newScheduledThreadPool(1);
+                            AtomicInteger remainingTime = new AtomicInteger(70);
+    
+                            CompletableFuture<Void> countdownFuture = new CompletableFuture<>();
+    
+                            countdownScheduler.scheduleAtFixedRate(() -> {
+                                int timeLeft = remainingTime.decrementAndGet();
+                                if (timeLeft >= 0) {
+                                    // Log the remaining time in the terminal, updating the same line
+                                    System.out.print("\rWaiting: " + timeLeft + " seconds remaining");
+                                } else {
+                                    countdownScheduler.shutdown();
+                                    countdownFuture.complete(null);
+                                }
+                            }, 0, 1, TimeUnit.SECONDS);
+    
+                            try {
+                                countdownFuture.get(); // Wait for the countdown to complete
+                            } catch (InterruptedException | ExecutionException e) {
+                                Thread.currentThread().interrupt();
+                            }
+    
+                            count.set(0); // Reset the count after waiting
+                        }
+                    }
+                }
+            };
+            scheduler.schedule(fetchTask, 0, TimeUnit.SECONDS);
         });
-        tfDur.textProperty().addListener(new ChangeListener<String>(){
 
-            @Override
-            public void changed(ObservableValue<? extends String> obs, String old, String newv) {
-                // TODO Auto-generated method stub
-                System.out.println(newv);
-                selectedDuration = Integer.parseInt(newv);
-                lblTimeFrameState.setText("Current - "+selectedDuration+selectedPeriod);
-
-            }
-
-        });
     }
 
     protected void addInfo() {
@@ -276,39 +330,64 @@ public class DashController {
         cbPd.setItems(periods);
 
     }
-    protected void provideListeners(){
+
+    protected void provideListeners() {
         cbPd.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
             @Override
             public void changed(ObservableValue<? extends String> obs, String oldp, String newp) {
                 // TODO Auto-generated method stub
-                switch(newp) {
+                switch (newp) {
                     case "Min":
-                        selectedPeriod = "Min";
+                        selectedPeriod.set("Min");
                         break;
                     case "Hour":
-                    selectedPeriod = "Hour";
+                        selectedPeriod.set("Hour");
                         break;
-                    case "Day":
-                        selectedPeriod = "Day";
+                    case "Daily":
+                        selectedPeriod.set("Day");
                         break;
-                    case "Week":
-                        selectedPeriod = "Week";
+                    case "Weekly":
+                        selectedPeriod.set("Week");
                         break;
                     case "Month":
-                        selectedPeriod = "M";
+                        selectedPeriod.set("M");
                         break;
                     case "Year":
-                        selectedPeriod = "Y";
+                        selectedPeriod.set("Y");
                         break;
                 }
 
-                lblTimeFrameState.setText("Current - "+selectedDuration+selectedPeriod);
+            }
+        });
+        tfDur.textProperty().addListener(new ChangeListener<String>() {
 
+            @Override
+            public void changed(ObservableValue<? extends String> obs, String old, String newv) {
+                // TODO Auto-generated method stub
+                System.out.println(newv);
+                selectedDuration.set(Integer.parseInt(newv));
 
-            }});
+            }
 
-        
+        });
+        // Add listener to selectedDuration
+        selectedDuration.addListener(new ChangeListener<Number>() {
+            @Override
+            public void changed(ObservableValue<? extends Number> obs, Number oldVal, Number newVal) {
+                // Update the label with the new value
+                lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
+            }
+        });
+
+        selectedPeriod.addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> obs, String oldVal, String newVal) {
+                // Update the label with the new value
+                lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
+            }
+        });
+        lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
     }
 
     @FXML
@@ -381,7 +460,6 @@ public class DashController {
         String keyID = tfKey_ID.getText();
         String secretKey = tfSec_ID.getText();
         // connect to Alpaca
-
         ac.connect();
         this.onReconnect(event);
 
@@ -486,7 +564,8 @@ public class DashController {
         streamListener.listenToCoin(Set.of(tfSymboltoGet.getText()));
     }
 
-    private ObservableList<OHLCData> getUserData(ActionEvent event) throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException{
+    private ObservableList<OHLCData> getUserData(ActionEvent event)
+            throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
         String sym = tfSymboltoGet.getText();
         String startDate = dpStartDate.getValue().toString();
         String endDate = dpEndDate.getValue().toString();
@@ -509,7 +588,7 @@ public class DashController {
          */
         // Retrieve new data series
         ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth,
-                endDay,selectedTimePeriod);
+                endDay, selectedTimePeriod);
         return series;
     }
 
@@ -610,8 +689,6 @@ public class DashController {
 
     public void onSell(ActionEvent event) {
 
-
-    
     }
 
     @FXML
@@ -712,45 +789,43 @@ public class DashController {
 
         switch (buttonId) {
             case "tbtnDef1D":
-                selectedTimePeriod = "1Day";
-                selectedDuration = 1;
-                
+                selectedPeriod .set("Day");
+                selectedDuration.set(1);
+
                 break;
             case "tbtnDef1MIN":
-                selectedTimePeriod = "1Min";
-                
+                selectedPeriod .set("Min");
+                selectedDuration.set(1);
                 break;
             case "tbtnDef1MON":
-                selectedTimePeriod = "1M";
-                
+                selectedPeriod .set("M");
+                selectedDuration.set(1);
                 break;
             case "tbtnDef1W":
-                selectedTimePeriod = "1Week";
-                
+                selectedPeriod .set("Week");
+                selectedDuration.set(1);
                 break;
             case "tbtnDef1Y":
-                selectedTimePeriod = "12M";
-                
+                selectedPeriod .set("M");
+                selectedDuration.set(12);
                 break;
             case "tbtnDef4H":
-                selectedTimePeriod = "4Hour";
-                
+                selectedPeriod .set("Hour");
+                selectedDuration.set(4);
                 break;
             case "tbtnDef4MON":
-                selectedTimePeriod = "4M";
-                
+                selectedPeriod .set("M");
+                selectedDuration.set(4);
                 break;
             case "tbtnHourly":
-                selectedTimePeriod = "1Hour";
-                
+                selectedPeriod .set("Hour");
+                selectedDuration.set(1);
                 break;
             default:
                 break;
             // Add more cases if you have more toggle buttons
         }
     }
-
-
 
     @FXML
     public void onLogData(ActionEvent event) {
@@ -783,14 +858,12 @@ public class DashController {
             // Get the results from passResults() and add them to lvDataDisplay
             String[] results = bt.passResults();
 
-
-
             ObservableList<String> current = FXCollections.observableArrayList();
-            current.addAll(lvDataDisplay.getItems());
+            //current.addAll(lvDataDisplay.getItems());
             current.addAll(results);
             lvDataDisplay.getItems().clear();
-            //lvDataDisplay.getItems().addAll(results);
-            
+            // lvDataDisplay.getItems().addAll(results);
+
             lvDataDisplay.getItems().addAll(current);
 
         } catch (Exception e) {

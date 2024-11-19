@@ -59,22 +59,22 @@ public class Controller {
     AlpacaController ac = new AlpacaController();
     public boolean rememberMe;
     Properties properties = new Properties();
-    Path config = ac.jatConfigPath;
-
+    JATInfoHandler infoHandler = new JATInfoHandler();
+    Path config = infoHandler.jatConfigPath;
     private double yOffset;
     private double xOffset;
     @FXML
     void initialize() {
         // Load the state of the checkbox when the program starts
         try {
-            String[] propertiesArray = ac.loadProperties();
-            boolean checked = Boolean.parseBoolean(propertiesArray[4]);
+            String[] props = infoHandler.loadProperties();
+            boolean checked = Boolean.parseBoolean(props[4]);
             JATbot.botLogger.info("Remember me: " + checked);
             chkRemember.setSelected(checked);
             rememberMe = checked; // Update the rememberMe variable
             if (checked) {
-                tfKey_ID.setText(propertiesArray[0]);
-                tfSec_ID.setText(propertiesArray[1]);
+                tfKey_ID.setText(props[0]);
+                tfSec_ID.setText(props[1]);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,7 +87,7 @@ public class Controller {
         // Save the state of the checkbox when the program is closed
         try {
             // Modify the specific property using the existing method
-            ac.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
+            infoHandler.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
         } catch (Exception e) {
             JATbot.botLogger.error("Error updating rememberMe property on close: " + e.getMessage());
             e.printStackTrace();
@@ -110,7 +110,7 @@ public class Controller {
         if (rememberMe) {
             try {
                 // Load the properties file
-                String[] propertiesArray = ac.loadProperties();
+                String[] propertiesArray = infoHandler.loadProperties();
                 tfKey_ID.setText(propertiesArray[0]);
                 tfSec_ID.setText(propertiesArray[1]);
                 FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
@@ -135,7 +135,7 @@ public class Controller {
                 props.setProperty("key_id", keyID);
                 props.setProperty("secret_key", secretKey);
     
-                ac.writeProps(config, props);
+                infoHandler.writeProps(config, props);
     
                 loadscene();
     
@@ -149,7 +149,17 @@ public class Controller {
     void onRememberMe(ActionEvent event) {
         try {
             // Modify the specific property
-            ac.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
+            infoHandler.modifyProperty(config, "remMe", String.valueOf(chkRemember.isSelected()));
+            if (chkRemember.isSelected()) {
+                rememberMe = true;
+                infoHandler.modifyProperty(config, "key_id", tfKey_ID.getText());
+                infoHandler.modifyProperty(config, "secret_key", tfSec_ID.getText());
+            } else {
+                rememberMe = false;
+                infoHandler.modifyProperty(config, "key_id", "");
+                infoHandler.modifyProperty(config, "secret_key","");
+            }
+
         } catch (Exception e) {
             JATbot.botLogger.error("Error updating rememberMe property: " + e.getMessage());
         }

@@ -10,6 +10,7 @@ module JAT {
     requires transitive commons.math3;
     requires transitive ctfxplotsplus;
     requires java.sql;
+    requires transitive org.json;
     
 
     opens JAT to javafx.fxml;

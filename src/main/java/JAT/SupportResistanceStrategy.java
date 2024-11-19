@@ -34,35 +34,36 @@ public class SupportResistanceStrategy {
         int checkLeft = 20; // Increased window size
         int checkRight = 20; // Increased window size
         double minPriceDifferencePercent = 0.5; // Fine-tuned minimum price difference in percent
-        int minTouches = 8; // Increased minimum number of touches
+        int minTouches = 3; // Increased minimum number of touches
 
         for (int i = checkLeft; i < barsData.size() - checkRight; i++) {
+            OHLCData d = barsData.get(i);
             int supportTouches = 0;
             int resistanceTouches = 0;
 
             for (int l = i - checkLeft; l < i; l++) {
-                double priceDifferencePercent = Math.abs(barsData.get(i).getLow() - barsData.get(l).getLow()) / barsData.get(l).getLow() * 100;
-                if (priceDifferencePercent <= minPriceDifferencePercent && barsData.get(i).getLow() < barsData.get(i + 1).getLow()) {
+                double priceDifferencePercent = Math.abs(d.getLow() - barsData.get(l).getLow()) / barsData.get(l).getLow() * 100;
+                if (priceDifferencePercent <= minPriceDifferencePercent && d.getLow() < barsData.get(i + 1).getLow()) {
                     supportTouches++;
                 }
             }
 
             for (int r = i + 1; r < i + checkRight; r++) {
-                double priceDifferencePercent = Math.abs(barsData.get(i).getHigh() - barsData.get(r).getHigh()) / barsData.get(r).getHigh() * 100;
-                if (priceDifferencePercent <= minPriceDifferencePercent && barsData.get(i).getHigh() > barsData.get(i - 1).getHigh()) {
+                double priceDifferencePercent = Math.abs(d.getHigh() - barsData.get(r).getHigh()) / barsData.get(r).getHigh() * 100;
+                if (priceDifferencePercent <= minPriceDifferencePercent && d.getHigh() > barsData.get(i - 1).getHigh()) {
                     resistanceTouches++;
                 }
             }
 
             if (supportTouches >= minTouches) {
-                orderConfirm(barsData.get(i).getClose(), barsData.get(i).getDateTime(), true);
+                orderConfirm(d.getClose(), d.getDateTime(), true);
             }
 
             
             if (resistanceTouches >= minTouches) {
-                orderConfirm(barsData.get(i).getClose(), barsData.get(i).getDateTime(), false);
+                orderConfirm(d.getClose(), d.getDateTime(), false);
             }
-        executeTrades(barsData.get(i).getClose());
+        executeTrades(d.getClose());
         }
     }
     
@@ -296,13 +297,14 @@ public class SupportResistanceStrategy {
         List<Double> ema10 = new ArrayList<>();
 
         for (int i = 0; i < barsData.size(); i++) {
+            OHLCData d = barsData.get(i);
             List<Double> prices = barsData.subList(Math.max(0, i - 20), i).stream().map(OHLCData::getClose).collect(Collectors.toList());
             sma20.add(indi.calculateSMA(prices, 20));
             ema21.add(indi.calculateEMA(prices, 21, i > 0 ? ema21.get(i - 1) : sma20.get(0)));
             ema10.add(indi.calculateEMA(prices, 10, i > 0 ? ema10.get(i - 1) : sma20.get(0)));
 
             if (i >= 20 && sma20.get(i) == ema21.get(i) && sma20.get(i) == ema10.get(i)) {
-                return "Signal entry at price: " + barsData.get(i).getClose();
+                return "Signal entry at price: " + d.getClose();
             }
         }
 
