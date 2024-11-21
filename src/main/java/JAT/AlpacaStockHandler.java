@@ -27,6 +27,51 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockBarsResp;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.StockFeed;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.StockLatestBarsRespSingle;
 
+/**
+ * The AlpacaStockHandler class extends the StockApi and provides methods to interact with the Alpaca stock API.
+ * It includes methods to fetch and write stock data asynchronously, as well as methods to get stock bars and latest stock bars.
+ * 
+ * <p>Dependencies:
+ * <p>
+ * - JATInfoHandler: Handles loading properties and handles information asynchronously.
+ * <p>
+ * - ApiClient: The client used to interact with the Alpaca API.
+ * <p>
+ * - AlpacaController: Controller for Alpaca-specific operations.
+ * <p>
+ * - OkHttpClient: HTTP client for making API requests.
+ * 
+ * <p>Methods:
+ * <ul>
+ *   <li>{@link #fetchAndWriteStockData(String, String)}: Fetches stock data for a given symbol and timeframe, and writes it to a file.</li>
+ *   <li>{@link #getStockBarsAsync(String, String, Long, ApiCallback)}: Fetches stock bars asynchronously.</li>
+ *   <li>{@link #getStockBarsWithOHLCDateAsync(String, String, OHLCData, ApiCallback)}: Fetches stock bars asynchronously using an OHLCData object for the start date.</li>
+ *   <li>{@link #getLatestStockbarAsync(String, ApiCallback)}: Fetches the latest stock bar asynchronously.</li>
+ *   <li>{@link #getLatestBarDataAsync(String)}: Fetches the latest OHLC data for a specified symbol asynchronously.</li>
+ *   <li>{@link #getBarsDataWithDateAsync(String, String, OHLCData)}: Fetches OHLC data for a specified symbol using an OHLCData object for the start date asynchronously.</li>
+ *   <li>{@link #getBarsDataAsync(String, String)}: Fetches OHLC data for a specified symbol and timeframe asynchronously.</li>
+ * </ul>
+ * <p>Example usage:
+ * <pre>
+ * {@code
+ * 
+ * AlpacaController ac = new AlpacaController();
+ * AlpacaStockHandler stockHandler = new AlpacaStockHandler(ac.alpaca.marketData().getInternalAPIClient(), controller);
+ * 
+ * stockHandler.fetchAndWriteStockData("AAPL", "1Day").thenRun(() -> {
+ *     System.out.println("Stock data fetched and written to file.");
+ * });
+ * }
+ * </pre>
+ * 
+ * <p>Note: This class requires the Alpaca API and related dependencies to be properly configured.
+ * 
+ * @see StockApi
+ * @see JATInfoHandler
+ * @see ApiClient
+ * @see AlpacaController
+ * @see OkHttpClient
+ */
 public class AlpacaStockHandler extends StockApi {
     private JATInfoHandler infoHandler = new JATInfoHandler();
     String[] props = infoHandler.loadProperties();
@@ -88,6 +133,7 @@ return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdju
         StockFeed.IEX, null,
         null, null, _callback);
 }
+
 
     public okhttp3.Call getLatestStockbarAsync(String symbol,
             final ApiCallback<StockLatestBarsRespSingle> _callback) throws ApiException {
@@ -165,17 +211,12 @@ return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdju
     }
 
     /**
-     * Asynchronously fetches OHLC data for a specified symbol and returns it as an
-     * ObservableList.
+     * Asynchronously fetches OHLC data for a specified symbol using an OHLCData object
+     * for the start date and returns it as an ObservableList.
      *
      * @param sym       the stock symbol
-     * @param stYr      start year
-     * @param stMo      start month
-     * @param stDay     start day
-     * @param endYr     end year
-     * @param endMo     end month
-     * @param endDay    end day
      * @param timeframe the timeframe of the bars (e.g., "1Min", "1Day")
+     * @param od        the OHLCData object to use for the start date
      * @return a CompletableFuture that completes with an ObservableList of OHLCData
      */
     public CompletableFuture<ObservableList<OHLCData>> getBarsDataWithDateAsync(String sym, String timeframe,OHLCData od) {
