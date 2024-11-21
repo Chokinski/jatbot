@@ -2,21 +2,17 @@ package JAT;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.openapi.trader.model.*;
-import net.jacobpeterson.alpaca.rest.marketdata.AlpacaMarketDataAPI;
+
 import net.jacobpeterson.alpaca.model.util.apitype.MarketDataWebsocketSourceType;
 import net.jacobpeterson.alpaca.model.util.apitype.TraderAPIEndpointType;
-import okhttp3.Call;
+
 import okhttp3.OkHttpClient;
-import okhttp3.Response;
 
-import java.io.BufferedReader;
 
-import java.io.IOException;
+
 
 import java.math.BigDecimal;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+
 import java.time.ZoneId;
 import java.time.ZoneOffset;
 
@@ -25,26 +21,63 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
-import java.util.Properties;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import net.jacobpeterson.alpaca.openapi.marketdata.ApiCallback;
-import net.jacobpeterson.alpaca.openapi.marketdata.ApiClient;
+
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
-import net.jacobpeterson.alpaca.openapi.marketdata.api.StockApi;
+
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
-import java.nio.ByteBuffer;
-import java.nio.channels.AsynchronousFileChannel;
-import java.nio.channels.CompletionHandler;
 
-import java.nio.file.StandardOpenOption;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 import com.jat.OHLCData;
+
+/**
+ * The AlpacaController class provides methods to interact with the Alpaca API for trading and market data.
+ * It extends the AlpacaAPI class and includes various methods to retrieve account information, place trades,
+ * and get market data.
+ * <p>Dependencies:
+ * <p>
+ * - JATInfoHandler: Handles loading properties and handles information asynchronously.
+ * <p>
+ * - AlpacaAPI: Used to interact with the Alpaca API.
+ * <p>
+ * - AlpacaController: Controller for Alpaca-specific operations.
+ * <p>
+ * - OkHttpClient: HTTP client for making API requests.
+ * 
+ * <p>Methods included in this class:
+ * <ul>
+ *   <li>{@link #AlpacaController()}: Constructor to initialize the AlpacaController with API credentials and endpoints.</li>
+ *   <li>{@link #connect()}: Connects to the Alpaca API using the provided credentials and endpoints.</li>
+ *   <li>{@link #getAccount()}: Retrieves the account information from the Alpaca API.</li>
+ *   <li>{@link #getAccID()}: Retrieves the account ID.</li>
+ *   <li>{@link #getAccCash()}: Retrieves the cash balance of the account.</li>
+ *   <li>{@link #getPortValue()}: Retrieves the portfolio value of the account.</li>
+ *   <li>{@link #getAccStatus()}: Retrieves the status of the account.</li>
+ *   <li>{@link #getCreateDate()}: Retrieves the creation date of the account.</li>
+ *   <li>{@link #getBuyingPower()}: Retrieves the buying power of the account.</li>
+ *   <li>{@link #getLongMarketValue()}: Retrieves the long market value of the account.</li>
+ *   <li>{@link #getDayTradeLimit()}: Retrieves the day trade limit of the account.</li>
+ *   <li>{@link #getShortMarketValue()}: Retrieves the short market value of the account.</li>
+ *   <li>{@link #getEquity()}: Retrieves the equity of the account.</li>
+ *   <li>{@link #getLastEquity()}: Retrieves the last equity of the account.</li>
+ *   <li>{@link #getInitialMargin()}: Retrieves the initial margin of the account.</li>
+ *   <li>{@link #getMaintenanceMargin()}: Retrieves the maintenance margin of the account.</li>
+ *   <li>{@link #getLastMaintenanceMargin()}: Retrieves the last maintenance margin of the account.</li>
+ *   <li>{@link #getDayTradeCount()}: Retrieves the day trade count of the account.</li>
+ *   <li>{@link #getCurrency()}: Retrieves the currency of the account.</li>
+ *   <li>{@link #getMarketTime()}: Retrieves the current market time.</li>
+ *   <li>{@link #placeTrade(String, String, OrderSide, OrderType, TimeInForce)}: Places a trade order.</li>
+ *   <li>{@link #closeTrade(String, BigDecimal, BigDecimal)}: Closes an open trade position.</li>
+ *   <li>{@link #getAssets()}: Retrieves a list of assets.</li>
+ *   <li>{@link #getBarsData(String, int, int, int, int, int, int, String)}: Retrieves OHLC data for a specific symbol.</li>
+ *   <li>{@link #getOkHttpClient()}: Retrieves the OkHttpClient instance used for API requests.</li>
+ * </ul>
+ * 
+ * <p>Note: This class requires valid Alpaca API credentials and proper configuration to function correctly.
+ */
 
 public class AlpacaController extends AlpacaAPI {
     public AlpacaAPI alpaca;
