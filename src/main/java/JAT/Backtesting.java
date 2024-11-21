@@ -3,18 +3,7 @@ package JAT;
 import com.jat.OHLCData;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javafx.collections.ObservableList;
 
@@ -38,8 +27,8 @@ public class Backtesting {
     }
 
     public static void main(String[] args) {
-        Backtesting backtesting = new Backtesting(ac, 500);
-        testFileFinder("AEAEU");
+        //Backtesting backtesting = new Backtesting(ac, 500);
+
     }
 
     public void run(String symbol, ObservableList<OHLCData> d) {
@@ -87,40 +76,12 @@ public class Backtesting {
         return SRstrat.getFormattedResults();
     }
 
-    public static Map<Path, String> assetFileFind(String sym) {
-        CompletableFuture<Map<Path, String>> future = new CompletableFuture<>();
-        CompletableFuture.runAsync(() -> {
-            Map<Path, String> fileMap = new HashMap<>();
-            Pattern pattern = Pattern.compile(Pattern.quote(sym) + "_(\\w+)\\.txt");
 
-            try {
-                Path searchDir = Paths.get(System.getProperty("user.home"), "JAT");
-                Files.walkFileTree(searchDir, new SimpleFileVisitor<>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-                        Matcher matcher = pattern.matcher(file.getFileName().toString());
-                        if (matcher.matches()) {
-                            String timeframe = matcher.group(1);
-                            fileMap.put(file, timeframe);
-                        }
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
-                future.complete(fileMap);
-            } catch (IOException e) {
-                future.completeExceptionally(e);
-            }
-        });
 
-        return future.join();
-    }
 
-    //This will test file finder, and return file paths and timeframes.
-    public static void testFileFinder(String sym) {
-        Map<Path, String> fileMap = assetFileFind(sym);
-        for (Map.Entry<Path, String> entry : fileMap.entrySet()) {
-            System.out.println("File: " + entry.getKey() + " Timeframe: " + entry.getValue());
-        }
-    }
+
+
+
+
 
 }
