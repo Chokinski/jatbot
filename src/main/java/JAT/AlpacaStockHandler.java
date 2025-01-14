@@ -26,6 +26,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockAdjustment;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.StockBarsResp;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.StockFeed;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.StockLatestBarsRespSingle;
+import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
 
 /**
  * The AlpacaStockHandler class extends the StockApi and provides methods to interact with the Alpaca stock API.
@@ -74,36 +75,49 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockLatestBarsRespSing
  */
 public class AlpacaStockHandler extends StockApi {
     private JATInfoHandler infoHandler = new JATInfoHandler();
-    String[] props = infoHandler.loadProperties();
+    String[] props = JATInfoHandler.loadProperties();
     private String apiKey = props[0];
     private String apiSecret = props[1];
     private String apiEndpoint = props[2];
     private ApiClient apiClient;
 
-    private static AlpacaController controlla;
+
     private static OkHttpClient okClient;
 
-    public AlpacaStockHandler(ApiClient ac, AlpacaController controlla) {
+    public AlpacaStockHandler(ApiClient ac) {
         super(ac);
-        this.controlla = controlla;
+
         this.apiClient = ac;
 
     }
 
-    public CompletableFuture<Void> fetchAndWriteStockData(String sym, String timeframe) {
-        return getBarsDataAsync(sym, timeframe)
+    public CompletableFuture<Void> fetchAndWriteStockData(String sym, String timeframe, AtomicInteger c) {
+        return JATInfoHandler.doesFileExist(sym, timeframe) // Check if the file exists
+                .thenCompose(fileExists -> {
+                    if (fileExists) {
+                        // If the file exists, delete it first
+                        return JATInfoHandler.deleteAssetFile(sym, timeframe);
+                    } else {
+                        // If the file doesn't exist, no need to delete, just continue
+                        return CompletableFuture.completedFuture(null);
+                    }
+                })
+                .thenCompose(aVoid -> getBarsDataAsync(sym, timeframe,c)) // After (potential) deletion, fetch stock data
                 .thenAccept(data -> {
-                    // Create StringBuilder from data
+                    // Create StringBuilder from fetched data
                     StringBuilder sb = new StringBuilder();
                     for (OHLCData ohlc : data) {
                         sb.append(ohlc.toString()).append("\n");
                     }
-
                     // Create file path for asset-specific file
                     Path filePath = Paths.get(System.getProperty("user.home"), "JAT", sym + "_" + timeframe + ".txt");
-
-                    // Write asynchronously to file
-                    infoHandler.asyncWrite(sb, filePath);
+    
+                    // Write asynchronously to the file
+                    JATInfoHandler.asyncWrite(sb, filePath);
+                })
+                .exceptionally(e -> {
+                    JATbot.botLogger.error("Error during fetch and write process: {}", e.getMessage());
+                    return null;
                 });
     }
 
@@ -113,8 +127,37 @@ public class AlpacaStockHandler extends StockApi {
         // Set the start and end dates
         ZoneId zid = ZoneId.of("America/New_York");
         ZoneOffset zoffset = zid.getRules().getOffset(LocalDateTime.now());
+
+
+
+
         OffsetDateTime startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset);
-        return stockBarsAsync(symbols, timeframe, startDateTime, null, limit, StockAdjustment.ALL, "2016-01-10",
+            // Adjust start date dynamically based on timeframe
+            startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+            switch (timeframe) {
+        case "1Day":
+            startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+            break;
+        case "15min":
+            startDateTime = OffsetDateTime.now().minusDays(30).withOffsetSameLocal(zoffset); // For example, limit to 30 days ago for 15min data
+            break;
+        case "1min":
+            startDateTime = OffsetDateTime.now().minusDays(7).withOffsetSameLocal(zoffset); // For example, limit to 7 days ago for 1min data
+            break;
+        case "4Hour":
+        startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+            //startDateTime = startDateTime.minusDays(90); // For example, limit to 90 days ago for 4Hour data
+            break;
+        case "1Week":
+            startDateTime = OffsetDateTime.now().minusDays(365).withOffsetSameLocal(zoffset); // For example, limit to 365 days ago for 1Week data
+        case "1Month":
+        startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+            default:
+            break;
+        
+    }
+
+        return stockBarsAsync(symbols, timeframe, startDateTime, null, limit, StockAdjustment.ALL, null,
                 StockFeed.IEX, null,
                 null, null, _callback);
     }
@@ -194,6 +237,7 @@ return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdju
                                 double low = result.getBar().getL();
                                 double close = result.getBar().getC();
                                 long volume = result.getBar().getV();
+                                
 
                                 future.complete(new OHLCData(date, open, high, low, close, volume));
                                     
@@ -300,116 +344,92 @@ return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdju
      * @param timeframe the timeframe of the bars (e.g., "1Min", "1Day")
      * @return a CompletableFuture that completes with an ObservableList of OHLCData
      */
-    public CompletableFuture<ObservableList<OHLCData>> getBarsDataAsync(String sym, String timeframe) {
-
+    public CompletableFuture<ObservableList<OHLCData>> getBarsDataAsync(String sym, String timeframe, AtomicInteger c) {
+        CompletableFuture<ObservableList<OHLCData>> future = new CompletableFuture<>();
         ObservableList<OHLCData> ohlcDataList = FXCollections.observableArrayList();
-        // Make the asynchronous API call using the provided getStockBarsAsync method
-        return CompletableFuture.supplyAsync(() -> {
-            try {
-
-                getStockBarsAsync(
-                        sym,
-                        timeframe,
-                        10000L, // Limiting to 100 bars
-                        new ApiCallback<StockBarsResp>() {
-
-                            @Override
-                            public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
-                                // Not used for download
-                            }
-
-                            @Override
-                            public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
-                                // Not used for download
-                            }
-
-                            @Override
-                            public void onFailure(net.jacobpeterson.alpaca.openapi.marketdata.ApiException e,
-                                    int statusCode,
-                                    Map<String, List<String>> responseHeaders) {
-                                JATbot.botLogger.error("Error fetching async bars data: {}", e.getMessage());
-                                JATbot.botLogger.error("Status Code: {}", statusCode);
-                                JATbot.botLogger.error("Response Headers: {}", responseHeaders);
-                            }
-
-                            @Override
-                            public void onSuccess(StockBarsResp result, int statusCode,
-                                    Map<String, List<String>> responseHeaders) {
-
-                                // Populate ohlcDataList with the response data
-                                result.getBars().forEach((symbol, barsList) -> {
-                                    AtomicInteger count = new AtomicInteger();
-                                    count.set(0);
-                                    barsList.forEach(bar -> {
-                                        OffsetDateTime timestamp = bar.getT();
-                                        LocalDateTime date = timestamp.toLocalDateTime();
-
-                                        double open = bar.getO();
-                                        double high = bar.getH();
-                                        double low = bar.getL();
-                                        double close = bar.getC();
-                                        long volume = bar.getV();
-
-                                        OHLCData ohlcData = new OHLCData(date, open, high, low, close, volume);
-                                        ohlcDataList.add(ohlcData);
-                                        count.getAndIncrement();
-                                    });
-                                    JATbot.botLogger.info(
-                                            "\nSuccessfully fetched " + count.get() + " bars for {}" + timeframe, sym);
-                                });
-                            }
-
+    
+        try {
+            getStockBarsAsync(sym, timeframe, 1000L, new ApiCallback<StockBarsResp>() {
+                @Override
+                public void onSuccess(StockBarsResp result, int statusCode, Map<String, List<String>> responseHeaders) {
+                    c.incrementAndGet();
+                    result.getBars().forEach((symbol, barsList) -> {
+                        barsList.forEach(bar -> {
+                            OffsetDateTime timestamp = bar.getT();
+                            LocalDateTime date = timestamp.toLocalDateTime();
+                            double open = bar.getO();
+                            double high = bar.getH();
+                            double low = bar.getL();
+                            double close = bar.getC();
+                            long volume = bar.getV();
+    
+                            OHLCData ohlcData = new OHLCData(date, open, high, low, close, volume);
+                            ohlcDataList.add(ohlcData);
                         });
-            } catch (net.jacobpeterson.alpaca.openapi.marketdata.ApiException e) {
-                JATbot.botLogger.error("Error initiating async bars data call: {}", e.getMessage());
-            }
-            return ohlcDataList;
-        });
+                    });
+                    JATbot.botLogger.info("Successfully fetched {} bars for {}{}", ohlcDataList.size(), sym, timeframe);
+                    future.complete(ohlcDataList); // Complete the future with the data
+                }
+    
+                @Override
+                public void onFailure(net.jacobpeterson.alpaca.openapi.marketdata.ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+                    JATbot.botLogger.error("Error fetching async bars data: {}", e.getMessage());
+                    future.completeExceptionally(e); // Complete with exception if failure
+                }
+    
+                @Override
+                public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {}
+    
+                @Override
+                public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {}
+            });
+        } catch (net.jacobpeterson.alpaca.openapi.marketdata.ApiException e) {
+            JATbot.botLogger.error("Error initiating async bars data call: {}", e.getMessage());
+            future.completeExceptionally(e); // Complete with exception if the API call fails
+        }
+    
+        return future;
     }
 
-    /*
-     * public void checkAndUpdateStockData(String sym) {
-     * infoHandler.assetFileFind(sym).thenCompose(fileMap -> {
-     * // Step 1: For each file, check the last entry and get the latest available
-     * timestamp
-     * CompletableFuture<Void> allUpdates =
-     * CompletableFuture.allOf(fileMap.entrySet().stream()
-     * .map(entry -> {
-     * Path filePath = entry.getKey();
-     * String timeframe = entry.getValue();
-     * 
-     * return getLastTimestampFromFile(filePath) // Step 2: Get last timestamp from
-     * file
-     * .thenCompose(lastTimestamp -> {
-     * return getLatestTimestamp(sym, timeframe) // Step 3: Get latest timestamp
-     * from the source
-     * .thenCompose(latestTimestamp -> {
-     * // Step 4: Compare timestamps and determine if update is needed
-     * if (lastTimestamp.isBefore(latestTimestamp)) {
-     * return fetchAndWriteStockData(sym, timeframe, lastTimestamp, latestTimestamp)
-     * // Step 5: Fetch and write data
-     * .thenRun(() -> System.out.println("Data updated for " + sym +
-     * " on timeframe " + timeframe));
-     * } else {
-     * System.out.println("No update needed for " + sym + " on timeframe " +
-     * timeframe);
-     * return CompletableFuture.completedFuture(null);
-     * }
-     * });
-     * });
-     * })
-     * .toArray(CompletableFuture[]::new));
-     * 
-     * return allUpdates;
-     * }).exceptionally(ex -> {
-     * System.out.println("Error checking and updating stock data: " +
-     * ex.getMessage());
-     * return null;
-     * });
-     * }
-     */
+    public okhttp3.Call getStockSnapshotsAsync(String symbols, final ApiCallback<Map<String,StockSnapshot>> _callback) throws ApiException {
+        return stockSnapshotsAsync(symbols,StockFeed.IEX,null, _callback);
+    }
 
-    // Method that gets the lastest timestamp of the OHLCData object within the
-    // datafile.
+    public CompletableFuture<Map<String,StockSnapshot>> getStockSnapshots(String symbols){
+        
+        CompletableFuture<Map<String, StockSnapshot>> future = new CompletableFuture<>();
+            try {
+                getStockSnapshotsAsync(symbols,new ApiCallback<Map<String,StockSnapshot>>() {
 
+    @Override
+    public void onFailure(ApiException e, int statusCode, Map<String, List<String>> responseHeaders) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'onFailure'");
+    }
+
+    @Override
+    public void onSuccess(Map<String, StockSnapshot> result, int statusCode,
+            Map<String, List<String>> responseHeaders) {
+        future.complete(result);
+    }
+
+    @Override
+    public void onUploadProgress(long bytesWritten, long contentLength, boolean done) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'onUploadProgress'");
+    }
+
+    @Override
+    public void onDownloadProgress(long bytesRead, long contentLength, boolean done) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'onDownloadProgress'");
+    }   
+    });
+}
+catch (ApiException e) {
+    // TODO Auto-generated catch block
+    e.printStackTrace();}
+    return future;        
+    }
+                   
 }

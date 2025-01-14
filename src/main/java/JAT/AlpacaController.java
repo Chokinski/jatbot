@@ -25,9 +25,9 @@ import java.time.OffsetDateTime;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
-
+import net.jacobpeterson.alpaca.openapi.broker.model.Asset;
+import net.jacobpeterson.alpaca.openapi.marketdata.ApiCallback;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
 
@@ -84,12 +84,15 @@ public class AlpacaController extends AlpacaAPI {
     private OkHttpClient okClient;
     private static JATInfoHandler infoHandler = new JATInfoHandler();
     static String[]  props = infoHandler.loadProperties();
-
+    public AlpacaStockHandler stockH;
+    public AlpacaAssetHandler assetH;
     public AlpacaController() {
         super(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]),
         MarketDataWebsocketSourceType.valueOf(props[3]),new OkHttpClient());
         this.alpaca = this;
         okClient = this.getOkHttpClient();
+        stockH = new AlpacaStockHandler(this.marketData().getInternalAPIClient());
+        assetH = new AlpacaAssetHandler(this.trader().getInternalAPIClient());
     }
 
 
@@ -275,7 +278,6 @@ public class AlpacaController extends AlpacaAPI {
     }
 
     public List<Assets> getAssets() {
-
         try {
             List<Assets> assets = alpaca.trader().assets().getV2Assets("active", null, null, null);
             //JATbot.botLogger.info("Assets: {}", assets);
@@ -285,6 +287,8 @@ public class AlpacaController extends AlpacaAPI {
         }
         return null;
     }
+
+
     /*
      * public void logRecentData(String sym, String timeframe) {
      * try {

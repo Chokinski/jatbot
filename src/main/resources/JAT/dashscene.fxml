@@ -59,7 +59,7 @@
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.control.TreeTableColumn?>
 <?import javafx.scene.control.TreeTableView?>
-<?import javafx.scene.effect.DropShadow?>
+<?import javafx.scene.effect.GaussianBlur?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -73,22 +73,22 @@
 
 <VBox fx:id="vbDash" alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="702.0" minWidth="1044.0" onMouseDragged="#onDragged" onMousePressed="#onPressed" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="mainWindow" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.DashController">
   <children>
-      <HBox alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="702.0" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="mainWindow" stylesheets="@styles.css" VBox.vgrow="ALWAYS">
+      <HBox alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="759.0" prefWidth="1164.0" style="-fx-background-color: transparent; -fx-border-color: #000; -fx-border-width: 0.001px;" styleClass="mainWindow" stylesheets="@styles.css" VBox.vgrow="ALWAYS">
          <VBox.margin>
             <Insets />
          </VBox.margin>
          <children>
-          <AnchorPane focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="0.0" prefHeight="0.0" prefWidth="1044.0" style="-fx-background-color: transparent; -fx-border-width: 0px;" stylesheets="@styles.css" HBox.hgrow="ALWAYS">
+          <AnchorPane focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="0.0" prefHeight="0.0" prefWidth="1044.0" style="-fx-background-color: #000; -fx-border-width: 0px;" stylesheets="@styles.css" HBox.hgrow="ALWAYS">
             <children>
                   <SplitPane dividerPositions="0.892" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="702.0" minWidth="1044.0" orientation="VERTICAL" prefHeight="702.0" prefWidth="1024.0" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                     <items>
                       <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="1025.0">
                            <children>
-                              <SplitPane dividerPositions="0.8453" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1025.0" style="-fx-border-color: transparent; -fx-border-width: 0px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
+                              <SplitPane dividerPositions="0.7125" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefWidth="1025.0" style="-fx-border-color: #000; -fx-border-width: 0px;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="87.0">
                                 <items>
                                     <SplitPane dividerPositions="0.1952054794520548" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="505.0" prefWidth="876.0">
                                       <items>
-                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="168.0" minHeight="0.0" minWidth="168.0" prefHeight="531.0" prefWidth="168.0" style="-fx-border-width: 0px; -fx-border-color: transparent;" styleClass="accent">
+                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="168.0" minHeight="0.0" minWidth="0.0" prefHeight="531.0" prefWidth="168.0" style="-fx-border-width: 1px; -fx-border-color: #000;" styleClass="accent">
                                              <children>
                                                 <GridPane alignment="CENTER" layoutY="32.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="165.0" prefHeight="117.0" prefWidth="168.0" style="-fx-border-width: 0px;" AnchorPane.leftAnchor="0.0">
                                                    <columnConstraints>
@@ -295,61 +295,123 @@
                                           </ScrollPane>
                                       </items>
                                     </SplitPane>
-                                    <SplitPane cache="true" cacheHint="SPEED" dividerPositions="0.48363636363636364" orientation="VERTICAL" prefHeight="525.0" prefWidth="158.0" style="-fx-border-color: transparent; -fx-border-width: 0px;">
+                                    <SplitPane cache="true" cacheHint="SPEED" dividerPositions="0.48363636363636364" maxWidth="296.0" minWidth="0.0" orientation="VERTICAL" prefHeight="525.0" prefWidth="158.0" style="-fx-border-color: transparent; -fx-border-width: 0px;">
                                       <items>
-                                          <TabPane prefHeight="228.0" prefWidth="158.0" side="BOTTOM" tabClosingPolicy="UNAVAILABLE" tabMaxHeight="0.5" tabMaxWidth="0.0">
-                                             <tabs>
-                                                <Tab text="Acc Info">
-                                                   <content>
-                                                      <SplitPane dividerPositions="0.5131578947368421" prefHeight="230.0" prefWidth="185.0" snapToPixel="false" styleClass="accent">
-                                                        <items>
-                                                          <AnchorPane prefWidth="99.0">
-                                                               <children>
-                                                                  <ListView fx:id="lvAccTypes" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="99.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                               </children>
-                                                            </AnchorPane>
-                                                          <AnchorPane>
-                                                               <children>
-                                                                  <ListView fx:id="lvAccValues" layoutY="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="92.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0" />
-                                                               </children>
-                                                            </AnchorPane>
-                                                        </items>
-                                                      </SplitPane>
-                                                   </content>
-                                                </Tab>
-                                                <Tab text="Trade History">
-                                                   <content>
-                                                      <SplitPane dividerPositions="0.5131578947368421" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="240.0" minWidth="0.0" prefHeight="240.0" prefWidth="158.0" snapToPixel="false" styleClass="accent">
-                                                         <items>
-                                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="275.0" prefWidth="35.0">
-                                                               <children>
-                                                                  <ListView fx:id="lvAccTypes1" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="99.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                                                               </children>
-                                                            </AnchorPane>
-                                                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="272.0" prefWidth="143.0">
-                                                               <children>
-                                                                  <ListView fx:id="lvAccValues1" layoutX="1.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="92.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="0.0" />
-                                                               </children>
-                                                            </AnchorPane>
-                                                         </items>
-                                                      </SplitPane>
-                                                   </content>
-                                                </Tab>
-                                                <Tab text="Orders" />
-                                             </tabs>
-                                          </TabPane>
+                                          <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308">
+                                             <children>
+                                                <TabPane cache="true" prefHeight="228.0" prefWidth="158.0" side="BOTTOM" tabMaxHeight="0.5" tabMaxWidth="0.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                   <tabs>
+                                                      <Tab text="Acc Info">
+                                                         <content>
+                                                            <SplitPane dividerPositions="0.5131578947368421" prefHeight="320.0" prefWidth="296.0" snapToPixel="false" styleClass="accent">
+                                                              <items>
+                                                                <AnchorPane focusTraversable="true">
+                                                                     <children>
+                                                                        <ListView fx:id="lvAccTypes" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="313.0" prefWidth="149.0" styleClass="accent" AnchorPane.bottomAnchor="-7.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                                <AnchorPane focusTraversable="true">
+                                                                     <children>
+                                                                        <ListView fx:id="lvAccValues" layoutY="6.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="92.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="-6.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="6.0" />
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                              </items>
+                                                            </SplitPane>
+                                                         </content>
+                                                      </Tab>
+                                                      <Tab text="Trade History">
+                                                         <content>
+                                                            <SplitPane dividerPositions="0.5131578947368421" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="240.0" minWidth="0.0" prefHeight="240.0" prefWidth="158.0" snapToPixel="false" styleClass="accent">
+                                                               <items>
+                                                                  <AnchorPane focusTraversable="true" minHeight="0.0" minWidth="0.0" prefHeight="275.0" prefWidth="35.0">
+                                                                     <children>
+                                                                        <ListView maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="275.0" prefWidth="99.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                                  <AnchorPane focusTraversable="true" minHeight="0.0" minWidth="0.0" prefHeight="272.0" prefWidth="143.0">
+                                                                     <children>
+                                                                        <ListView layoutX="1.0" layoutY="3.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="306.0" prefWidth="92.0" styleClass="accent" stylesheets="@styles.css" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-12.0" AnchorPane.topAnchor="0.0" />
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                               </items>
+                                                            </SplitPane>
+                                                         </content>
+                                                      </Tab>
+                                                      <Tab text="Orders" />
+                                                      <Tab text="Watchlist">
+                                                         <content>
+                                                            <SplitPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="240.0" minWidth="0.0" prefHeight="240.0" prefWidth="158.0" styleClass="accent">
+                                                               <items>
+                                                                  <AnchorPane focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="0.0">
+                                                                     <children>
+                                                                        <ScrollPane fitToHeight="true" fitToWidth="true" layoutY="37.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" pannable="true" prefHeight="240.0" prefWidth="299.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="-3.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="37.0">
+                                                                           <content>
+                                                                              <TreeTableView fx:id="tbWatchlist" editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefHeight="201.0" prefWidth="297.0" showRoot="false" style="-fx-text-fill: #000;" styleClass="root">
+                                                                                 <columns>
+                                                                                    <TreeTableColumn fx:id="colAssets" maxWidth="1.7976931348623157E308" prefWidth="54.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Asset" />
+                                                                                    <TreeTableColumn fx:id="colAssetBid" maxWidth="1.7976931348623157E308" prefWidth="56.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Bid" />
+                                                                                    <TreeTableColumn fx:id="colAssetAsk" maxWidth="1.7976931348623157E308" prefWidth="53.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Ask" />
+                                                                                    <TreeTableColumn fx:id="colDaily" maxWidth="1.7976931348623157E308" prefWidth="53.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Daily%" />
+                                                                                    <TreeTableColumn fx:id="colAssetBidVol" maxWidth="1.7976931348623157E308" prefWidth="59.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Bid Vol" />
+                                                                                    <TreeTableColumn fx:id="colAssetAskVol" maxWidth="1.7976931348623157E308" prefWidth="74.0" style="-fx-text-fill: #F6F6F4;" styleClass="root" text="Ask Vol" />
+                                                                                 </columns>
+                                                                              </TreeTableView>
+                                                                           </content>
+                                                                        </ScrollPane>
+                                                                        <AnchorPane layoutX="100.0" layoutY="4.0" AnchorPane.bottomAnchor="252.0" AnchorPane.rightAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                                           <children>
+                                                                              <TextField layoutX="-17.0" minHeight="-Infinity" prefHeight="20.0" prefWidth="100.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="3.0">
+                                                                                 <padding>
+                                                                                    <Insets left="100.0" />
+                                                                                 </padding>
+                                                                              </TextField>
+                                                                           </children>
+                                                                        </AnchorPane>
+                                                                        <AnchorPane layoutX="2.0" maxWidth="105.0" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="25.0" prefWidth="105.0" AnchorPane.leftAnchor="0.0">
+                                                                           <children>
+                                                                              <ChoiceBox fx:id="cbAssetClass" centerShape="false" layoutX="9.0" layoutY="8.0" maxHeight="29.0" minHeight="-Infinity" minWidth="-Infinity" nodeOrientation="LEFT_TO_RIGHT" prefHeight="29.0" prefWidth="100.0" style="-fx-text-fill: rgb(255,255,255);" styleClass="btnSell" AnchorPane.leftAnchor="5.0" AnchorPane.topAnchor="5.0">
+                                                                                 <opaqueInsets>
+                                                                                    <Insets />
+                                                                                 </opaqueInsets>
+                                                                                 <cursor>
+                                                                                    <Cursor fx:constant="DEFAULT" />
+                                                                                 </cursor>
+                                                                              </ChoiceBox>
+                                                                           </children>
+                                                                           <effect>
+                                                                              <GaussianBlur radius="1.12" />
+                                                                           </effect>
+                                                                        </AnchorPane>
+                                                                     </children>
+                                                                  </AnchorPane>
+                                                               </items>
+                                                            </SplitPane>
+                                                         </content>
+                                                      </Tab>
+                                                   </tabs>
+                                                </TabPane>
+                                             </children>
+                                          </AnchorPane>
                                           <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="283.0" prefWidth="158.0">
                                              <children>
-                                                <TreeTableView editable="true" layoutX="-427.0" layoutY="69.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="0.0" minWidth="0.0" prefWidth="155.0" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                                  <columns>
-                                                      <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="Volume" />
-                                                    <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="Asset" />
-                                                    <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="Time" />
-                                                      <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="Price" />
-                                                      <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="SL" />
-                                                      <TreeTableColumn maxWidth="200.0" prefWidth="75.0" styleClass="mainPanels" text="TP" />
-                                                  </columns>
-                                                </TreeTableView>
+                                                <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="-3.0" layoutY="-3.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="306.0" prefWidth="400.0" AnchorPane.bottomAnchor="-3.0" AnchorPane.leftAnchor="-4.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="-3.0">
+                                                   <content>
+                                                      <AnchorPane maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minWidth="-Infinity">
+                                                         <children>
+                                                            <TreeTableView editable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" showRoot="false" styleClass="accent" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                              <columns>
+                                                                  <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="71.0" styleClass="mainPanels" text="Price" />
+                                                                <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="99.0" text="Asset" />
+                                                                <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="62.0" styleClass="mainPanels" text="Time" />
+                                                                  <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="75.0" styleClass="mainPanels" text="SL" />
+                                                                  <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="75.0" styleClass="mainPanels" text="TP" />
+                                                                  <TreeTableColumn maxWidth="1.7976931348623157E308" prefWidth="68.0" text="Volume" />
+                                                              </columns>
+                                                            </TreeTableView>
+                                                         </children>
+                                                      </AnchorPane>
+                                                   </content>
+                                                </ScrollPane>
                                              </children>
                                           </AnchorPane>
                                       </items>
@@ -374,14 +436,9 @@
                                           </ImageView>
                                        </children>
                                     </AnchorPane>
-                                 </children>
-                              </AnchorPane>
-                              <AnchorPane layoutY="80.0" maxHeight="52.0" maxWidth="1.7976931348623157E308" minHeight="7.0" prefHeight="7.0" prefWidth="1042.0" style="-fx-background-color: TRANSPARENT;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="80.0">
-                                 <children>
-                                    <Separator layoutX="13.0" layoutY="3.0" maxHeight="14.0" maxWidth="1.7976931348623157E308" minHeight="7.0" minWidth="1006.0" prefHeight="7.0" prefWidth="1027.0" AnchorPane.leftAnchor="13.0" AnchorPane.rightAnchor="2.0" />
-                                    <ToolBar focusTraversable="false" layoutY="-27.0" minWidth="1025.0" prefHeight="34.0" prefWidth="1042.0" style="-fx-background-color: #383F42; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="whitePanel" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                                    <ToolBar cache="true" layoutX="41.0" layoutY="116.0" maxWidth="1.7976931348623157E308" minWidth="1025.0" pickOnBounds="false" prefHeight="23.0" prefWidth="1086.0" style="-fx-background-color: #383F42; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="whitePanel" AnchorPane.leftAnchor="-40.0" AnchorPane.rightAnchor="-40.0" AnchorPane.topAnchor="2.0">
                                        <items>
-                                          <AnchorPane maxHeight="20.0" maxWidth="127.0" prefHeight="20.0" prefWidth="127.0">
+                                          <AnchorPane focusTraversable="true" maxHeight="20.0" maxWidth="127.0" pickOnBounds="false" prefHeight="20.0" prefWidth="127.0">
                                              <children>
                                                 <AnchorPane fx:id="nodeToggle" blendMode="SRC_ATOP" layoutX="7.0" layoutY="4.0" maxHeight="25.0" maxWidth="-Infinity" minHeight="-Infinity" prefHeight="19.0" prefWidth="100.0" style="-fx-background-color: #f6f6f4; -fx-background-radius: 15 6 15 6; -fx-border-width: 2px; -fx-opacity: 50%;" AnchorPane.topAnchor="4.0">
                                                    <children>
@@ -516,15 +573,19 @@
                                                 <Font name="System Bold" size="9.0" />
                                              </font>
                                           </Button>
+                                          <AnchorPane>
+                                             <children>
+                                                <Separator maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="24.0" prefWidth="79.0" style="-fx-opacity: 0;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="-39.0" />
+                                             </children>
+                                          </AnchorPane>
+                                          <AnchorPane />
                                        </items>
+                                       <opaqueInsets>
+                                          <Insets />
+                                       </opaqueInsets>
                                     </ToolBar>
+                                    <AnchorPane layoutY="74.0" prefHeight="13.0" prefWidth="1162.0" styleClass="accent" AnchorPane.leftAnchor="-40.0" AnchorPane.rightAnchor="-40.0" AnchorPane.topAnchor="36.0" />
                                  </children>
-                                 <cursor>
-                                    <Cursor fx:constant="DISAPPEAR" />
-                                 </cursor>
-                                 <effect>
-                                    <DropShadow />
-                                 </effect>
                               </AnchorPane>
                            </children>
                         </AnchorPane>

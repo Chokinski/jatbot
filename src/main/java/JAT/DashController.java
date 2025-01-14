@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import javafx.application.Platform;
 import javafx.scene.control.*;
@@ -28,6 +30,7 @@ import javafx.stage.Stage;
 import javafx.animation.*;
 import javafx.util.Duration;
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiClient;
+import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
 import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
 import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
@@ -37,11 +40,17 @@ import com.jat.OHLCChart;
 import com.jat.OHLCData;
 
 import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import net.jacobpeterson.alpaca.openapi.marketdata.model.StockBar;
+import net.jacobpeterson.alpaca.openapi.marketdata.model.StockQuote;
+import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
+import net.jacobpeterson.alpaca.openapi.marketdata.model.StockTrade;
 
 /**
  * The DashController class is responsible for controlling the dashboard view of
@@ -194,6 +203,27 @@ public class DashController {
     @FXML
     private ChoiceBox<String> cbPd;
 
+    @FXML
+    private ChoiceBox<String> cbAssetClass;
+
+    @FXML
+    private TreeTableView<List<Object>> tbWatchlist;
+    @FXML
+    private TreeTableColumn<List<Object>, String> colAssets;
+    @FXML
+    private TreeTableColumn<List<Object>, Number> colAssetBid;
+    @FXML
+    private TreeTableColumn<List<Object>, Number> colAssetBidVol;
+    @FXML
+    private TreeTableColumn<List<Object>, Number> colAssetAsk;
+    @FXML
+    private TreeTableColumn<List<Object>, Number> colAssetAskVol;
+    @FXML
+    private TreeTableColumn<List<Object>, Number> colDaily;
+    
+
+
+
     private double xOffset;
     private double yOffset;
     // Variables to store the initial position of a drag event
@@ -208,19 +238,20 @@ public class DashController {
     private double scaleX = 1.0;
     private double scaleY = 1.0;
     private String streamChoice = "Stocks";
-    private String selectedTimePeriod = "1Day"; // Default value
+    private static String selectedTimePeriod = "1Day"; // Default value
     //private int selectedDuration.set(1; // Default value
     private IntegerProperty selectedDuration = new SimpleIntegerProperty(1); // Default value
     private StringProperty selectedPeriod = new SimpleStringProperty("Day"); // Default value
-    private StreamListener streamListener;
-    private List<String> timeframes = new ArrayList<>(Arrays.asList("15min", "4Hour", "1Day", "1Week", "1Month"));
+    private StreamListener streamListener;//"15Min", , "1Week", "1Month"
+    private List<String> timeframes = new ArrayList<>(Arrays.asList("4Hour", "1Day"));
     private AlpacaController ac;
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
-    private AlpacaStockHandler stockHandler;
-    private ApiClient adc;
+    //private ApiClient adc;
     private List<Assets> assets;
-
+    private List<String> watchlist = new ArrayList<>(Arrays.asList("AAPL","TSLA","MSFT","META","GOLD"));
+    
+    public JATInfoHandler jai = new JATInfoHandler();
     // private JFreeChart chart;
 
     @FXML
@@ -241,9 +272,16 @@ public class DashController {
             vbDash.setMaxSize(1044, 702);
             this.mainWindow.setFullScreenExitHint("tryhard...");
             ac = new AlpacaController();
-            adc = ac.alpaca.marketData().getInternalAPIClient();
-            AlpacaStockHandler stockHandler = new AlpacaStockHandler(adc, ac);
+            assets = ac.getAssets();
+            //adc = ac.alpaca.marketData().getInternalAPIClient();
+            for(String x : watchlist){
+                System.out.println(x);
+            }
             addInfo();
+            jai.resetRate();
+            //jai.dataFromList(assets,watchlist, ac.stockH,ac.assetH, timeframes);
+
+            
             
 
             // nodeChart.setMouseTransparent(true);
@@ -255,56 +293,9 @@ public class DashController {
             startGradientAnimation();
             startMarketTimeUpdate();
             provideListeners();
+            onBacktest(new ActionEvent());
             
-            AtomicInteger count = new AtomicInteger(0);
-            assets = ac.getAssets();
-            Iterator<Assets> iterator = assets.iterator();
-            ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
-            Runnable fetchTask = new Runnable() {
-                @Override
-                public void run() {
-                    while (iterator.hasNext()) {
-                        Assets asset = iterator.next();
-                        if (count.get() < 200) {
-                            for (String i : timeframes){
-                                stockHandler.fetchAndWriteStockData(asset.getSymbol(), i);
-                                count.incrementAndGet();
-                            }
-                            iterator.remove();
-                            
-                        } else {
-                            // Wait for 70 seconds before continuing
-                            JATbot.botLogger.info("Reached rate limit. Waiting for 70 seconds before continuing.\n");
-    
-                            // Create a separate scheduler for the countdown
-                            ScheduledExecutorService countdownScheduler = Executors.newScheduledThreadPool(1);
-                            AtomicInteger remainingTime = new AtomicInteger(70);
-    
-                            CompletableFuture<Void> countdownFuture = new CompletableFuture<>();
-    
-                            countdownScheduler.scheduleAtFixedRate(() -> {
-                                int timeLeft = remainingTime.decrementAndGet();
-                                if (timeLeft >= 0) {
-                                    // Log the remaining time in the terminal, updating the same line
-                                    System.out.print("\rWaiting: " + timeLeft + " seconds remaining");
-                                } else {
-                                    countdownScheduler.shutdown();
-                                    countdownFuture.complete(null);
-                                }
-                            }, 0, 1, TimeUnit.SECONDS);
-    
-                            try {
-                                countdownFuture.get(); // Wait for the countdown to complete
-                            } catch (InterruptedException | ExecutionException e) {
-                                Thread.currentThread().interrupt();
-                            }
-    
-                            count.set(0); // Reset the count after waiting
-                        }
-                    }
-                }
-            };
-            scheduler.schedule(fetchTask, 0, TimeUnit.SECONDS);
+
         });
 
     }
@@ -328,8 +319,102 @@ public class DashController {
         ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour", "Daily", "Weekly", "Month",
                 "Year");
         cbPd.setItems(periods);
+        ObservableList<String> classes = FXCollections.observableArrayList("Stocks", "Crypto","Options","Futures","Forex");
+        cbAssetClass.setItems(classes);
+
+
+        Platform.runLater(() -> {populateWatchlist(watchlist);});
+        
 
     }
+public void populateWatchlist(List<String> watchlist) {
+    // Initialize root node with an empty list of objects (no initial data)
+    final TreeItem<List<Object>> root = new TreeItem<>(new ArrayList<>(Arrays.asList("Assets", "", "", "")));
+    root.setExpanded(true); // Expand the root node by default
+    tbWatchlist.setShowRoot(false); // Hide the root node in the TreeTableView
+    tbWatchlist.setRoot(root);
+
+    // Set up the cell value factories for each column
+    colAssets.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().get(0).toString())); // Asset symbol (String)
+
+    colAssetAsk.setCellValueFactory(param -> {
+        Object value = param.getValue().getValue().get(1);
+        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
+    });
+
+    colAssetBid.setCellValueFactory(param -> {
+        Object value = param.getValue().getValue().get(2);
+        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
+    });
+
+    colDaily.setCellValueFactory(param -> {
+        Object value = param.getValue().getValue().get(3);
+        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
+    });
+
+    colAssetBidVol.setCellValueFactory(param -> {
+        Object value = param.getValue().getValue().get(4);
+        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
+    });
+
+    colAssetAskVol.setCellValueFactory(param -> {
+        Object value = param.getValue().getValue().get(5);
+        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
+    });
+
+    // Fetch the stock snapshots asynchronously
+    Map<String, StockSnapshot> snapResp = ac.stockH.getStockSnapshots(String.join(",", watchlist)).join();
+
+    List<CompletableFuture<Void>> futures = new ArrayList<>();
+
+    // Iterate over each symbol in snapResp
+    for (Map.Entry<String, StockSnapshot> entry : snapResp.entrySet()) {
+        String symbol = entry.getKey();
+        StockSnapshot snapshot = entry.getValue();
+
+        // Get the StockQuote for bid/ask/bidVol/askVol
+        jai.addToRate();
+        StockQuote quote = snapshot.getLatestQuote();
+        if (quote != null) {
+            double bid = quote.getBp();
+            double ask = quote.getAp();
+            int bidVol = quote.getBs();
+            int askVol = quote.getAs();
+
+            // Calculate the daily percentage change
+            double dailyPercentage = 0;
+            StockBar dailyBar = snapshot.getDailyBar();
+            StockTrade latestT = snapshot.getLatestTrade();
+            if (latestT != null && dailyBar != null && dailyBar.getO() != 0) {
+                dailyPercentage = (dailyBar.getC() - latestT.getP()) / dailyBar.getO() * 100;
+            }
+
+            // Create the row with asset data: symbol, bid, ask, daily%, bidVol, askVol
+            List<Object> row = Arrays.asList(symbol, ask, bid, dailyPercentage, bidVol, askVol);
+
+            // Create a new TreeItem for the row
+            TreeItem<List<Object>> treeItem = new TreeItem<>(row);
+
+            // Add the new TreeItem to the TreeView in a thread-safe way
+            Platform.runLater(() -> {
+                root.getChildren().add(treeItem); // Add directly to the root
+            });
+        } else {
+            System.err.println("No quote data available for symbol: " + symbol);
+        }
+    }
+
+    // Wait for all futures to complete (if necessary)
+    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
+            .thenRun(() -> {
+                System.out.println("All asset data fetched and added to the watchlist.");
+            })
+            .exceptionally(e -> {
+                e.printStackTrace();
+                return null;
+            });
+}
+    
 
     protected void provideListeners() {
         cbPd.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
@@ -566,19 +651,7 @@ public class DashController {
 
     private ObservableList<OHLCData> getUserData(ActionEvent event)
             throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
-        String sym = tfSymboltoGet.getText();
-        String startDate = dpStartDate.getValue().toString();
-        String endDate = dpEndDate.getValue().toString();
-        LocalDate startParse = LocalDate.parse(startDate);
-        LocalDate endParse = LocalDate.parse(endDate);
 
-        int startYear = startParse.getYear();
-        int startMonth = startParse.getMonthValue();
-        int startDay = startParse.getDayOfMonth();
-
-        int endYear = endParse.getYear();
-        int endMonth = endParse.getMonthValue();
-        int endDay = endParse.getDayOfMonth();
         /*
          * Debugging statements
          * JATbot.botLogger.info("Start Date: " + startParse+"\nEnd Date: " + endParse+
@@ -587,9 +660,8 @@ public class DashController {
          * "\nEnd Year: " + endYear+"\nEnd Month: " + endMonth+"\nEnd Day: " + endDay);
          */
         // Retrieve new data series
-        ObservableList<OHLCData> series = ac.getBarsData(sym, startYear, startMonth, startDay, endYear, endMonth,
-                endDay, selectedTimePeriod);
-        return series;
+
+        return ac.stockH.getBarsDataAsync("aapl", selectedTimePeriod,jai.getCount()).join();
     }
 
     // Sets the text of the button
@@ -832,46 +904,67 @@ public class DashController {
     }
 
     @FXML
-    public void onBacktest(ActionEvent event) throws IOException {
-        String sym = tfSymboltoGet.getText();
+public void onBacktest(ActionEvent event) {
+    String sym = "aapl";//tfSymboltoGet.getText();
 
+    CompletableFuture.supplyAsync(() -> {
         try {
-            // Create a new instance of Backtesting
-            Backtesting bt = new Backtesting(ac, 500);
-
-            // Get backtesting data for the symbol
-            ObservableList<OHLCData> series = getUserData(event);
-
-            // Run backtesting for the symbol
-            bt.run(sym, series);
-
-            // Clear existing chart from nodeChart if it exists
-            if (chart != null) {
-                nodeChart.getChildren().remove(chart);
-            }
-
-            // Show the OHLC chart with backtesting results
-            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
-            this.chart = ph.getOHLCChart();
-            this.chart.setTitle(sym);
-
-            // Get the results from passResults() and add them to lvDataDisplay
-            String[] results = bt.passResults();
-
-            ObservableList<String> current = FXCollections.observableArrayList();
-            //current.addAll(lvDataDisplay.getItems());
-            current.addAll(results);
-            lvDataDisplay.getItems().clear();
-            // lvDataDisplay.getItems().addAll(results);
-
-            lvDataDisplay.getItems().addAll(current);
-
-        } catch (Exception e) {
+            return getUserData(event);
+        } catch (ApiException e) {
             e.printStackTrace();
-            // Handle exceptions, e.g., display an error message
         }
-    }
+        return null;
+    })
+    .thenCompose(series -> CompletableFuture.supplyAsync(() -> {
+        // Perform backtesting logic here
+        if (series != null) {
 
+        }
+        return series;
+    }))
+    .thenCompose(series -> {
+        // Run the backtest after data processing
+        return CompletableFuture.runAsync(() -> {
+            try {
+
+                if (series != null) {
+                    for (OHLCData data : series) {
+                        System.out.println(data);
+                    }
+                    Backtesting bt = new Backtesting(ac, 500);
+                    bt.run(sym, series);
+
+                    String[] results = bt.passResults();
+                    Platform.runLater(() -> {
+
+                        try {
+                            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 1000, series);
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        }
+                        this.chart = ph.getOHLCChart();
+                        this.chart.setTitle(sym);
+    
+                        ObservableList<String> current = FXCollections.observableArrayList();
+                        current.addAll(results);
+                        lvDataDisplay.getItems().clear();
+                        lvDataDisplay.getItems().addAll(current);
+                    });
+
+                } else {
+                    System.out.println("No data available for backtesting.");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
+    })
+    .exceptionally(ex -> {
+        ex.printStackTrace();
+        return null;
+    });
+}
     @FXML
     public void onExit(MouseEvent event) {
         Platform.exit();

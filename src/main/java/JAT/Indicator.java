@@ -6,7 +6,7 @@ import com.jat.OHLCData;
 
 import javafx.collections.ObservableList;
 
-public abstract class Indicator {
+public class Indicator {
 
 
     public double [] parseData(ObservableList<OHLCData> data){
@@ -20,7 +20,7 @@ public abstract class Indicator {
     }
 
     
-    public double calculateSMA(List<Double> prices, int period) {
+    public static double calculateSMA(List<Double> prices, int period) {
         if(prices.size() < period) throw new ArithmeticException("Not enough data points.");
         
         int sum = 0;
@@ -30,7 +30,7 @@ public abstract class Indicator {
         return (double)sum/period;
     }
     
-    public double calculateEMA(List<Double> prices, int period, double previousEMA) {
+    public static double calculateEMA(List<Double> prices, int period, double previousEMA) {
         double smoothingConstant = 2.0 / (period + 1);
         // Assuming that the latest price is at the end of the list
         double close = prices.get(prices.size() - 1);

@@ -2,7 +2,6 @@
     -fx-border-width: 0px;
     -fx-font-family: 'Montserrat', sans-serif;
     -fx-background-color:#383F42;
-
 }
 
 .mainWindow{
@@ -48,7 +47,6 @@
 -fx-opacity: 100%;
 
 }
-
 .btnAccent {
     -fx-background-color:#331872;
     -fx-text-fill: #f6f6f4;
@@ -103,6 +101,40 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 
 
 
+}
+
+.headerAreas {
+
+    -fx-text-fill: #f6f6f4;
+    -fx-foreground-color: #f6f6f4;
+
+}
+.headerAreas.label {
+
+-fx-text-fill:#F6F6F4;
+
+}
+.table-column {
+    -fx-padding: 0px;
+}
+
+.table-column .label {
+    -fx-background-color: #383F42;
+    -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 5, 0);
+}
+
+.table-column .label .text {
+    -fx-fill: #c5b3f0f4;
+    
+}
+.table-column {
+
+    -fx-background-color: #383F42;
+    -fx-border-color: #F6F6F4;
+    -fx-border-width: 0.3px;
+    -fx-fill: #F6F6F4;
+    -fx-text-fill:#F6F6F4;;
 }
 
 .btnSell {
@@ -163,7 +195,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .titled-pane >.title {
-    -fx-background-color: #383F42;
+    -fx-background-color: #383f42;
     -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 5, 0);
 }
@@ -174,7 +206,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 
 .whitePanel {
     -fx-background-color: #F6F6F4;
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0, 0, 0);
 }
 
 .split-pane:vertical > .split-pane-divider{

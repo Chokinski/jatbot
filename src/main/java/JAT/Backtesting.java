@@ -32,8 +32,10 @@ public class Backtesting {
     }
 
     public void run(String symbol, ObservableList<OHLCData> d) {
-        testOnData(d);
-        this.SRstrat = new SupportResistanceStrategy(initialCapital, barsData, symbol);
+        this.barsData = d;
+        System.out.println("Running backtest for " + symbol);
+
+        this.SRstrat = new SupportResistanceStrategy(initialCapital, d, symbol);
         System.out.println("\n\nRunning backtest for " + symbol);
 
         try {
@@ -61,9 +63,6 @@ public class Backtesting {
         return null;
     }
 
-    public void testOnData(ObservableList<OHLCData> d) {
-        barsData = d;
-    }
 
     public void outputResults(String[] results) {
         for (String result : results) {
