@@ -12,6 +12,7 @@ public class Trade {
     private double portfolioBalanceAfter;
     private double stopLoss;
     private double takeProfit;
+    private double quantity;
 
     public Trade(boolean isLong, double entryPrice, LocalDateTime date, double portfolioBalanceBefore) {
         this.isLong = isLong;
@@ -23,6 +24,7 @@ public class Trade {
         this.portfolioBalanceAfter = portfolioBalanceBefore;
         this.stopLoss = 0.0;
         this.takeProfit = 0.0;
+        this.quantity = 0.0;
 
     }
 
@@ -40,7 +42,8 @@ public class Trade {
     public void setPortfolioBalanceAfter(double portfolioBalanceAfter) { this.portfolioBalanceAfter = portfolioBalanceAfter; }
     public double setStopLoss(double stopLoss) {return this.stopLoss = stopLoss;}
     public double setTakeProfit(double takeProfit) {return this.takeProfit = takeProfit;}
-
+    public double setQuantity(double quantity) {return this.quantity = quantity;}
+    public double getQuantity() {return this.quantity;}
     @Override
     public String toString() {
         return (netGainLoss >= 0 ? "Profitable" : "Loss") + " " + (isLong ? "Long" : "Short") +

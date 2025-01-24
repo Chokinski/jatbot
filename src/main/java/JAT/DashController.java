@@ -293,6 +293,7 @@ public class DashController {
             startGradientAnimation();
             startMarketTimeUpdate();
             provideListeners();
+            tfSymboltoGet.setText("AAPL");
             onBacktest(new ActionEvent());
             
 
@@ -661,7 +662,7 @@ public void populateWatchlist(List<String> watchlist) {
          */
         // Retrieve new data series
 
-        return ac.stockH.getBarsDataAsync("aapl", selectedTimePeriod,jai.getCount()).join();
+        return ac.stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
     }
 
     // Sets the text of the button
@@ -905,7 +906,7 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
 public void onBacktest(ActionEvent event) {
-    String sym = "aapl";//tfSymboltoGet.getText();
+    String sym = tfSymboltoGet.getText();
 
     CompletableFuture.supplyAsync(() -> {
         try {
@@ -968,6 +969,7 @@ public void onBacktest(ActionEvent event) {
     @FXML
     public void onExit(MouseEvent event) {
         Platform.exit();
+        System.exit(0);
 
     }
 }

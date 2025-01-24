@@ -41,68 +41,60 @@ public abstract class Strategy {
             double stopLossLevel = trade.getStopLoss();
             double takeProfitLevel = trade.getTakeProfit();
             double entryPrice = trade.getEntryPrice();
-            double closePrice = trade.getClosePrice();
-
-            // Check if the trade hits stop loss or take profit
-            if (currentPrice <= stopLossLevel || currentPrice >= takeProfitLevel) {
-                double tradeProfit = currentPrice - entryPrice;
-                double netGainLoss = tradeProfit * (closePrice <= entryPrice ? -1 : 1);
+            boolean isLong = trade.isLong(); // Access the isLong flag
+    
+            // Determine if stop loss or take profit levels are hit for long/short positions
+            boolean stopLossHit = isLong ? currentPrice <= stopLossLevel : currentPrice >= stopLossLevel;
+            boolean takeProfitHit = isLong ? currentPrice >= takeProfitLevel : currentPrice <= takeProfitLevel;
+    
+            if (stopLossHit || takeProfitHit) {
+                double tradeProfit = isLong ? currentPrice - entryPrice : entryPrice - currentPrice;
+                double netGainLoss = tradeProfit * trade.getQuantity(); // Assuming quantity is a property of Trade
                 accountBalance += netGainLoss;
                 trade.setClosePrice(currentPrice); // Update close price
                 trade.setNetGainLoss(netGainLoss); // Update net gain/loss
                 trade.setPortfolioBalanceAfter(accountBalance); // Update portfolio balance after the trade
-
+    
                 // Move trade to completeTrades and remove from trades
                 completeTrades.add(trade);
                 trades.remove(i);
                 i--; // Adjust index after removal
-            } else {
-                // Implement trailing stop loss
-                double trailingStopLevel = entryPrice * (1 - trailingStopPercent / 100);
-
-                if (currentPrice <= trailingStopLevel || currentPrice >= takeProfitLevel) {
-                    double tradeProfit = currentPrice - entryPrice;
-                    double netGainLoss = tradeProfit * (closePrice <= entryPrice ? -1 : 1);
-                    accountBalance += netGainLoss;
-                    trade.setClosePrice(currentPrice); // Update close price
-                    trade.setNetGainLoss(netGainLoss); // Update net gain/loss
-                    trade.setPortfolioBalanceAfter(accountBalance); // Update portfolio balance after the trade
-
-                    // Move trade to completeTrades and remove from trades
-                    completeTrades.add(trade);
-                    trades.remove(i);
-                    i--; // Adjust index after removal
-                }
             }
         }
     }
 
     public void orderConfirm(double currentPrice, LocalDateTime date, boolean uptrend) {
-        // Note the trade along with the portfolio balances
-
-        double riskPercentage = trades.isEmpty() ? 0.02 : 0.01; // Adjusted initial risk percentage to 2%, then 1%
-        double riskAmount = accountBalance * riskPercentage;
-        double positionSize = riskAmount / currentPrice;
+        double riskPercentage = trades.isEmpty() ? 0.02 : 0.01; // 2% for the first trade, then 1%
+        double riskAmount = accountBalance * riskPercentage; // Calculate the risk amount (1% of account balance)
+        double positionSize =(riskAmount / currentPrice); // Calculate the number of shares to purchase
+        double moneyUsed = positionSize * currentPrice; // Calculate money used in this trade
+    
+        if (moneyUsed > accountBalance) {
+            System.out.println("Insufficient funds to execute this trade.");
+            return; // Exit if there's not enough balance
+        }
+    
         double portfolioBalanceBefore = accountBalance; // Store portfolio balance before the trade
-
+        accountBalance -= moneyUsed; // Deduct the amount used for the trade from the account balance
+    
+        // Create a new Trade object with relevant details
+        Trade trade = new Trade(uptrend, currentPrice, date, portfolioBalanceBefore);
+        trade.setQuantity(positionSize); // Set the quantity of shares for the trade
+    
         double stopLossLevel;
         double takeProfitLevel;
-        double moneyUsed = positionSize * currentPrice; // Calculate money used in this trade
-        accountBalance -= moneyUsed;
-        Trade trade = new Trade(uptrend, currentPrice, date, portfolioBalanceBefore);
-        if (uptrend) {
-            // Adjust stop loss and take profit levels for uptrend trades
-            stopLossLevel = currentPrice * 0.97; // Tightened stop loss level
-            takeProfitLevel = currentPrice * 1.05; // Extended take profit level
-        } else {
-
-            // Adjust stop loss and take profit levels for downtrend trades
-            stopLossLevel = currentPrice * 1.05; // Extended stop loss level
-            takeProfitLevel = currentPrice * 0.97; // Tightened take profit level
-        }
-        trade.setStopLoss(stopLossLevel);
-        trade.setTakeProfit(takeProfitLevel);
-        trades.add(trade);
+    
+if (uptrend) {
+    stopLossLevel = currentPrice * 0.98; // Slightly wider stop loss for flexibility
+    takeProfitLevel = currentPrice * 1.1; // More conservative take profit
+} else {
+    stopLossLevel = currentPrice * 1.01; // More conservative stop loss for downtrend
+    takeProfitLevel = currentPrice * 0.90; // Slightly less aggressive take profit
+}
+    
+        trade.setStopLoss(stopLossLevel); // Set stop loss level
+        trade.setTakeProfit(takeProfitLevel); // Set take profit level
+        trades.add(trade); // Add the trade to the list of active trades
     }
 
     // Getters for strategy performance metrics
