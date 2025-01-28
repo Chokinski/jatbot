@@ -1,15 +1,13 @@
 package JAT;
 
-import java.util.ArrayList;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.jat.OHLCData;
 
-import net.jacobpeterson.alpaca.openapi.broker.model.Asset;
 import net.jacobpeterson.alpaca.openapi.trader.ApiCallback;
 import net.jacobpeterson.alpaca.openapi.trader.ApiClient;
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;

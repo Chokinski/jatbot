@@ -681,10 +681,6 @@ public void populateWatchlist(List<String> watchlist) {
 
             ObservableList<OHLCData> series = getUserData(event);
 
-            // Create and show new OHLC chart
-            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 0, series);
-            this.chart = ph.getOHLCChart();
-            this.chart.setTitle(sym);
 
         } catch (DateTimeParseException e) {
             System.err.println("Error parsing date: " + e.getMessage());
@@ -953,9 +949,7 @@ public void onBacktest(ActionEvent event) {
             try {
                 String sym = tfSymboltoGet.getText();
                 if (series != null) {
-                    for (OHLCData data : series) {
-                        System.out.println(data);
-                    }
+
                     Backtesting bt = new Backtesting(ac, 500);
                     bt.run(sym, series);
 
@@ -964,7 +958,7 @@ public void onBacktest(ActionEvent event) {
 
                         try {
                             
-                            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 1000, series);
+                            this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, series);
                         } catch (IOException e) {
                             // TODO Auto-generated catch block
                             e.printStackTrace();

@@ -33,10 +33,8 @@ public class Backtesting {
 
     public void run(String symbol, ObservableList<OHLCData> d) {
         this.barsData = d;
-        System.out.println("Running backtest for " + symbol);
 
         this.SRstrat = new SupportResistanceStrategy(initialCapital, d, symbol);
-        System.out.println("\n\nRunning backtest for " + symbol);
 
         try {
             OHLCParser.writeResultsUsingStandardOutput(barsData);

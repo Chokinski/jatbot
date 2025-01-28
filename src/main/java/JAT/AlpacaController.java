@@ -27,8 +27,7 @@ import java.time.OffsetDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
-import net.jacobpeterson.alpaca.openapi.broker.model.Asset;
-import net.jacobpeterson.alpaca.openapi.marketdata.ApiCallback;
+
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
 
@@ -355,6 +354,7 @@ public class AlpacaController extends AlpacaAPI {
      * 
      * @throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException
      */
+    
     public ObservableList<OHLCData> getBarsData(String sym, int stYr, int stMo, int stDay,
             int endYr, int endMo, int endDay, String timeframe)
             throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
