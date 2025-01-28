@@ -7,7 +7,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
+
 import java.util.Properties;
 
 import org.slf4j.Logger;
@@ -17,7 +17,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.TextInputDialog;
+
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 

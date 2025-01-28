@@ -1,7 +1,7 @@
 package JAT;
 
 import com.jat.OHLCData;
-import javafx.collections.ObservableList;
+
 
 import java.util.ArrayList;
 import java.util.List;

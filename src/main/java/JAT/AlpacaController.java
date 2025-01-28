@@ -27,8 +27,7 @@ import java.time.OffsetDateTime;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.jacobpeterson.alpaca.openapi.trader.ApiException;
-import net.jacobpeterson.alpaca.openapi.broker.model.Asset;
-import net.jacobpeterson.alpaca.openapi.marketdata.ApiCallback;
+
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
 

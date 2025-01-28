@@ -12,7 +12,7 @@ module JAT {
     requires transitive java.desktop;
     requires java.base;
     requires commons.math3;
-    requires com.jat.ctfxplotsplus;
+    requires transitive com.jat.ctfxplotsplus;
     requires java.sql;
     requires transitive org.json;
     
