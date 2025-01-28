@@ -19,6 +19,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
@@ -107,153 +108,211 @@ public class AlpacaController extends AlpacaAPI {
     }
 
     public Account getAccount() {
-        try {
-            // Get 'Account' information
-            Account account = alpaca.trader().accounts().getAccount();
-            return account;
-        } catch (net.jacobpeterson.alpaca.openapi.trader.ApiException exception) {
-            JATbot.botLogger.error("Error getting acc info: " + exception.getMessage());
-            return null;
-        }
 
+        return CompletableFuture.supplyAsync(()->{
+            try {
+                return alpaca.trader().accounts().getAccount();
+            } catch (net.jacobpeterson.alpaca.openapi.trader.ApiException exception) {
+                JATbot.botLogger.error("Error getting acc info: " + exception.getMessage());
+                return null;
+            }
+        }).join();
     }
 
     public String getAccID() {
-        String accID = getAccount().getAccountNumber();
-        // JATbot.botLogger.info("Account ID: {}", accID);
-        JATbot.botLogger.info("Account ID Logged" + "\n");
-        return accID;
+        return CompletableFuture.supplyAsync(()->{
+
+            return getAccount().getAccountNumber();
+        }).join();
+        
+ 
     }
 
     public String getAccCash() {
-        String cash = getAccount().getCash();
-        // JATbot.botLogger.info("Account Cash: {}", cash);
-        JATbot.botLogger.info("Cash Logged" + "\n");
-        return cash;
+
+        return CompletableFuture.supplyAsync(()->{
+  
+            return getAccount().getCash();
+        }).join();
     }
 
     public String getPortValue() {
-        String portValue = getAccount().getPortfolioValue();
-        // JATbot.botLogger.info("Portfolio Value: {}", portValue);
-        JATbot.botLogger.info("Portfolio Value Logged" + "\n");
-        return portValue;
+
+        return CompletableFuture.supplyAsync(()->{
+  
+            return getAccount().getPortfolioValue();
+        }).join();
 
     }
 
     public String getAccStatus() {
-        AccountStatus status = getAccount().getStatus();
-        // JATbot.botLogger.info("Account Status: {}", status);
-        JATbot.botLogger.info("Account Status Logged" + "\n");
 
-        return status.toString();
+        
+        return CompletableFuture.supplyAsync(()->{
+            return getAccount().getStatus().toString();
+        }).join();
 
     }
-
+  
     public String getCreateDate() {
-        OffsetDateTime creation = getAccount().getCreatedAt();
-        // JATbot.botLogger.info("Date Created: {}", creation);
-        // JATbot.botLogger.info("Date Created" + "\n");
-        String creationString = creation.format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
-        return creationString;
+
+
+        return CompletableFuture.supplyAsync(()->{
+                return getAccount().getCreatedAt().format(DateTimeFormatter.ISO_ZONED_DATE_TIME);
+        }).join();
 
     }
 
     public String getBuyingPower() {
-        String tradeableFunds = getAccount().getBuyingPower();
-        // JATbot.botLogger.info("Tradeable Funds: {}", tradeableFunds);
-        // JATbot.botLogger.info("Tradeable Funds Logged" + "\n");
-        return tradeableFunds;
+
+        return CompletableFuture.supplyAsync(()->{
+            return getAccount().getBuyingPower();
+
+
+        }).join();
 
     }
 
     public String getLongMarketValue() {
-        String longMarketValue = getAccount().getLongMarketValue();
-        // JATbot.botLogger.info("Long Market Value: {}", longMarketValue);
-        // JATbot.botLogger.info("Long Market Value Logged" + "\n");
-        return longMarketValue;
+
+
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getLongMarketValue();
+
+
+        }).join();
 
     }
 
     public String getDayTradeLimit() {
-        int dayTradeLimit = getAccount().getDaytradeCount();
-        // JATbot.botLogger.info("Day Trade Limit: {}", dayTradeLimit);
-        // JATbot.botLogger.info("Day Trade Limit Logged" + "\n");
-        return Integer.toString(dayTradeLimit);
+
+        
+        return CompletableFuture.supplyAsync(()->{
+
+            return Integer.toString(getAccount().getDaytradeCount());
+
+
+            
+        }).join();
 
     }
 
     public String getShortMarketValue() {
-        String shortMarketValue = getAccount().getShortMarketValue();
-        // JATbot.botLogger.info("Short Market Value: {}", shortMarketValue);
-        // JATbot.botLogger.info("Short Market Value Logged" + "\n");
-        return shortMarketValue;
+
+        
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getShortMarketValue();
+
+            
+        }).join();
 
     }
 
     public String getEquity() {
-        String equity = getAccount().getEquity();
-        // JATbot.botLogger.info("Equity: {}", equity);
-        // JATbot.botLogger.info("Equity Logged" + "\n");
-        return equity;
+
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getEquity();
+
+            
+        }).join();
 
     }
 
     public String getLastEquity() {
-        String lastEquity = getAccount().getLastEquity();
-        // JATbot.botLogger.info("Last Equity: {}", lastEquity);
-        // JATbot.botLogger.info("Last Equity Logged" + "\n");
-        return lastEquity;
+
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getLastEquity();
+
+            
+        }).join();
 
     }
 
+
     public String getInitialMargin() {
-        String initialMargin = getAccount().getInitialMargin();
-        // JATbot.botLogger.info("Initial Margin: {}", initialMargin);
-        // JATbot.botLogger.info("Initial Margin Logged" + "\n");
-        return initialMargin;
+
+        
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getInitialMargin();
+
+            
+        }).join();
 
     }
 
     public String getMaintenanceMargin() {
-        String maintenanceMargin = getAccount().getMaintenanceMargin();
-        // JATbot.botLogger.info("Maintenance Margin: {}", maintenanceMargin);
-        // JATbot.botLogger.info("Maintenance Margin Logged" + "\n");
-        return maintenanceMargin;
+
+        
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getMaintenanceMargin();
+
+            
+        }).join();
 
     }
 
     public String getLastMaintenanceMargin() {
-        String lastMaintenanceMargin = getAccount().getLastMaintenanceMargin();
-        // JATbot.botLogger.info("Last Maintenance Margin: {}", lastMaintenanceMargin);
-        // JATbot.botLogger.info("Last Maintenance Margin Logged" + "\n");
-        return lastMaintenanceMargin;
+
+        
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getLastMaintenanceMargin();
+
+            
+        }).join();
 
     }
 
     public String getDayTradeCount() {
-        int dayTradeCount = getAccount().getDaytradeCount();
-        // JATbot.botLogger.info("Day Trade Count: {}", dayTradeCount);
-        // JATbot.botLogger.info("Day Trade Count Logged" + "\n");
-        return Integer.toString(dayTradeCount);
+
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return Integer.toString(getAccount().getDaytradeCount());
+
+            
+        }).join();
 
     }
 
     public String getCurrency() {
-        String currency = getAccount().getCurrency();
-        // JATbot.botLogger.info("Currency: {}", currency);
-        // JATbot.botLogger.info("Currency Logged" + "\n");
-        return currency;
+
+    
+        return CompletableFuture.supplyAsync(()->{
+
+
+            return getAccount().getCurrency();
+
+            
+        }).join();
     }
 
     public Clock getMarketTime() {
-        try {
-            // Get the market 'Clock' and print it out
-            Clock clock = alpaca.trader().clock().getClock();
-            return clock;
-        } catch (ApiException exception) {
-            exception.printStackTrace();
-            return null;
-        }
+
+
+        return CompletableFuture.supplyAsync(()->{
+            try {
+                // Get the market 'Clock' and print it out
+                Clock clock = alpaca.trader().clock().getClock();
+                return clock;
+            } catch (ApiException exception) {
+                exception.printStackTrace();
+                return null;
+            }    
+        }).join();
     }
 
     public void placeTrade(String sym, String vol, OrderSide side, OrderType type, TimeInForce tif) {
@@ -289,24 +348,6 @@ public class AlpacaController extends AlpacaAPI {
     }
 
 
-    /*
-     * public void logRecentData(String sym, String timeframe) {
-     * try {
-     * StockBarsResp barsResponse = alpaca.marketData().stock().stockBars(sym,
-     * timeframe, OffsetDateTime.of(0, 0, 0, 0, 0, 0, 0, null), null, null,null);
-     * barsResponse.getBars().forEach(bar -> {
-     * String barString = bar.toString();
-     * int index = barString.indexOf("StockBar@");
-     * if (index != -1) {
-     * String strippedBarString = barString.substring(index);
-     * JATbot.botLogger.info(sym + " Bar: {}", strippedBarString);
-     * }
-     * });
-     * } catch (ApiException exception) {
-     * exception.printStackTrace();
-     * }
-     * }
-     */
 
     /**
      * Represents a series of Open, High, Low, Close (OHLC) data for a specific

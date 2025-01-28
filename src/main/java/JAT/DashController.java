@@ -1,17 +1,16 @@
 package JAT;
 
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
+
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+
 import java.util.Set;
 import javafx.application.Platform;
 import javafx.scene.control.*;
@@ -29,12 +28,15 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.animation.*;
 import javafx.util.Duration;
-import net.jacobpeterson.alpaca.openapi.marketdata.ApiClient;
+
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
 import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
 import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
+
+
+
 import com.jat.PlotHandler;
 import com.jat.OHLCChart;
 import com.jat.OHLCData;
@@ -696,38 +698,60 @@ public void populateWatchlist(List<String> watchlist) {
 
     // Method to update the label with the market time
     public void updateMarketTimeLabel() {
-        // System.out.println("\nInside updateMarrkeTimeLabel.");
-        Clock clock = ac.getMarketTime();
-        String formattedTime = formatMarketTime(clock); // Format the market time as needed
-        Platform.runLater(() -> {
-            lblMarketTime.setText(formattedTime);
-            if (clock.getIsOpen() == true) {
-                lblMarketIndicator1.setText("OPEN");
-                lblMarketIndicator1.setTextFill(Color.GREEN);
-                lblTimeStatus.setText("Closes at: " + formattoHHMM(clock.getNextClose()));
-            } else if (clock.getIsOpen() == false) {
-                lblMarketIndicator1.setText("CLOSED");
-                lblMarketIndicator1.setTextFill(Color.RED);
-                lblTimeStatus.setText("Opens at: " + formattoHHMM(clock.getNextOpen()));
-            }
-        }); // Update label on JavaFX Application Thread
+        
+        CompletableFuture.supplyAsync(() -> {
+            return ac.getMarketTime();}).thenAcceptAsync(clock -> {
+            String formattedTime = formatMarketTime(clock); // Format the market time as needed
+            Platform.runLater(() -> {
+                lblMarketTime.setText(formattedTime);
+                if (clock.getIsOpen() == true) {
+                    lblMarketIndicator1.setText("OPEN");
+                    lblMarketIndicator1.setTextFill(Color.GREEN);
+                    lblTimeStatus.setText("Closes at: " + formattoHHMM(clock.getNextClose()));
+                } else if (clock.getIsOpen() == false) {
+                    lblMarketIndicator1.setText("CLOSED");
+                    lblMarketIndicator1.setTextFill(Color.RED);
+                    lblTimeStatus.setText("Opens at: " + formattoHHMM(clock.getNextOpen()));
+                }
+            });
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
+
+
+ // Update label on JavaFX Application Thread
 
     }
 
     // Method to format the market time as needed
     private String formatMarketTime(Clock clock) {
         // System.out.println("\n\nInside formatter....");
-        OffsetDateTime cur = clock.getTimestamp();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String formattedTime = formatter.format(cur);
+        CompletableFuture<String> time = CompletableFuture.supplyAsync(() -> {
+            OffsetDateTime cur = clock.getTimestamp();
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+            String formattedTime = formatter.format(cur);
+            return formattedTime;
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return "Error formatting time";
+        });
+    
         // System.out.println("\n\n\nReceived and formatted to: " + formattedTime);
-        return formattedTime;
+        return time.join();
     }
 
     private String formattoHHMM(OffsetDateTime time) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-        String formattedTime = formatter.format(time);
-        return formattedTime;
+        CompletableFuture<String> formatted = CompletableFuture.supplyAsync(() -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+            String formattedTime = formatter.format(time);
+            return formattedTime;
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return "Error formatting time";
+        });
+        return formatted.join();
+        
     }
 
     // Other code...
@@ -737,7 +761,7 @@ public void populateWatchlist(List<String> watchlist) {
         // System.out.println("\nStarting market time update.");
         // Create a scheduled executor to periodically update the market time label
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 1, TimeUnit.SECONDS); // Update every second
+        executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 10, TimeUnit.SECONDS); // Update every second
     }
 
     private Stage mainWindow;
@@ -906,7 +930,7 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
 public void onBacktest(ActionEvent event) {
-    String sym = tfSymboltoGet.getText();
+    
 
     CompletableFuture.supplyAsync(() -> {
         try {
@@ -927,7 +951,7 @@ public void onBacktest(ActionEvent event) {
         // Run the backtest after data processing
         return CompletableFuture.runAsync(() -> {
             try {
-
+                String sym = tfSymboltoGet.getText();
                 if (series != null) {
                     for (OHLCData data : series) {
                         System.out.println(data);
@@ -939,6 +963,7 @@ public void onBacktest(ActionEvent event) {
                     Platform.runLater(() -> {
 
                         try {
+                            
                             this.ph.showOHLCChart(this.parentNode, this.nodeChart, true, 1000, series);
                         } catch (IOException e) {
                             // TODO Auto-generated catch block

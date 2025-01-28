@@ -3,7 +3,6 @@ package JAT;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 
 
-import net.jacobpeterson.alpaca.model.util.apitype.MarketDataWebsocketSourceType;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.*;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListener;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListenerAdapter;
@@ -12,8 +11,6 @@ import net.jacobpeterson.alpaca.websocket.marketdata.streams.stock.StockMarketDa
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.*;
 
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 

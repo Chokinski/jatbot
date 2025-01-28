@@ -23,7 +23,7 @@
             "request": "launch",
             "mainClass": "JAT/JAT.JATbot",
             "projectName": "jatbot",
-            "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-23.0.1/lib/\" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=first.jfr,stackdepth=400,settings=profile -XX:+UseG1GC",
+            "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-23.0.1/lib/\" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=brondon.jfr,settings=profile -XX:FlightRecorderOptions=stackdepth=400 -XX:+UseG1GC",
         },
         {
             "type": "java",
