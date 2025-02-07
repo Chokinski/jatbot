@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -8,7 +8,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCData;
 
 public abstract class Strategy {
 

@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCData;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

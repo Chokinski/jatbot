@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.time.LocalDateTime;
 

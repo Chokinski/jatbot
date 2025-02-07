@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.io.IOException;
 
@@ -38,9 +38,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 
 
-import com.jat.PlotHandler;
-import com.jat.OHLCChart;
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.PlotHandler;
+import com.jat.ctfxplotsplus.OHLCChart;
+import com.jat.ctfxplotsplus.OHLCData;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.ReadOnlyObjectWrapper;

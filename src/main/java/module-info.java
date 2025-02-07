@@ -1,4 +1,4 @@
-module JAT {
+module com.jat.jatbot {
 
     requires transitive alpaca.java;
     requires transitive okhttp3;
@@ -17,6 +17,6 @@ module JAT {
     requires transitive org.json;
     
 
-    opens JAT to javafx.fxml;
-    exports JAT;
+    opens com.jat.jatbot to javafx.fxml;
+    exports com.jat.jatbot;
 }

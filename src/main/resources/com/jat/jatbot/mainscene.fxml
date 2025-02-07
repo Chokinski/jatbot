@@ -11,7 +11,7 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="bp" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="237.0" prefWidth="431.0" style="-fx-background-radius: 20; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.Controller">
+<BorderPane fx:id="bp" onMouseDragged="#onDragged" onMousePressed="#onPressed" prefHeight="237.0" prefWidth="431.0" style="-fx-background-radius: 20; -fx-background-color: transparent;" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jat.jatbot.Controller">
    <center>
       <AnchorPane id="splashLogin" focusTraversable="true" maxHeight="237.0" maxWidth="409.0" minHeight="237.0" minWidth="409.0" prefHeight="237.0" prefWidth="409.0" stylesheets="@styles.css">
          <children>

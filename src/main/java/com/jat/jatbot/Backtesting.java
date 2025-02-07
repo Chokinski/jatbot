@@ -1,6 +1,6 @@
-package JAT;
+package com.jat.jatbot;
 
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCData;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;

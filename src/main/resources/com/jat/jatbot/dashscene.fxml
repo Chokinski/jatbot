@@ -71,7 +71,7 @@
 <?import javafx.scene.paint.Color?>
 <?import javafx.scene.text.Font?>
 
-<VBox fx:id="vbDash" alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="702.0" minWidth="1044.0" onMouseDragged="#onDragged" onMousePressed="#onPressed" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="mainWindow" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="JAT.DashController">
+<VBox fx:id="vbDash" alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" minHeight="702.0" minWidth="1044.0" onMouseDragged="#onDragged" onMousePressed="#onPressed" style="-fx-background-color: transparent; -fx-border-color: transparent; -fx-border-width: 0px;" styleClass="mainWindow" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.jat.jatbot.DashController">
   <children>
       <HBox alignment="CENTER" focusTraversable="true" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="759.0" prefWidth="1164.0" style="-fx-background-color: transparent; -fx-border-color: #000; -fx-border-width: 0.001px;" styleClass="mainWindow" stylesheets="@styles.css" VBox.vgrow="ALWAYS">
          <VBox.margin>

@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.io.IOException;
 
@@ -110,7 +110,7 @@ public class Controller {
                 String[] propertiesArray = infoHandler.loadProperties();
                 tfKey_ID.setText(propertiesArray[0]);
                 tfSec_ID.setText(propertiesArray[1]);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
                 Parent root = loader.load();
                 DashController dashController = loader.getController();
                 dashController.setMainWindow(mainWindow);
@@ -181,7 +181,7 @@ public class Controller {
         this.mainWindow = mainWindow;
     }
     public void loadscene() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/JAT/dashscene.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
         Parent root = loader.load();
         DashController dashController = loader.getController();
         dashController.setMainWindow(mainWindow);

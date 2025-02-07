@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
 
@@ -19,8 +19,8 @@ import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.t
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import com.jat.OHLCChart;
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCChart;
+import com.jat.ctfxplotsplus.OHLCData;
 
 /**
  * This class represents a StreamListener that extends StockMarketDataWebsocket and implements MarketDataListener.

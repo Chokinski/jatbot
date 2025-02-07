@@ -14,14 +14,14 @@
             "type": "java",
             "name": "Backtesting",
             "request": "launch",
-            "mainClass": "JAT/JAT.Backtesting",
+            "mainClass": "com.jat.jatbot.Backtesting",
             "projectName": "jatbot"
         },
         {
             "type": "java",
             "name": "JATbot",
             "request": "launch",
-            "mainClass": "JAT/JAT.JATbot",
+            "mainClass": "com.jat.jatbot.JATbot",
             "projectName": "jatbot",
             "vmArgs": "--module-path \"C:/Program Files/Java/javafx-sdk-23.0.1/lib/\" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=brondon.jfr,settings=profile -XX:FlightRecorderOptions=stackdepth=400 -XX:+UseG1GC",
         },
@@ -29,7 +29,7 @@
             "type": "java",
             "name": "test",
             "request": "launch",
-            "mainClass": "JAT/JAT.test",
+            "mainClass": "com.jat.jatbot.test",
             "projectName": "jatbot"
         }
     ]

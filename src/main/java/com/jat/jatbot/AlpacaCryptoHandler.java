@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCData;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;

@@ -1,5 +1,5 @@
-package JAT;
-import com.jat.OHLCData;
+package com.jat.jatbot;
+import com.jat.ctfxplotsplus.OHLCData;
 
 import javafx.collections.ObservableList;
 

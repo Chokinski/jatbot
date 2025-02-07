@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -68,7 +68,7 @@ public class JATbot extends Application {
         new ProcessBuilder("java", "-jar", jarPath).start();
         Platform.exit();
     }
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("mainscene.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/mainscene.fxml"));
         Parent root = loader.load();
         Controller controller = loader.getController();
 

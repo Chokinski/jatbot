@@ -1,4 +1,4 @@
-package JAT;
+package com.jat.jatbot;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.openapi.trader.model.*;
@@ -31,7 +31,7 @@ import net.jacobpeterson.alpaca.openapi.trader.ApiException;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
 
-import com.jat.OHLCData;
+import com.jat.ctfxplotsplus.OHLCData;
 
 /**
  * The AlpacaController class provides methods to interact with the Alpaca API for trading and market data.
