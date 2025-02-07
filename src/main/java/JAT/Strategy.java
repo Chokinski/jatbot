@@ -4,6 +4,8 @@ import java.text.DecimalFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.stream.Collectors;
 
 import com.jat.OHLCData;
@@ -64,37 +66,42 @@ public abstract class Strategy {
     }
 
     public void orderConfirm(double currentPrice, LocalDateTime date, boolean uptrend) {
-        double riskPercentage = trades.isEmpty() ? 0.02 : 0.01; // 2% for the first trade, then 1%
-        double riskAmount = accountBalance * riskPercentage; // Calculate the risk amount (1% of account balance)
-        double positionSize =(riskAmount / currentPrice); // Calculate the number of shares to purchase
-        double moneyUsed = positionSize * currentPrice; // Calculate money used in this trade
+CompletableFuture<Void> future = CompletableFuture.runAsync(() -> executeTrades(currentPrice, date, uptrend));
+try {
+    future.join(); // Blocks until the task is finished
+} catch (CompletionException e) {
+    if (e.getCause() instanceof IllegalArgumentException) {
+        System.out.println("No funds");
+        throw (IllegalArgumentException) e.getCause();
+    } else {
+        throw e; // Re-throw other exceptions
+    }
+    }
+    }
+    private void executeTrades(double currentPrice, LocalDateTime date, boolean uptrend) {
+        double riskPercentage = trades.isEmpty() ? 0.02 : 0.01;
+        double riskAmount = accountBalance * riskPercentage;
+        double positionSize = (riskAmount / currentPrice);
+        double moneyUsed = positionSize * currentPrice;
     
         if (moneyUsed > accountBalance) {
-            System.out.println("Insufficient funds to execute this trade.");
-            return; // Exit if there's not enough balance
+            throw new IllegalArgumentException("Insufficient funds to execute trade.");
         }
     
-        double portfolioBalanceBefore = accountBalance; // Store portfolio balance before the trade
-        accountBalance -= moneyUsed; // Deduct the amount used for the trade from the account balance
+        synchronized (this) { // Prevent race conditions
+            double portfolioBalanceBefore = accountBalance;
+            accountBalance -= moneyUsed;
     
-        // Create a new Trade object with relevant details
-        Trade trade = new Trade(uptrend, currentPrice, date, portfolioBalanceBefore);
-        trade.setQuantity(positionSize); // Set the quantity of shares for the trade
+            Trade trade = new Trade(uptrend, currentPrice, date, portfolioBalanceBefore);
+            trade.setQuantity(positionSize);
     
-        double stopLossLevel;
-        double takeProfitLevel;
+            double stopLossLevel = uptrend ? currentPrice * 0.98 : currentPrice * 1.01;
+            double takeProfitLevel = uptrend ? currentPrice * 1.1 : currentPrice * 0.90;
     
-if (uptrend) {
-    stopLossLevel = currentPrice * 0.98; // Slightly wider stop loss for flexibility
-    takeProfitLevel = currentPrice * 1.1; // More conservative take profit
-} else {
-    stopLossLevel = currentPrice * 1.01; // More conservative stop loss for downtrend
-    takeProfitLevel = currentPrice * 0.90; // Slightly less aggressive take profit
-}
-    
-        trade.setStopLoss(stopLossLevel); // Set stop loss level
-        trade.setTakeProfit(takeProfitLevel); // Set take profit level
-        trades.add(trade); // Add the trade to the list of active trades
+            trade.setStopLoss(stopLossLevel);
+            trade.setTakeProfit(takeProfitLevel);
+            trades.add(trade);
+        }
     }
 
     // Getters for strategy performance metrics

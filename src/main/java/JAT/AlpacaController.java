@@ -85,6 +85,7 @@ public class AlpacaController extends AlpacaAPI {
     private static JATInfoHandler infoHandler = new JATInfoHandler();
     static String[]  props = infoHandler.loadProperties();
     public AlpacaStockHandler stockH;
+    public AlpacaCryptoHandler cryptoH;
     public AlpacaAssetHandler assetH;
     public AlpacaController() {
         super(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]),
@@ -93,6 +94,7 @@ public class AlpacaController extends AlpacaAPI {
         okClient = this.getOkHttpClient();
         stockH = new AlpacaStockHandler(this.marketData().getInternalAPIClient());
         assetH = new AlpacaAssetHandler(this.trader().getInternalAPIClient());
+        cryptoH = new AlpacaCryptoHandler(this.marketData().getInternalAPIClient());
     }
 
 

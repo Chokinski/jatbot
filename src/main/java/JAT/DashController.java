@@ -30,6 +30,7 @@ import javafx.animation.*;
 import javafx.util.Duration;
 
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
+import net.jacobpeterson.alpaca.openapi.trader.model.AssetClass;
 import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
 import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
@@ -225,7 +226,7 @@ public class DashController {
     
 
 
-
+    public ObservableList<OHLCData> ser = FXCollections.observableArrayList();
     private double xOffset;
     private double yOffset;
     // Variables to store the initial position of a drag event
@@ -259,7 +260,7 @@ public class DashController {
     @FXML
     public void initialize() throws IOException {
         try {
-            this.streamListener = new StreamListener();
+            this.streamListener = new StreamListener(chart);
             
         } catch (Exception e) {
             JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
@@ -465,6 +466,7 @@ public void populateWatchlist(List<String> watchlist) {
             public void changed(ObservableValue<? extends Number> obs, Number oldVal, Number newVal) {
                 // Update the label with the new value
                 lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
+                selectedTimePeriod = selectedDuration.getValue() + selectedPeriod.getValue();
             }
         });
 
@@ -473,6 +475,7 @@ public void populateWatchlist(List<String> watchlist) {
             public void changed(ObservableValue<? extends String> obs, String oldVal, String newVal) {
                 // Update the label with the new value
                 lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
+                selectedTimePeriod = selectedDuration.getValue() + selectedPeriod.getValue();
             }
         });
         lblTimeFrameState.setText("Current - " + selectedDuration.getValue() + selectedPeriod.getValue());
@@ -638,7 +641,7 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
     void onGetStock(ActionEvent event) {
-        streamListener.listenToStock(Set.of(tfSymboltoGet.getText()));
+        streamListener.listenToStockTrades(Set.of(tfSymboltoGet.getText()));
     }
 
     public void updateTokenDisplay(String text) {
@@ -649,12 +652,12 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
     void onGetCrypto() {
-        streamListener.listenToCoin(Set.of(tfSymboltoGet.getText()));
+        streamListener.listenToCoinData(Set.of(tfSymboltoGet.getText()));
     }
 
     private ObservableList<OHLCData> getUserData(ActionEvent event)
             throws net.jacobpeterson.alpaca.openapi.marketdata.ApiException {
-
+                ObservableList<OHLCData> datatoreturn = FXCollections.observableArrayList();
         /*
          * Debugging statements
          * JATbot.botLogger.info("Start Date: " + startParse+"\nEnd Date: " + endParse+
@@ -663,8 +666,39 @@ public void populateWatchlist(List<String> watchlist) {
          * "\nEnd Year: " + endYear+"\nEnd Month: " + endMonth+"\nEnd Day: " + endDay);
          */
         // Retrieve new data series
+        CompletableFuture<AssetClass> assetClass = 
+        CompletableFuture.supplyAsync(()->{
+            boolean stop = false;
+            for(int i = 0; i<assets.size() && !stop;i++){
+                
+                Assets a = assets.get(i);
+                if(a.getSymbol().toLowerCase().equals(tfSymboltoGet.getText().toLowerCase())){
+                    System.out.println("Found one!");    
+                    stop=true;
+                    return a.getPropertyClass();
+                    
+                }
+            }
+            System.out.println("But returning null...");
+            return null;
 
-        return ac.stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+        }).exceptionally(ex -> {
+            ex.printStackTrace();
+            return null;
+        });
+        AssetClass assetc = assetClass.join();
+        System.out.println(assetc.toString());
+        switch(assetc.toString()) 
+            {
+                case "crypto":
+                datatoreturn = ac.cryptoH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+                    break;
+
+                case "us_equity":
+                datatoreturn = ac.stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+            }
+
+            return datatoreturn;
     }
 
     // Sets the text of the button
@@ -926,8 +960,8 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
 public void onBacktest(ActionEvent event) {
+    String sym = tfSymboltoGet.getText();
     
-
     CompletableFuture.supplyAsync(() -> {
         try {
             return getUserData(event);
@@ -947,13 +981,10 @@ public void onBacktest(ActionEvent event) {
         // Run the backtest after data processing
         return CompletableFuture.runAsync(() -> {
             try {
-                String sym = tfSymboltoGet.getText();
+                
                 if (series != null) {
+                    ser = series;
 
-                    Backtesting bt = new Backtesting(ac, 500);
-                    bt.run(sym, series);
-
-                    String[] results = bt.passResults();
                     Platform.runLater(() -> {
 
                         try {
@@ -965,11 +996,13 @@ public void onBacktest(ActionEvent event) {
                         }
                         this.chart = ph.getOHLCChart();
                         this.chart.setTitle(sym);
+                        streamListener.giveCharts(this.chart);
+                        
+                        
+                        
     
-                        ObservableList<String> current = FXCollections.observableArrayList();
-                        current.addAll(results);
-                        lvDataDisplay.getItems().clear();
-                        lvDataDisplay.getItems().addAll(current);
+
+
                     });
 
                 } else {
@@ -984,9 +1017,28 @@ public void onBacktest(ActionEvent event) {
         ex.printStackTrace();
         return null;
     });
+    try  {
+        ObservableList<String> current = FXCollections.observableArrayList();
+        Backtesting bt = new Backtesting(ac, 500);
+        bt.run(sym, ser);
+        String[] results = bt.passResults();
+        Platform.runLater(()->{
+            current.addAll(results);
+            lvDataDisplay.getItems().clear();
+            lvDataDisplay.getItems().addAll(current);
+
+
+
+        });
+    }
+    catch (IllegalArgumentException e) {
+        e.printStackTrace();
+    }
+
 }
     @FXML
     public void onExit(MouseEvent event) {
+        streamListener.disconnectStream();
         Platform.exit();
         System.exit(0);
 

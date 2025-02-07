@@ -4,15 +4,23 @@ import net.jacobpeterson.alpaca.AlpacaAPI;
 
 
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.*;
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.bar.CryptoBarMessage;
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.quote.CryptoQuoteMessage;
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.trade.CryptoTradeMessage;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListener;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListenerAdapter;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.stock.StockMarketDataListener;
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.stock.StockMarketDataListenerAdapter;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.*;
-
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.bar.StockBarMessage;
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.quote.StockQuoteMessage;
+import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.trade.StockTradeMessage;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import com.jat.OHLCChart;
+import com.jat.OHLCData;
 
 /**
  * This class represents a StreamListener that extends StockMarketDataWebsocket and implements MarketDataListener.
@@ -22,22 +30,29 @@ import java.util.concurrent.TimeUnit;
 
     protected AlpacaAPI alpacaAPICrypto;
     protected AlpacaAPI alpacaAPIStocks;
-    protected StockMarketDataListener sml;
-    protected CryptoMarketDataListener cml;
-    public StreamListener() {
-
+    protected StockListener sml;
+    protected CryptoListener cml;
+    public OHLCChart passchart;
+    public StreamListener(OHLCChart chart) {
+        this.passchart = chart;
         
-        sml = new StockMarketDataListenerAdapter();
-        cml = new CryptoMarketDataListenerAdapter();
+        sml = new StockListener(passchart);
+        cml = new CryptoListener(passchart);
         AlpacaController ac = new AlpacaController();
         this.alpacaAPIStocks = ac.connect();
         this.alpacaAPICrypto = ac.connect();
+  
     }
-
+    public void giveCharts(OHLCChart chart) {
+    this.passchart = chart;
+    sml.chart = chart;
+    cml.chart = chart;
+    
+    }
     public void connectStockStream() {
         alpacaAPIStocks.stockMarketDataStream().connect();
         if (!alpacaAPIStocks.stockMarketDataStream().waitForAuthorization(3, TimeUnit.SECONDS)) 
-        {throw new RuntimeException("Failed to authorize stock stream");}
+        {JATbot.botLogger.error("Failed to authorize stock stream");}
         alpacaAPIStocks.stockMarketDataStream().setListener(sml);                                                            
     }
 
@@ -45,7 +60,7 @@ import java.util.concurrent.TimeUnit;
 
         alpacaAPICrypto.cryptoMarketDataStream().connect();
         if (!alpacaAPICrypto.cryptoMarketDataStream().waitForAuthorization(3, TimeUnit.SECONDS))
-        {throw new RuntimeException("Failed to authorize crypto stream");}
+        {JATbot.botLogger.error("Failed to authorize crypto stream");}
         alpacaAPICrypto.cryptoMarketDataStream().setListener(cml);                                                                                                                      
     }
 
@@ -85,22 +100,88 @@ import java.util.concurrent.TimeUnit;
 
     }
 
-    public void listenToStock(Set<String> symbols) {
+    public void listenToStockTrades(Set<String> symbols) {
         alpacaAPIStocks.stockMarketDataStream().setTradeSubscriptions(symbols);
     }
 
-    public void listenToCoin(Set<String> symbols) {
+    public void listenToCoinTrades(Set<String> symbols) {
         alpacaAPICrypto.cryptoMarketDataStream().setTradeSubscriptions(symbols);
     }
-
-
-    public String[] getMessages(CryptoMarketDataMessageType msgType, CryptoMarketDataMessage msg){
-        return new String[]{msgType.name(), msg.toString()};
+    public void listenToCoinData(Set<String> symbols) {
+        alpacaAPICrypto.cryptoMarketDataStream().setMinuteBarSubscriptions(symbols);
     }
 
-    public String[] getMessages(StockMarketDataMessageType msgType, StockMarketDataMessage msg){
-        return new String[]{msgType.name(), msg.toString()};
+    public class CryptoListener extends CryptoMarketDataListenerAdapter {
+        public OHLCChart chart;
+        public CryptoListener(OHLCChart c) {
+        this.chart = c;
+        }
+        @Override
+        public void onDailyBar(CryptoBarMessage bar) {
+            JATbot.botLogger.info("Daily Bar: " + bar);
+            sendUpdate(bar);
+        }
+        @Override
+        public void onMinuteBar(CryptoBarMessage bar) {
+            JATbot.botLogger.info("Minute Bar MSG: " + bar.toString());
+            sendUpdate(bar);
+        }
+        @Override
+        public void onQuote(CryptoQuoteMessage quote) {
+            JATbot.botLogger.info("Quote: " + quote);
+        }
+        @Override
+        public void onTrade(CryptoTradeMessage trade) {
+            JATbot.botLogger.info("Trade: " + trade);
+            
+        }
+
+        public void sendUpdate(CryptoBarMessage msgData) {
+            OHLCData od = new OHLCData(msgData.getTimestamp().toLocalDateTime(), msgData.getOpen(), msgData.getHigh(), msgData.getLow(), msgData.getClose(), msgData.getVolume());
+            od.symbol = msgData.getSymbol();
+            System.out.println("Sending update from ["+ msgData.getSymbol()+"] data.");
+            chart.updateData(od);
+            
+            
+        }
+        
+
+
     }
 
+    public class StockListener extends StockMarketDataListenerAdapter {
+        public OHLCChart chart;
+        public StockListener(OHLCChart c) {
+        this.chart = c;
+        }
+        @Override
+        public void onDailyBar(StockBarMessage bar) {
+            JATbot.botLogger.info("Daily Bar: " + bar);
+            sendUpdate(bar);
+        }
+        @Override
+        public void onMinuteBar(StockBarMessage bar) {
+            JATbot.botLogger.info("Minute Bar MSG: " + bar.toString());
+            sendUpdate(bar);
+        }
+        @Override
+        public void onQuote(StockQuoteMessage quote) {
+            JATbot.botLogger.info("Quote: " + quote);
+        }
+        @Override
+        public void onTrade(StockTradeMessage trade) {
+            JATbot.botLogger.info("Trade: " + trade);
+        }
+        
+        public void sendUpdate(StockBarMessage msgData) {
+            OHLCData od = new OHLCData(msgData.getTimestamp().toLocalDateTime(), msgData.getOpen(), msgData.getHigh(), msgData.getLow(), msgData.getClose(), msgData.getVolume());
+            od.symbol = msgData.getSymbol();
+            
+            chart.updateData(od);
+            
+            
+        }
+
+    }
 
 }
