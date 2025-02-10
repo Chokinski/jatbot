@@ -4,6 +4,7 @@ import java.io.IOException;
 
 import java.util.Properties;
 
+import org.springframework.stereotype.Component;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -23,7 +24,7 @@ import java.nio.file.Path;
 
 
 // This controller belongs to the login scene
-
+@Component
 public class Controller {    
 
     @FXML

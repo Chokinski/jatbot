@@ -84,13 +84,7 @@ public class JATInfoHandler {
 
                 properties = writeProps(jatConfigPath, properties);
             }
-            String keyID = properties.getProperty("key_id");
-            String secretKey = properties.getProperty("secret_key");
-            String type = properties.getProperty("type");
-            String source = properties.getProperty("source");
-            String remMe = properties.getProperty("remMe");
-
-            return new String[] { keyID, secretKey, type, source, remMe };
+            return new String[] { properties.getProperty("key_id"), properties.getProperty("secret_key"), properties.getProperty("type"), properties.getProperty("source"), properties.getProperty("remMe") };
         } catch (IOException e) {
             JATbot.botLogger.error("\nError loading properties, IO exception: " + e.getMessage());
         }

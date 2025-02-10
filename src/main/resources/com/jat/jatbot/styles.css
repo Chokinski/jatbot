@@ -98,9 +98,6 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-border-color: transparent;
     -fx-background-radius: 80px;
-
-
-
 }
 
 .headerAreas {

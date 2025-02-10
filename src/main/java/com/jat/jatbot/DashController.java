@@ -36,7 +36,7 @@ import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-
+import org.springframework.stereotype.Component;
 
 import com.jat.ctfxplotsplus.PlotHandler;
 import com.jat.ctfxplotsplus.OHLCChart;
@@ -62,6 +62,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockTrade;
  * connecting to the Alpaca API,
  * and managing the stream listener.
  */
+@Component
 public class DashController {
 
     @FXML
@@ -283,9 +284,6 @@ public class DashController {
             addInfo();
             jai.resetRate();
             //jai.dataFromList(assets,watchlist, ac.stockH,ac.assetH, timeframes);
-
-            
-            
 
             // nodeChart.setMouseTransparent(true);
             // redrawChart();

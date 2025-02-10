@@ -8,45 +8,136 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <sdk>  C:/Program Files/Java/javafx-sdk-23.0.1/lib/</sdk>
+        <sdk>C:/Program Files/Java/javafx-sdk-23.0.1/lib/</sdk>
     </properties>
     <dependencies>
-<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter</artifactId>
-    <version>3.4.2</version>
-</dependency>
 
-<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-web</artifactId>
-    <version>3.4.2</version>
-</dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>2.0.2-beta</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ml.dmlc</groupId>
+            <artifactId>xgboost-jvm</artifactId>
+            <version>2.0.1</version>
+            <type>pom</type>
+        </dependency>
+
+        <dependency>
+            <groupId>org.deeplearning4j</groupId>
+            <artifactId>deeplearning4j-core</artifactId>
+            <version>1.0.0-M2.1</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>3.4.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jakarta.annotation-api</artifactId>
+                    <groupId>jakarta.annotation</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
 
 
-<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-starter-data-jpa</artifactId>
-    <version>3.4.2</version>
-</dependency>
-<!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-devtools -->
-<dependency>
-    <groupId>org.springframework.boot</groupId>
-    <artifactId>spring-boot-devtools</artifactId>
-    <version>3.4.2</version>
-</dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+       <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.4.2</version>
+        </dependency>-->
+                <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+
+                <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.4.2</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-datatype-jdk8</artifactId>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-module-parameter-names</artifactId>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+            <version>24.6.4</version>
+		</dependency>-->
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-oauth2-client</artifactId>
+            <version>3.4.2</version>
+        </dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-security</artifactId>
+            <version>3.4.2</version>
+		</dependency>
+        <!-- PostgreSQL Driver (only if you're using a database) -->
+        <!--<dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+            <version>10.20.1</version>
+		</dependency>
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+            <version>10.20.1</version>
+        </dependency>-->
+        
+		<dependency>
+			<groupId>org.springframework.session</groupId>
+			<artifactId>spring-session-core</artifactId>
+            <version>3.4.1</version>
+		</dependency>
+
+        <dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux</artifactId>
+            <version>3.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+			<scope>runtime</scope>
+            <version>1.14.3</version>
+		</dependency>
 
 
-    <!-- PostgreSQL Driver (only if you're using a database) -->
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.7.3</version>
-    </dependency>
-    
         <!-- https://mvnrepository.com/artifact/net.jacobpeterson.alpaca/alpaca-java -->
         <dependency>
             <groupId>net.jacobpeterson.alpaca</groupId>
@@ -54,18 +145,18 @@
             <version>10.0.1</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/org.jetbrains/annotations -->
-            <dependency>
-                <groupId>org.jetbrains</groupId>
-                <artifactId>annotations</artifactId>
-                <version>13.0</version>
-            </dependency>
+        <dependency>
+            <groupId>org.jetbrains</groupId>
+            <artifactId>annotations</artifactId>
+            <version>13.0</version>
+        </dependency>
         
-<!-- https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api -->
-<dependency>
-    <groupId>jakarta.annotation</groupId>
-    <artifactId>jakarta.annotation-api</artifactId>
-    <version>2.1.0</version>
-</dependency>
+        <!-- https://mvnrepository.com/artifact/jakarta.annotation/jakarta.annotation-api -->
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
+            <version>2.1.0</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.openapitools/jackson-databind-nullable -->
         <dependency>
@@ -73,20 +164,41 @@
             <artifactId>jackson-databind-nullable</artifactId>
             <version>0.2.6</version>
         </dependency>
-
-
-
-<!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-api</artifactId>
-    <version>2.0.9</version>
-</dependency>
-<dependency>
-    <groupId>org.slf4j</groupId>
-    <artifactId>slf4j-simple</artifactId>
-    <version>2.0.9</version>
-</dependency>
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<optional>true</optional>
+            <version>1.18.36</version>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<scope>test</scope>
+            <version>3.4.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.projectreactor</groupId>
+			<artifactId>reactor-test</artifactId>
+			<scope>test</scope>
+            <version>3.7.2</version>
+		</dependency>        
+		<dependency>
+			<groupId>org.springframework.security</groupId>
+			<artifactId>spring-security-test</artifactId>
+			<scope>test</scope>
+            <version>6.4.2</version>
+		</dependency>
+        <!-- https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.9</version>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
@@ -119,56 +231,56 @@
             <artifactId>okhttp-sse</artifactId>
             <version>5.0.0-alpha.12</version>
         </dependency>
-<dependency>
-    <groupId>org.openjfx</groupId>
-    <artifactId>javafx.controls</artifactId>
-    <version>23.0.1</version> <!-- Ensure this matches your version -->
-    <scope> system</scope>
-    <systemPath>${sdk}javafx.controls.jar</systemPath>
-</dependency>
-<dependency>
-    <groupId>org.openjfx</groupId>
-    <artifactId>javafx.graphics</artifactId>
-    <version>23.0.1</version> <!-- Ensure this matches your version -->
-    <scope> system</scope>
-    <systemPath>${sdk}javafx.graphics.jar</systemPath>
-</dependency>
-<dependency>
-    <groupId>org.openjfx</groupId>
-    <artifactId>javafx.fxml</artifactId>
-    <version>23.0.1</version> <!-- Ensure this matches your version -->
-    <scope> system</scope>
-    <systemPath>${sdk}javafx.fxml.jar</systemPath>
-</dependency>
-<dependency>
-    <groupId>org.openjfx</groupId>
-    <artifactId>javafx.base</artifactId>
-    <version>23.0.1</version> <!-- Ensure this matches your version -->
-    <scope> system</scope>
-    <systemPath>${sdk}javafx.base.jar</systemPath>
-</dependency>
-<!-- https://mvnrepository.com/artifact/io.gsonfire/gson-fire -->
-<dependency>
-    <groupId>io.gsonfire</groupId>
-    <artifactId>gson-fire</artifactId>
-    <version>1.9.0</version>
-</dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx.controls</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.controls.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx.graphics</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.graphics.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx.fxml</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.fxml.jar</systemPath>
+        </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx.base</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.base.jar</systemPath>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/io.gsonfire/gson-fire -->
+        <dependency>
+            <groupId>io.gsonfire</groupId>
+            <artifactId>gson-fire</artifactId>
+            <version>1.9.0</version>
+        </dependency>
 
-            <dependency>
+        <dependency>
             <groupId>com.jat</groupId>
             <artifactId>ctfxplotsplus</artifactId>
             <version>1.0-SNAPSHOT</version>
-            </dependency>
+        </dependency>
         <dependency>
             <groupId>com.jfoenix</groupId>
             <artifactId>jfoenix</artifactId>
             <version>9.0.10</version>
         </dependency>
-<dependency>
-    <groupId>org.apache.commons</groupId>
-    <artifactId>commons-math3</artifactId>
-    <version>3.6.1</version>
-</dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.6.1</version>
+        </dependency>
     
       <dependency>
         <groupId>org.json</groupId>
@@ -178,7 +290,7 @@
     </dependencies>
     <build>
         <plugins>
-        <plugin>
+        <!--<plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-jar-plugin</artifactId>
             <version>3.2.0</version>
@@ -194,7 +306,27 @@
                         <exclude>**/module-info.class</exclude>
                     </excludes>
             </configuration>
-        </plugin>
+        </plugin>-->
+              <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <version>3.4.2</version>
+        <configuration>
+            <jvmArguments>
+                --module-path "C:/Program Files/Java/javafx-sdk-23.0.1/lib/" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=brondon.jfr,settings=profile -XX:FlightRecorderOptions=stackdepth=400 -XX:+UseG1GC
+            </jvmArguments>
+            <mainClass>com.jat.jatbot.JATbot</mainClass>
+            <layout>ZIP</layout>
+        </configuration>
+    <executions>
+        <execution>
+            <goals>
+                <goal>repackage</goal>
+            </goals>
+        </execution>
+    </executions>
+
+      </plugin>
             
         </plugins>
     </build>
