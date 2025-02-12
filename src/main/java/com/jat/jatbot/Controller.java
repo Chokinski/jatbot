@@ -4,6 +4,8 @@ import java.io.IOException;
 
 import java.util.Properties;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import javafx.event.ActionEvent;
@@ -54,17 +56,24 @@ public class Controller {
    @FXML
     private CheckBox chkRemember;
 
-    AlpacaController ac = new AlpacaController();
+    @Autowired
+    private ApplicationContext applicationContext;
     public boolean rememberMe;
     Properties properties = new Properties();
     JATInfoHandler infoHandler = new JATInfoHandler();
     Path config = infoHandler.jatConfigPath;
     private double yOffset;
     private double xOffset;
+    public FXMLLoader loader;
+    public Parent root;
     @FXML
     void initialize() {
         // Load the state of the checkbox when the program starts
+
+
         try {
+
+
             String[] props = infoHandler.loadProperties();
             boolean checked = Boolean.parseBoolean(props[4]);
             JATbot.botLogger.info("Remember me: " + checked);
@@ -111,17 +120,19 @@ public class Controller {
                 String[] propertiesArray = infoHandler.loadProperties();
                 tfKey_ID.setText(propertiesArray[0]);
                 tfSec_ID.setText(propertiesArray[1]);
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
-                Parent root = loader.load();
+                loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
+                loader.setControllerFactory(applicationContext::getBean);
+                root = loader.load();
                 DashController dashController = loader.getController();
                 dashController.setMainWindow(mainWindow);
+                
                 Scene scene = new Scene(root);
                 scene.setFill(null);    
                 mainWindow.setScene(scene);
                 mainWindow.setResizable(true);
                 mainWindow.centerOnScreen();
     
-            } catch (IOException e) {
+            } catch (Exception e) {
                 JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}", e.getMessage());
             }
         } else {

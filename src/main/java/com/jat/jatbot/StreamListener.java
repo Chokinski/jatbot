@@ -3,21 +3,24 @@ package com.jat.jatbot;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 
 
-import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.*;
+
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.bar.CryptoBarMessage;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.quote.CryptoQuoteMessage;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.crypto.model.trade.CryptoTradeMessage;
-import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListener;
+
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.crypto.CryptoMarketDataListenerAdapter;
-import net.jacobpeterson.alpaca.websocket.marketdata.streams.stock.StockMarketDataListener;
+
 import net.jacobpeterson.alpaca.websocket.marketdata.streams.stock.StockMarketDataListenerAdapter;
-import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.*;
+
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.bar.StockBarMessage;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.quote.StockQuoteMessage;
 import net.jacobpeterson.alpaca.model.websocket.marketdata.streams.stock.model.trade.StockTradeMessage;
 
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import com.jat.ctfxplotsplus.OHLCChart;
 import com.jat.ctfxplotsplus.OHLCData;
@@ -26,21 +29,24 @@ import com.jat.ctfxplotsplus.OHLCData;
  * This class represents a StreamListener that extends StockMarketDataWebsocket and implements MarketDataListener.
  * It is responsible for handling market data streaming and WebSocket events.
  */
+@Service
  public class StreamListener  {
-
+    @Autowired
     protected AlpacaAPI alpacaAPICrypto;
+    @Autowired
     protected AlpacaAPI alpacaAPIStocks;
     protected StockListener sml;
     protected CryptoListener cml;
     public OHLCChart passchart;
-    public StreamListener(OHLCChart chart) {
-        this.passchart = chart;
+    @Autowired
+    public AlpacaAPI ac;
+    public StreamListener() {
+        
         
         sml = new StockListener(passchart);
         cml = new CryptoListener(passchart);
-        AlpacaController ac = new AlpacaController();
-        this.alpacaAPIStocks = ac.connect();
-        this.alpacaAPICrypto = ac.connect();
+        
+
   
     }
     public void giveCharts(OHLCChart chart) {

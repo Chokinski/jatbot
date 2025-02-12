@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.stereotype.Service;
+
 import com.jat.ctfxplotsplus.OHLCData;
 import okhttp3.OkHttpClient;
 import javafx.collections.FXCollections;
@@ -88,20 +90,14 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
  * @see AlpacaController
  * @see OkHttpClient
  */
-public class AlpacaStockHandler extends StockApi {
-    private JATInfoHandler infoHandler = new JATInfoHandler();
-    String[] props = JATInfoHandler.loadProperties();
-    private String apiKey = props[0];
-    private String apiSecret = props[1];
-    private String apiEndpoint = props[2];
-    private ApiClient apiClient;
+@Service
+ public class AlpacaStockHandler extends StockApi {
 
-    private static OkHttpClient okClient;
+
 
     public AlpacaStockHandler(ApiClient ac) {
         super(ac);
 
-        this.apiClient = ac;
 
     }
 

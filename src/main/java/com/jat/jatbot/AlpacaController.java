@@ -20,6 +20,10 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
@@ -78,23 +82,28 @@ import com.jat.ctfxplotsplus.OHLCData;
  * 
  * <p>Note: This class requires valid Alpaca API credentials and proper configuration to function correctly.
  */
-
+@Service
 public class AlpacaController extends AlpacaAPI {
     public AlpacaAPI alpaca;
     private OkHttpClient okClient;
     private static JATInfoHandler infoHandler = new JATInfoHandler();
     static String[]  props = infoHandler.loadProperties();
+    @Autowired
     public AlpacaStockHandler stockH;
+    @Autowired
     public AlpacaCryptoHandler cryptoH;
+    @Autowired
     public AlpacaAssetHandler assetH;
-    public AlpacaController() {
+    
+    public AlpacaController(AlpacaAPI alpacaAPI,AlpacaStockHandler sH, AlpacaCryptoHandler cH, AlpacaAssetHandler aH) {
         super(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]),
         MarketDataWebsocketSourceType.valueOf(props[3]),new OkHttpClient());
-        this.alpaca = this;
+        this.alpaca = alpacaAPI;
         okClient = this.getOkHttpClient();
-        stockH = new AlpacaStockHandler(this.marketData().getInternalAPIClient());
-        assetH = new AlpacaAssetHandler(this.trader().getInternalAPIClient());
-        cryptoH = new AlpacaCryptoHandler(this.marketData().getInternalAPIClient());
+        this.assetH = aH;
+        this.cryptoH = cH;
+        this.stockH = sH;
+        
     }
 
 
@@ -338,14 +347,8 @@ public class AlpacaController extends AlpacaAPI {
     }
 
     public List<Assets> getAssets() {
-        try {
-            List<Assets> assets = alpaca.trader().assets().getV2Assets("active", null, null, null);
-            //JATbot.botLogger.info("Assets: {}", assets);
-            return assets;
-        } catch (ApiException exception) {
-            JATbot.botLogger.error("Error getting assets: " + exception.getMessage());
-        }
-        return null;
+        return assetH.getAssets();
+        
     }
 
 

@@ -28,7 +28,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.animation.*;
 import javafx.util.Duration;
-
+import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.openapi.marketdata.ApiException;
 import net.jacobpeterson.alpaca.openapi.trader.model.AssetClass;
 import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
@@ -36,6 +36,7 @@ import net.jacobpeterson.alpaca.openapi.trader.model.Clock;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.jat.ctfxplotsplus.PlotHandler;
@@ -246,9 +247,23 @@ public class DashController {
     //private int selectedDuration.set(1; // Default value
     private IntegerProperty selectedDuration = new SimpleIntegerProperty(1); // Default value
     private StringProperty selectedPeriod = new SimpleStringProperty("Day"); // Default value
+    @Autowired
     private StreamListener streamListener;//"15Min", , "1Week", "1Month"
     private List<String> timeframes = new ArrayList<>(Arrays.asList("4Hour", "1Day"));
-    private AlpacaController ac;
+    @Autowired
+    public AlpacaController ac;
+    @Autowired
+    public AlpacaAPI api;
+
+    @Autowired
+    public AlpacaStockHandler stockH;
+    @Autowired
+    public AlpacaAssetHandler assetH;
+    @Autowired
+    public AlpacaCryptoHandler cryptoH;
+    
+
+
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
     //private ApiClient adc;
@@ -261,27 +276,29 @@ public class DashController {
     @FXML
     public void initialize() throws IOException {
         try {
-            this.streamListener = new StreamListener(chart);
+            
             
         } catch (Exception e) {
             JATbot.botLogger.error("Error initializing DashController: " + e.getMessage());
         }
 
         // Add the strings to the ListView when the scene is loaded
-
         Platform.runLater(() -> {
             
             vbDash.setPrefSize(1044, 702);
             vbDash.setMinSize(1044, 702);
             vbDash.setMaxSize(1044, 702);
             this.mainWindow.setFullScreenExitHint("tryhard...");
-            ac = new AlpacaController();
+            
             assets = ac.getAssets();
+            stockH = ac.stockH;
             //adc = ac.alpaca.marketData().getInternalAPIClient();
             for(String x : watchlist){
                 System.out.println(x);
             }
             addInfo();
+
+            
             jai.resetRate();
             //jai.dataFromList(assets,watchlist, ac.stockH,ac.assetH, timeframes);
 
@@ -325,7 +342,7 @@ public class DashController {
         cbAssetClass.setItems(classes);
 
 
-        Platform.runLater(() -> {populateWatchlist(watchlist);});
+        populateWatchlist(watchlist);
         
 
     }
@@ -365,7 +382,7 @@ public void populateWatchlist(List<String> watchlist) {
     });
 
     // Fetch the stock snapshots asynchronously
-    Map<String, StockSnapshot> snapResp = ac.stockH.getStockSnapshots(String.join(",", watchlist)).join();
+    Map<String, StockSnapshot> snapResp = stockH.getStockSnapshots(String.join(",", watchlist)).join();
 
     List<CompletableFuture<Void>> futures = new ArrayList<>();
 
@@ -558,8 +575,10 @@ public void populateWatchlist(List<String> watchlist) {
     void onReconnect(ActionEvent event) {
         streamListener.disconnectStream();
         if ("Stocks".equals(this.streamChoice)) {
+            streamListener.giveCharts(chart);
             streamListener.connectStockStream(); // Connect the stock stream when the button is not selected
         } else {
+            streamListener.giveCharts(chart);
             streamListener.connectCryptoStream();
         }
         onCheckStatus(event);
@@ -575,6 +594,7 @@ public void populateWatchlist(List<String> watchlist) {
     @FXML
     void onStreamConnect(ActionEvent event) {
         onDisconnectStream(event);
+        streamListener.giveCharts(chart);
         streamListener.connectCryptoStream();
     }
 
@@ -639,6 +659,7 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
     void onGetStock(ActionEvent event) {
+        streamListener.giveCharts(chart);
         streamListener.listenToStockTrades(Set.of(tfSymboltoGet.getText()));
     }
 
@@ -689,11 +710,11 @@ public void populateWatchlist(List<String> watchlist) {
         switch(assetc.toString()) 
             {
                 case "crypto":
-                datatoreturn = ac.cryptoH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+                datatoreturn = cryptoH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
                     break;
 
                 case "us_equity":
-                datatoreturn = ac.stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+                datatoreturn = stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
             }
 
             return datatoreturn;
@@ -1039,6 +1060,6 @@ public void onBacktest(ActionEvent event) {
         streamListener.disconnectStream();
         Platform.exit();
         System.exit(0);
-
+        // close the fuckin app
     }
 }

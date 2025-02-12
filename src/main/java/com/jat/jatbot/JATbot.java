@@ -14,9 +14,11 @@ import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
@@ -31,6 +33,7 @@ import javafx.stage.StageStyle;
 
 @SpringBootApplication
 public class JATbot extends Application {
+    @Autowired
     private static ApplicationContext springContext;
     private static Stage primaryStage;
     // init logger
@@ -49,8 +52,8 @@ public class JATbot extends Application {
 
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/mainscene.fxml"));
-        Parent root = loader.load();
         loader.setControllerFactory(springContext::getBean);
+        Parent root = loader.load();
         Controller controller = loader.getController();
         primaryStage.initStyle(StageStyle.TRANSPARENT);
         controller.setMainWindow(primaryStage);
@@ -95,7 +98,6 @@ public class JATbot extends Application {
     }
 
     public static void main(String[] args) {
-        springContext = SpringApplication.run(JATbot.class, args);
 
         try {
             launch(args);
@@ -106,8 +108,16 @@ public class JATbot extends Application {
                 e.printStackTrace();
             }
         }
+        
+        
+
+
 
     }
+    @Override
+    public void init() {
+    springContext = new SpringApplicationBuilder(JATbot.class).run();
+}
     @Bean
     public ApplicationRunner applicationRunner() {
         return args -> botLogger.info("JATbot is running...");

@@ -9,6 +9,8 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.springframework.stereotype.Service;
+
 import com.jat.ctfxplotsplus.OHLCData;
 
 import javafx.collections.FXCollections;
@@ -23,13 +25,14 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.CryptoLatestBarsResp;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.CryptoLoc;
 import net.jacobpeterson.alpaca.openapi.marketdata.model.CryptoSnapshotsResp;
 
+@Service
 public class AlpacaCryptoHandler extends CryptoApi {
 
-    private ApiClient apiClient;
+
 
     public AlpacaCryptoHandler(ApiClient ac) {
         super(ac);
-        this.apiClient = ac;
+
     }
 
     public okhttp3.Call getCryptoBarsAsync(String symbols, String timeframe, Long limit,

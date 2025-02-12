@@ -26,6 +26,17 @@ public AlpacaAssetHandler(ApiClient ac) {
         return getV2AssetsSymbolOrAssetIdAsync(symbol,_callback);
 
     }
+    public List<Assets> getAssets() {
+        try {
+            List<Assets> assets = getV2Assets("active", null, null, null);
+            //JATbot.botLogger.info("Assets: {}", assets);
+            return assets;
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error getting assets: " + exception.getMessage());
+            return null;
+        }
+        
+    }
 
     public CompletableFuture<Assets> getAssetAsync(String sym, AtomicInteger count) {
 
