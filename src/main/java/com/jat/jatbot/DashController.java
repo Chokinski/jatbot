@@ -21,6 +21,7 @@ import javafx.fxml.FXML;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.DragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.*;
@@ -65,7 +66,8 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockTrade;
  */
 @Component
 public class DashController {
-
+    @FXML
+    private AnchorPane menuBar;
     @FXML
     private Button btnBacktest;
 
@@ -225,19 +227,15 @@ public class DashController {
     private TreeTableColumn<List<Object>, Number> colAssetAskVol;
     @FXML
     private TreeTableColumn<List<Object>, Number> colDaily;
-    
+    @FXML
+    private AnchorPane mainAnchor;
 
 
     public ObservableList<OHLCData> ser = FXCollections.observableArrayList();
-    private double xOffset;
-    private double yOffset;
-    // Variables to store the initial position of a drag event
-    private double dragStartX;
-    private double dragStartY;
 
-    // Variables to store the current translation of the chart
-    private double translateX = 0.0;
-    private double translateY = 0.0;
+
+
+
 
     // Variables to store the current scale of the chart
     private double scaleX = 1.0;
@@ -262,7 +260,10 @@ public class DashController {
     @Autowired
     public AlpacaCryptoHandler cryptoH;
     
-
+    private double initialX;
+    private double initialY;
+    private double deltaX;
+    private double deltaY;
 
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
@@ -308,7 +309,7 @@ public class DashController {
             // Redraw the chart when the canvas size changes
             // chartCanvas.widthProperty().addListener(obs -> redrawChart());
             // chartCanvas.heightProperty().addListener(obs -> redrawChart());
-            startGradientAnimation();
+
             startMarketTimeUpdate();
             provideListeners();
             tfSymboltoGet.setText("AAPL");
@@ -436,6 +437,15 @@ public void populateWatchlist(List<String> watchlist) {
     
 
     protected void provideListeners() {
+        menuBar.addEventFilter(MouseEvent.MOUSE_PRESSED, event -> {
+            initialX = event.getScreenX(); // Store absolute screen position
+            initialY = event.getScreenY();
+        });
+        menuBar.addEventFilter(MouseEvent.MOUSE_DRAGGED, event -> {
+            onDragged(event);
+        
+        
+        });
         cbPd.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
 
             @Override
@@ -503,17 +513,19 @@ public void populateWatchlist(List<String> watchlist) {
 
     }
 
-    @FXML
+
     void onDragged(MouseEvent event) {
-        mainWindow.setX(event.getScreenX() - xOffset);
-        mainWindow.setY(event.getScreenY() - yOffset);
+        double deltaX = event.getScreenX() - initialX;
+        double deltaY = event.getScreenY() - initialY;
+    
+        mainWindow.setX(mainWindow.getX() + deltaX);
+        mainWindow.setY(mainWindow.getY() + deltaY);
+    
+        initialX = event.getScreenX(); // Update position for next event
+        initialY = event.getScreenY();
     }
 
-    @FXML
-    void onPressed(MouseEvent event) {
-        xOffset = event.getSceneX();
-        yOffset = event.getSceneY();
-    }
+
 
     @FXML
     void onMaximize(MouseEvent event) {
@@ -819,17 +831,7 @@ public void populateWatchlist(List<String> watchlist) {
         this.mainWindow = mainWindow;
     }
 
-    public void startGradientAnimation() {
-        Timeline timeline = new Timeline(
-                new KeyFrame(Duration.ZERO, new KeyValue(gradientSeparator.backgroundProperty(), createGradient(0))),
-                new KeyFrame(Duration.seconds(4),
-                        new KeyValue(gradientSeparator.backgroundProperty(), createGradient(50))),
-                new KeyFrame(Duration.seconds(8),
-                        new KeyValue(gradientSeparator.backgroundProperty(), createGradient(100))));
-        timeline.setAutoReverse(true);
-        timeline.setCycleCount(Timeline.INDEFINITE);
-        timeline.play();
-    }
+
 
     @FXML
 
@@ -843,27 +845,6 @@ public void populateWatchlist(List<String> watchlist) {
 
     }
 
-    private Background createGradient(double stripePercentage) {
-        double stripePosition = stripePercentage / 100.0;
-
-        LinearGradient gradient = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
-                new Stop(stripePosition, Color.web("#f6f6f492")),
-                new Stop(stripePosition, Color.web("#331872")),
-                new Stop(1.0, Color.web("#f6f6f492")));
-
-        return new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY));
-    }
-
-    private Background createGradient(int stripePercentage) {
-        double stripePosition = stripePercentage / 100.0;
-
-        LinearGradient gradient = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE,
-                new Stop(stripePosition, Color.web("#6931ec")),
-                new Stop(stripePosition, Color.web("#2E3436")),
-                new Stop(1.0, Color.web("#F6F6F4")));
-
-        return new Background(new BackgroundFill(gradient, CornerRadii.EMPTY, Insets.EMPTY));
-    }
 
     public void animateBackgroundColor(boolean isCryptoSelected) {
         // Find the node with the id nodeToggle
@@ -877,14 +858,14 @@ public void populateWatchlist(List<String> watchlist) {
 
         if (isCryptoSelected) {
             // Transition to Crypto state
-            initialColor = Color.web("#f6f6f492");
-            finalColor = Color.web("#331872");
+            initialColor = Color.web("#dfc6ba");
+            finalColor = Color.web("#111112");
             initialRadii = new CornerRadii(10, 15, 6, 10, false);
             finalRadii = new CornerRadii(15, 10, 10, 6, false);
         } else {
             // Transition to Stocks state
-            initialColor = Color.web("#331872");
-            finalColor = Color.web("#f6f6f492");
+            initialColor = Color.web("#111112");
+            finalColor = Color.web("#dfc6ba");
             initialRadii = new CornerRadii(15, 10, 10, 6, false);
             finalRadii = new CornerRadii(10, 15, 6, 10, false);
         }

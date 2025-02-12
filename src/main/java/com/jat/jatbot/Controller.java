@@ -73,7 +73,7 @@ public class Controller {
 
         try {
 
-
+            
             String[] props = infoHandler.loadProperties();
             boolean checked = Boolean.parseBoolean(props[4]);
             JATbot.botLogger.info("Remember me: " + checked);
