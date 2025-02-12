@@ -34,7 +34,7 @@ Please refer to the `.classpath` file for the specific versions of these depende
   <img src="usage.png" alt="DashUI" width="auto" height="auto">
   <img src="usage3.png" alt="DashUI Again" width="auto" height="auto">
   <img src="usage4.png" alt="DashUi once more" width="auto" height="auto">
-  
+  <img src="usage2.png" alt="LoginUI" width="auto" height="auto">
 </p>
 
 *To be completed*
