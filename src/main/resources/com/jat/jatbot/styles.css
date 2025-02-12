@@ -1,34 +1,33 @@
 .root {
     -fx-border-width: 0px;
     -fx-font-family: 'Montserrat', sans-serif;
-    -fx-background-color:#383F42;
+    -fx-background-color:#111212;
 }
 
 .mainWindow{
-    -fx-scene-fill: transparent;
+    
     -fx-background-radius: 80px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 4);
-    -fx-border-color: transparent;
-    -fx-border-width: 0px;
+
 }
 
 .menuBar {
  
-    -fx-background-color: linear-gradient(to bottom, #383F42, #583d96, #331872);
+    -fx-background-color: #111212;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     /*-fx-background-radius: 80px 80px 0 0;*/
     -fx-padding: 39;
 }
 
 .footer {
-    -fx-background-color: linear-gradient(to top, #383F42 5%, #583d96, #331872);
+    -fx-background-color: linear-gradient(to top, #111212 5%, #dfc6ba44, #dfc6ba);
     /*-fx-background-radius: 0 0 80px 80px;*/
     -fx-padding: 40;
 }
 
 .accent {
     
-    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66);
+    -fx-background-color: #111212;
     
 }
 
@@ -48,38 +47,39 @@
 
 }
 .btnAccent {
-    -fx-background-color:#331872;
-    -fx-text-fill: #f6f6f4;
+    -fx-background-color:#dfc6ba;
+    -fx-text-fill: #111112;
     -fx-font-family: 'Montserrat', sans-serif;
-    -fx-transition: all 0.3s ease;
+    -fx-transition: all 1s ease;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
 }
 .btnAccent:hover {
-    -fx-transform: scale(1.6) translate(0, -0.2px);
-    -fx-background-color: linear-gradient(to bottom, #6931ec, #583d96);
+    
+    -fx-transform: scale(0.5) translate(1px, 1px);
+    -fx-background-color: #fee2d5;
     /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 0);*/
-    -fx-text-fill: #ffffffe0;
+    -fx-text-fill: #111112;
 }
 
 .chartMenu {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 0);
-    -fx-background-color:#a6a6a6;
+    -fx-background-color:#dfc6ba;
 }
 .chartMenu:hover {
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 10), 10, 0, 0, 0);
-    -fx-background-color: #d2d2d2;
+    -fx-background-color: #fee2d5;
 }
 
 .chartChoice {
 -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
 -fx-border-color: transparent;
--fx-background-color: #a6a6a6;}
+-fx-background-color: #dfc6ba;}
 
 
 .chartChoice:hover {
 
-    -fx-background-color:#bdbdbd;
+    -fx-background-color:#fee2d5;
 }
 
 
@@ -92,10 +92,10 @@ Implement a buy button style that compliments chartmenu and chartchoice colorsch
 Make the color a subtle blue that compliments the chartmenu and chartchoice colorscheme and the purple.
 */
 
-    -fx-background-color: #383F42;
-    -fx-text-fill: #f6f6f4;
+    -fx-background-color: #111112;
+    -fx-text-fill: #dfc6ba;
 
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
+    -fx-effect: dropshadow(three-pass-box, #dfc6ba, 10, 0, 0, 0);
     -fx-border-color: transparent;
     -fx-background-radius: 80px;
 }
@@ -116,30 +116,28 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .table-column .label {
-    -fx-background-color: #383F42;
+    -fx-background-color: #111212;
     -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 5, 0);
 }
 
 .table-column .label .text {
-    -fx-fill: #c5b3f0f4;
+    -fx-fill: #dfc6ba;
     
 }
 .table-column {
 
-    -fx-background-color: #383F42;
-    -fx-border-color: #F6F6F4;
-    -fx-border-width: 0.3px;
+    -fx-background-color: #111112;
     -fx-fill: #F6F6F4;
-    -fx-text-fill:#F6F6F4;;
+    -fx-text-fill:#dfc6ba;;
 }
 
 .btnSell {
 
 /*Same as buy but a sell color thats not obnoxious and works with our colorscheme.*/
 
-    -fx-background-color: #6931ec;
-    -fx-text-fill: #f6f6f4;
+    -fx-background-color: #dfc6ba;
+    -fx-text-fill: #111112;
 
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-border-color: transparent;
@@ -151,8 +149,8 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 
 .tglAccent
 {
-    -fx-background-color:#331872;
-    -fx-text-fill: #f6f6f492;
+    -fx-background-color:#dfc6ba;
+    -fx-text-fill: #111112;
 
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
@@ -160,13 +158,13 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .nodeToggle {
-    -fx-background-color: #f6f6f492;
+    -fx-background-color: #111112;
     -fx-background-radius: 10 15 6 10;
     -fx-transition: all 0.3s ease;
 }
 
 .nodeToggle.stockState {
-    -fx-background-color: #331872;
+    -fx-background-color: #dfc6ba;
     -fx-background-radius: 15 10 10 6;
 }
 
@@ -178,7 +176,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .bgToggle {
-    -fx-background-color: #331872;
+    -fx-background-color: #111112;
     -fx-background-radius: 80px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
 }
@@ -192,7 +190,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .titled-pane >.title {
-    -fx-background-color: #383f42;
+    -fx-background-color: #111212;
     -fx-effect: innershadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 5, 0);
 }
@@ -202,7 +200,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .whitePanel {
-    -fx-background-color: #F6F6F4;
+    -fx-background-color: #111212;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0), 5, 0, 0, 0);
 }
 
@@ -226,9 +224,10 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 
 .separatorHPanel {
     
-    -fx-background-color: linear-gradient(to right, #86859e9e,#383F42, #F6F6F4,#383F42);
-    -fx-border-color: #383F42 transparent #6931ec transparent ;
+    -fx-background-color: #111212;
+    -fx-border-color: #dfc6ba;
     -fx-padding: 2px;
+    -fx-border-width: 0.3px;
 }
 .chart .plot-content .candlestick:hover {
 
@@ -256,7 +255,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 }
 
 .tab-pane:bottom > .tab-header-area > .tab-header-background {
-    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66);
+    -fx-background-color: #111212;
     
     
 }
@@ -269,7 +268,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
 
 .nodeChart {
 
-    -fx-background-color: linear-gradient(to bottom, #383F42, #4F5B66);
+    -fx-background-color: linear-gradient(to bottom, #111212, #030505);
     -fx-title-color: #F6F6F4;
     -fx-text-fill: #F6F6F4;
     
@@ -295,7 +294,7 @@ Make the color a subtle blue that compliments the chartmenu and chartchoice colo
     -fx-border-color: transparent;
 }
 >.thumb{
-    -fx-background-color: #6931ec;
+    -fx-background-color: #dfc6ba;
     -fx-background-radius: 80px;
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
 }}

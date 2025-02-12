@@ -30,7 +30,7 @@
                   <Font name="Sitka Small" size="12.0" />
                </font>
             </PasswordField>
-            <Button fx:id="btnLogin" layoutX="180.0" layoutY="193.0" mnemonicParsing="false" onAction="#onBtnLogin" styleClass="btnAccent" text="Login">
+            <Button fx:id="btnLogin" layoutX="180.0" layoutY="193.0" mnemonicParsing="false" onAction="#onBtnLogin" styleClass="btnAccent" stylesheets="@styles.css" text="Login">
                <font>
                   <Font name="Sitka Subheading" size="14.0" />
                </font>
