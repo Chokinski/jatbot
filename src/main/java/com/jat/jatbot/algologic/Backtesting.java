@@ -1,6 +1,9 @@
-package com.jat.jatbot;
+package com.jat.jatbot.algologic;
 
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.alpaca.AlpacaController;
+import com.jat.jatbot.datahandlers.OHLCParser;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
@@ -37,10 +40,10 @@ public class Backtesting {
         this.SRstrat = new SupportResistanceStrategy(initialCapital, d, symbol);
 
         try {
-            OHLCParser.writeResultsUsingStandardOutput(barsData);
+            OHLCParser.writeResultsUsingStandardOutput(d,symbol);
 
             outputResults(passResults());
-            OHLCParser.parseFile(null);
+            OHLCParser.parseFile(null, symbol);
         } catch (IOException | ExecutionException | InterruptedException e) {
             JATbot.botLogger.error("Error writing results to file");
 

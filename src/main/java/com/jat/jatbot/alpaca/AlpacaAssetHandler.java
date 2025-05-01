@@ -1,5 +1,5 @@
-package com.jat.jatbot;
-
+package com.jat.jatbot.alpaca;
+import com.jat.jatbot.JATbot;
 
 import java.util.HashMap;
 import java.util.List;
@@ -78,10 +78,8 @@ public AlpacaAssetHandler(ApiClient ac) {
         return future.join();
     });
 
-
-
-        
     }
+
 
     public CompletableFuture<Map<String, int[]>> getAssetWithInfo(String sym, AlpacaStockHandler ash,AtomicInteger c) {
         CompletableFuture<Map<String, int[]>> future = new CompletableFuture<>();

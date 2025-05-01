@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.ui;
 
 import java.io.IOException;
 
@@ -7,6 +7,14 @@ import java.util.Properties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
+
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.datahandlers.JATInfoHandler;
+import com.jat.jatbot.ui.DashController;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXCheckBox;
+import com.jfoenix.controls.JFXPasswordField;
+import com.jfoenix.controls.JFXTextField;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -24,7 +32,6 @@ import javafx.scene.layout.BorderPane;
 import javafx.stage.Stage;
 import java.nio.file.Path;
 
-
 // This controller belongs to the login scene
 @Component
 public class Controller {    
@@ -36,31 +43,24 @@ public class Controller {
     private Button btnLightMode;
 
     @FXML
-    private Button btnLogin;
+    private JFXButton btnLogin;
+
 
     @FXML
-    private Button btnTryLogin;
+    private JFXTextField tfKey_ID;
 
     @FXML
-    private TextField tfKey_ID;
-
-    @FXML
-    private PasswordField tfSec_ID;
-
-    @FXML
-    private Label streamStatus;
-
-    @FXML
-    private Label APIstatus;
+    private JFXPasswordField tfSec_ID;
 
    @FXML
-    private CheckBox chkRemember;
+    private JFXCheckBox chkRemember;
 
     @Autowired
     private ApplicationContext applicationContext;
     public boolean rememberMe;
     Properties properties = new Properties();
-    JATInfoHandler infoHandler = new JATInfoHandler();
+    @Autowired
+    JATInfoHandler infoHandler;
     Path config = infoHandler.jatConfigPath;
     private double yOffset;
     private double xOffset;
@@ -120,17 +120,7 @@ public class Controller {
                 String[] propertiesArray = infoHandler.loadProperties();
                 tfKey_ID.setText(propertiesArray[0]);
                 tfSec_ID.setText(propertiesArray[1]);
-                loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
-                loader.setControllerFactory(applicationContext::getBean);
-                root = loader.load();
-                DashController dashController = loader.getController();
-                dashController.setMainWindow(mainWindow);
-                
-                Scene scene = new Scene(root);
-                scene.setFill(null);    
-                mainWindow.setScene(scene);
-                mainWindow.setResizable(true);
-                mainWindow.centerOnScreen();
+            loadScene();
     
             } catch (Exception e) {
                 JATbot.botLogger.error("Login properties wrong...\n\nPrinting stack: \n{}", e.getMessage());
@@ -146,7 +136,7 @@ public class Controller {
     
                 infoHandler.writeProps(config, props);
     
-                loadscene();
+                loadScene();
     
             } catch (IOException e) {
                 JATbot.botLogger.error("Invalid credentials...\n\nPrinting stack: \n{}", e.getMessage());
@@ -192,15 +182,18 @@ public class Controller {
     public void setMainWindow(Stage mainWindow) {
         this.mainWindow = mainWindow;
     }
-    public void loadscene() throws IOException {
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
-        Parent root = loader.load();
-        DashController dashController = loader.getController();
-        dashController.setMainWindow(mainWindow);
-        Scene scene = new Scene(root);
-        mainWindow.setScene(scene);
-        mainWindow.setResizable(true);
-        mainWindow.centerOnScreen();
+    public void loadScene() throws IOException {
+                loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/dashscene.fxml"));
+                loader.setControllerFactory(applicationContext::getBean);
+                root = loader.load();
+                DashController dashController = loader.getController();
+                dashController.setMainWindow(mainWindow);
+                
+                Scene scene = new Scene(root);
+                scene.setFill(null);    
+                mainWindow.setScene(scene);
+                mainWindow.setResizable(true);
+                mainWindow.centerOnScreen();
     }
     
     /*

@@ -1,5 +1,6 @@
-package com.jat.jatbot;
+package com.jat.jatbot.datahandlers;
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.JATbot;
 
 import javafx.collections.ObservableList;
 
@@ -16,6 +17,8 @@ import java.nio.file.StandardOpenOption;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class OHLCParser {
 
@@ -27,8 +30,9 @@ public class OHLCParser {
     public static long totalTime = 0;
 
 
-    public static void parseFile(Path file) throws IOException{
-        if (file == null) {file = Paths.get(System.getProperty("user.home"), "JAT", "data.txt");}
+    public static void parseFile(Path fi,String asset) throws IOException{
+       String dname = asset.toUpperCase() + "DATASET.txt";
+        Path file = Paths.get(System.getProperty("user.home"), "JAT", dname);
         
         long datalength = 0;
         List<String> data;
@@ -65,7 +69,9 @@ public class OHLCParser {
 
 
 
-    public static void writeResultsUsingStandardOutput(ObservableList<OHLCData> data) throws IOException,ExecutionException,InterruptedException {
+
+
+    public static void writeResultsUsingStandardOutput(ObservableList<OHLCData> data,String asset) throws IOException,ExecutionException,InterruptedException {
         /* Overview of method.
         Get path of data.txt file residing in user's home directory under JAT folder and check with conditions. 
         Add data to a string builder, then convert to a bytebuffer.
@@ -77,7 +83,8 @@ public class OHLCParser {
         Cons: additional complexity, it is also not thread safe by default.
         
         */   
-        Path file = Paths.get(System.getProperty("user.home"), "JAT", "data.txt");
+        String dname = asset.toUpperCase() + "DATASET.txt";
+        Path file = Paths.get(System.getProperty("user.home"), "JAT", dname);
         if (Files.exists(file)) {
             //If datafile exists, delete for rewrite purpose
             Files.delete(file);
@@ -118,6 +125,9 @@ public class OHLCParser {
 
         JATbot.botLogger.info("Results written to filepath :" + file.toString());
     }
+
+
+
     public static void coutData(int count) {
 
         JATbot.botLogger.info(

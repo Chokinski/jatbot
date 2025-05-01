@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.alpaca;
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.model.util.apitype.MarketDataWebsocketSourceType;
 import net.jacobpeterson.alpaca.model.util.apitype.TraderAPIEndpointType;
@@ -6,14 +6,27 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
+import com.jat.jatbot.InfoConfig;
+import com.jat.jatbot.datahandlers.JATInfoHandler;
+
 import okhttp3.OkHttpClient;
 
 @Configuration
 public class AlpacaConfig {
-    private final String[] props = JATInfoHandler.loadProperties();
     @Primary
     @Bean
-    public AlpacaAPI alpacaAPI() {
+    public JATInfoHandler jatInfoHandler(InfoConfig infoConfig) {
+        return new JATInfoHandler(infoConfig);
+    }
+    @Primary
+    @Bean
+    public String[] props(JATInfoHandler jatInfoHandler) {
+        return jatInfoHandler.loadProperties();
+    }
+
+    @Primary
+    @Bean
+    public AlpacaAPI alpacaAPI(String[] props) {
         return new AlpacaAPI(
             props[0], props[1], 
             TraderAPIEndpointType.valueOf(props[2]),
@@ -22,8 +35,8 @@ public class AlpacaConfig {
         );
     }
     @Bean
-    public AlpacaController alpacaController(AlpacaAPI alpacaAPI, AlpacaStockHandler alpacaStockHandler, AlpacaCryptoHandler alpacaCryptoHandler, AlpacaAssetHandler alpacaAssetHandler) {
-        return new AlpacaController(alpacaAPI, alpacaStockHandler, alpacaCryptoHandler, alpacaAssetHandler);
+    public AlpacaController alpacaController(AlpacaAPI alpacaAPI, AlpacaStockHandler alpacaStockHandler, AlpacaCryptoHandler alpacaCryptoHandler, AlpacaAssetHandler alpacaAssetHandler, JATInfoHandler jatInfoHandler) {
+        return new AlpacaController(alpacaAPI, alpacaStockHandler, alpacaCryptoHandler, alpacaAssetHandler, jatInfoHandler);
     }
     @Bean
     @Primary

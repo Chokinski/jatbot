@@ -1,6 +1,7 @@
-package com.jat.jatbot;
+package com.jat.jatbot.datahandlers;
 
 import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.AsynchronousFileChannel;
@@ -30,22 +31,38 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
 
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.InfoConfig;
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.alpaca.AlpacaAssetHandler;
+import com.jat.jatbot.alpaca.AlpacaStockHandler;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import net.jacobpeterson.alpaca.openapi.trader.model.Assets;
 
+@Component
 public class JATInfoHandler {
+
+    @Autowired
+    static private InfoConfig iConfig;
+
     static Path jatDir = Paths.get(System.getProperty("user.home"), "JAT");
-    final static Path jatConfigPath = Paths.get(System.getProperty("user.home"), "JAT", "JATconfig.properties");
+    public static Path jatConfigPath = Paths.get(System.getProperty("user.home"), "JAT", "JATconfig.properties");
     public AtomicInteger count = new AtomicInteger(1);
     private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
     public boolean isRateLimited = false;
     private final ExecutorService executorService;
     private final Semaphore semaphore;
-    public JATInfoHandler() {
+    public JATInfoHandler(InfoConfig iConf) {
+        this.iConfig = iConf;
         this.isRateLimited = false; // Flag to track rate limit status
         this.count = new AtomicInteger(1);
 
@@ -53,43 +70,14 @@ public class JATInfoHandler {
         this.semaphore = new Semaphore(200); // Semaphore for limiting concurrency
     }
 
-    public static String[] loadProperties() {
-        // check if JAT directory exists, if not create it
-        if (!Files.exists(jatDir)) {
-            try {
-                Files.createDirectory(jatDir);
-            } catch (IOException e) {
-                JATbot.botLogger.error("Error creating JAT directory: " + e.getMessage());
-            }
-        }
-        Properties properties = new Properties();
+    public String[] loadProperties() {
 
-        try (BufferedReader reader = Files.newBufferedReader(jatConfigPath)) {
-            String line;
-            StringBuilder sb = new StringBuilder();
 
-            // Read the file line by line and skip the line containing "jarPath"
-            while ((line = reader.readLine()) != null) {
-                if (!line.startsWith("jarPath")) {
-                    sb.append(line).append(System.lineSeparator());
-                }
-            }
 
-            // Load properties from the filtered content
-            properties.load(new java.io.StringReader(sb.toString()));
-            if (!properties.containsKey("key_id") || !properties.containsKey("secret_key")
-                    || !properties.containsKey("type") || !properties.containsKey("source")
-                    || !properties.containsKey("remMe")) {
-                JATbot.botLogger.error("Error loading properties: key_id, secret_key, type, or source not found");
 
-                properties = writeProps(jatConfigPath, properties);
-            }
-            return new String[] { properties.getProperty("key_id"), properties.getProperty("secret_key"), properties.getProperty("type"), properties.getProperty("source"), properties.getProperty("remMe") };
-        } catch (IOException e) {
-            JATbot.botLogger.error("\nError loading properties, IO exception: " + e.getMessage());
-        }
+        return new String[] {iConfig.getKeyId(), iConfig.getSecret(), iConfig.getType(), iConfig.getSource(), iConfig.getRemMe()};
 
-        return null;
+
     }
 
     // New method to modify a single property
@@ -201,7 +189,37 @@ public class JATInfoHandler {
     }
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
-
+    public String formatDateTime(String DateTime) {
+        // Handle both formats dynamically
+        DateTimeFormatter formatterWithSpace = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatterWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    
+        LocalDateTime dateTime;
+        if (DateTime.contains("T")) {
+            dateTime = LocalDateTime.parse(DateTime, formatterWithT);
+        } else {
+            dateTime = LocalDateTime.parse(DateTime, formatterWithSpace);
+        }
+    
+        // Return the formatted string in "yyyy-MM-dd HH:mm:ss"
+        return dateTime.format(formatterWithSpace);
+    }
+    
+    public String addDay(String DateTime) {
+        // Handle both formats dynamically
+        DateTimeFormatter formatterWithSpace = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatterWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+    
+        LocalDateTime dateTime;
+        if (DateTime.contains("T")) {
+            dateTime = LocalDateTime.parse(DateTime, formatterWithT);
+        } else {
+            dateTime = LocalDateTime.parse(DateTime, formatterWithSpace);
+        }
+    
+        // Add one day and return the result in "yyyy-MM-dd HH:mm:ss"
+        return dateTime.plusDays(1).format(formatterWithSpace);
+    }
     public CompletableFuture<ObservableList<OHLCData>> parseOHLCFile(Path filePath) {
 
         return CompletableFuture.supplyAsync(() -> {
@@ -220,6 +238,7 @@ public class JATInfoHandler {
                     double volume = Double.parseDouble(parts[5].substring(parts[5].indexOf('=') + 1));
                     OHLCData ohlc = new OHLCData(timestamp, open, high, low, close, volume);
                     ohlcData.add(ohlc);
+                    
                 }
             } catch (IOException e) {
                 throw new RuntimeException("Error parsing OHLC file: " + e.getMessage(), e);
@@ -227,7 +246,74 @@ public class JATInfoHandler {
             return ohlcData;
         });
     }
+        public List<String> getDatasetFilePrefixs() throws IOException {
+        Path jatDirectory = Paths.get(System.getProperty("user.home"), "JAT");
 
+        // Debugging: Print out the resolved directory
+        System.out.println("JAT Directory: " + jatDirectory.toString());
+        List<String> prefixes = new ArrayList<>();
+        // Walk the directory tree and filter files ending with "DATASET.TXT"
+        try (Stream<Path> paths = Files.walk(jatDirectory)) {
+            List<Path> filteredPaths = paths
+                .filter(Files::isRegularFile)  // Ensure we are dealing with files
+                .filter(p -> p.getFileName().toString().endsWith("DATASET.txt"))  // Match files ending with "DATASET.TXT"
+                .collect(Collectors.toList());  // Collect to a list
+
+            // Check if no files were found
+            if (filteredPaths.isEmpty()) {
+                System.out.println("No files matching 'DATASET.TXT' found.");
+            }
+
+            // Iterate through the filtered list
+            filteredPaths.forEach(p -> {
+                // Extract prefix before "DATASET.TXT"
+                String filename = p.getFileName().toString();
+                String prefix = filename.replace("DATASET.txt", "");
+                if (!prefix.equals("ABBV")) {
+                    prefixes.add(prefix);
+                }
+
+                // Print both the path and the prefix
+                System.out.println("Path: " + p.toString() + ", Prefix: " + prefix);
+                for (String s : prefixes) {
+                    System.out.println("Prefix: " + s);
+                }
+            });
+
+            return prefixes;  // Return the list of filtered paths
+        }
+    }
+    public List<Path> getDatasetFilesWithPrefix() throws IOException {
+        Path jatDirectory = Paths.get(System.getProperty("user.home"), "JAT");
+
+        // Debugging: Print out the resolved directory
+        System.out.println("JAT Directory: " + jatDirectory.toString());
+
+        // Walk the directory tree and filter files ending with "DATASET.TXT"
+        try (Stream<Path> paths = Files.walk(jatDirectory)) {
+            List<Path> filteredPaths = paths
+                .filter(Files::isRegularFile)  // Ensure we are dealing with files
+                .filter(p -> p.getFileName().toString().endsWith("DATASET.txt"))  // Match files ending with "DATASET.TXT"
+                .collect(Collectors.toList());  // Collect to a list
+
+            // Check if no files were found
+            if (filteredPaths.isEmpty()) {
+                System.out.println("No files matching 'DATASET.TXT' found.");
+            }
+
+            // Iterate through the filtered list
+            filteredPaths.forEach(p -> {
+                // Extract prefix before "DATASET.TXT"
+                String filename = p.getFileName().toString();
+                String prefix = filename.replace("DATASET.TXT", "");
+
+                // Print both the path and the prefix
+                System.out.println("Path: " + p.toString() + ", Prefix: " + prefix);
+            });
+
+            return filteredPaths;  // Return the list of filtered paths
+        }
+    }
     // create a parser that takes the filepath and returns the last OHLCData object
 
     public static CompletableFuture<OHLCData> parseLastOHLCData(Path filePath) {
@@ -622,5 +708,52 @@ public void waitForRateLimit() {
     public void shutdown() {
         executorService.shutdown();
     }
+    public HashMap<LocalDateTime,Double> dataFromPredictionFile(String sym) {
+
+
+        String filePath = Paths.get("G:", "XGBoostMandData",
+        sym,
+        sym.toUpperCase()+"unbiasedCurrentModel1predictionresults.txt").toString();
+        HashMap<LocalDateTime,Double> predictionData = new HashMap<>();
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                // Check if the line contains a prediction
+                if (line.startsWith("Row")) {
+                    // Split the line to extract date and predicted price
+                    String[] parts = line.split(" ");
+                    if (parts.length >= 5) {
+                        String date = parts[1] + " " + parts[2]; // Combine date and time
+                        LocalDateTime timestamp = LocalDateTime.parse(date, formatter);
+                        String price = parts[4]; // Predicted price
+                        double value = Double.parseDouble(price);
+                        timestamp.plusDays(1);
+                        predictionData.put(timestamp, value);
+                    }
+                }
+                return predictionData;
+            }
+            
+            
+        } catch (IOException e) {
+            e.printStackTrace();
+            
+        }
+        return null;
+    }
     
+    public LocalDateTime parseStringToDateTime(String dateTimeStr) {
+        // Handle both formats dynamically
+        DateTimeFormatter formatterWithSpace = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatterWithT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+
+        LocalDateTime dateTime;
+        if (dateTimeStr.contains("T")) {
+            dateTime = LocalDateTime.parse(dateTimeStr, formatterWithT);
+        } else {
+            dateTime = LocalDateTime.parse(dateTimeStr, formatterWithSpace);
+        }
+
+        return dateTime;
+    }
 }

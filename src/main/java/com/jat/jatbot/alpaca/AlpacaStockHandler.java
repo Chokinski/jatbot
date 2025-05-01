@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.alpaca;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -14,6 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Service;
 
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.datahandlers.JATInfoHandler;
+
 import okhttp3.OkHttpClient;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -139,12 +142,12 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
         ZoneId zid = ZoneId.of("America/New_York");
         ZoneOffset zoffset = zid.getRules().getOffset(LocalDateTime.now());
 
-        OffsetDateTime startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset);
+        OffsetDateTime startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset);
         // Adjust start date dynamically based on timeframe
-        startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+        startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
         switch (timeframe) {
             case "1Day":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
                 break;
             case "15min":
                 startDateTime = OffsetDateTime.now().minusDays(30).withOffsetSameLocal(zoffset); // For example, limit
@@ -157,7 +160,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
                                                                                                 // data
                 break;
             case "4Hour":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
                 // startDateTime = startDateTime.minusDays(90); // For example, limit to 90 days
                 // ago for 4Hour data
                 break;
@@ -166,7 +169,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
                                                                                                   // to 365 days ago for
                                                                                                   // 1Week data
             case "1Month":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
             default:
                 break;
 
@@ -188,7 +191,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
                 od.getDateTime().getDayOfMonth(), od.getDateTime().getHour(),
                 od.getDateTime().getMinute(), od.getDateTime().getSecond(),
                 0, zoffset);
-        return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdjustment.ALL, "2016-01-10",
+        return stockBarsAsync(symbols, timeframe, startDateTime, null, 10000L, StockAdjustment.ALL, "2023-01-10",
                 StockFeed.IEX, null,
                 null, null, _callback);
     }
@@ -366,7 +369,7 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
         ObservableList<OHLCData> ohlcDataList = FXCollections.observableArrayList();
 
         try {
-            getStockBarsAsync(sym, timeframe, 1000L, new ApiCallback<StockBarsResp>() {
+            getStockBarsAsync(sym, timeframe, 10000L, new ApiCallback<StockBarsResp>() {
                 @Override
                 public void onSuccess(StockBarsResp result, int statusCode, Map<String, List<String>> responseHeaders) {
                     c.incrementAndGet();
@@ -453,5 +456,6 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.StockSnapshot;
         }
         return future;
     }
+
 
 }

@@ -1,5 +1,5 @@
 .root {
-    -fx-border-width: 0px;
+    
     -fx-font-family: 'Montserrat', sans-serif;
     -fx-background-color:#111212;
 }
@@ -50,24 +50,24 @@
     -fx-background-color:#dfc6ba;
     -fx-text-fill: #111112;
     -fx-font-family: 'Montserrat', sans-serif;
-    -fx-transition: all 1s ease;
+    
     -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 10, 0, 0, 0);
     
 }
 .btnAccent:hover {
     
-    -fx-transform: scale(0.5) translate(1px, 1px);
+    
     -fx-background-color: #fee2d5;
     /*-fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.8), 20, 0, 0, 0);*/
     -fx-text-fill: #111112;
 }
 
 .chartMenu {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.5), 10, 0, 0, 0);
+    
     -fx-background-color:#dfc6ba;
 }
 .chartMenu:hover {
-    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 10), 10, 0, 0, 0);
+    
     -fx-background-color: #fee2d5;
 }
 

@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.algologic;
 
 import java.text.DecimalFormat;
 import java.time.LocalDateTime;
@@ -85,7 +85,7 @@ try {
         double moneyUsed = positionSize * currentPrice;
     
         if (moneyUsed > accountBalance) {
-            throw new IllegalArgumentException("Insufficient funds to execute trade.");
+            System.out.println("Insufficient funds to place trade");
         }
     
         synchronized (this) { // Prevent race conditions

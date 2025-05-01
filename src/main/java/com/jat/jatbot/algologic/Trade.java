@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.algologic;
 
 import java.time.LocalDateTime;
 

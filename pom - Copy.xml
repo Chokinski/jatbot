@@ -8,30 +8,9 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <sdk>C:/Program Files/Java/javafx-sdk-23.0.2/lib/</sdk>
+        <sdk>C:/Program Files/Java/javafx-sdk-23.0.1/lib/</sdk>
     </properties>
     <dependencies>
-
-        <dependency>
-            <groupId>org.ta4j</groupId>
-            <artifactId>ta4j-core</artifactId>
-            <version>0.17</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.datavec</groupId>
-            <artifactId>datavec-api</artifactId>
-            <version>1.0.0-M2.1</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>org.nd4j</groupId>
-            <artifactId>nd4j-native-platform</artifactId>
-            <version>1.0.0-M2.1</version>
-        </dependency>
-
 
         <dependency>
             <groupId>org.mockito</groupId>
@@ -39,33 +18,18 @@
             <version>2.0.2-beta</version>
         </dependency>
 
-<!-- https://mvnrepository.com/artifact/ml.dmlc/xgboost4j -->
-<dependency>
-    <groupId>ml.dmlc</groupId>
-    <artifactId>xgboost4j_2.13</artifactId>
-    <version>2.1.4</version>
-</dependency>
-    <!-- Deeplearning4j: Data iterator class -->
-    <dependency>
-        <groupId>org.deeplearning4j</groupId>
-        <artifactId>deeplearning4j-datasets</artifactId>
-        <version>1.0.0-M2</version>
-    </dependency>
+        <dependency>
+            <groupId>ml.dmlc</groupId>
+            <artifactId>xgboost-jvm</artifactId>
+            <version>2.0.1</version>
+            <type>pom</type>
+        </dependency>
+
         <dependency>
             <groupId>org.deeplearning4j</groupId>
             <artifactId>deeplearning4j-core</artifactId>
             <version>1.0.0-M2.1</version>
         </dependency>
-    <dependency>
-        <groupId>org.deeplearning4j</groupId>
-        <artifactId>deeplearning4j-ui</artifactId>
-        <version>1.0.0-M2.1</version>
-    </dependency>
-      <dependency>
-        <groupId>org.deeplearning4j</groupId>
-        <artifactId>deeplearning4j-ui-model</artifactId>
-        <version>1.0.0-M2.1</version>
-      </dependency>
 
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter -->
         <dependency>
@@ -79,16 +43,55 @@
                 </exclusion>
             </exclusions>
         </dependency>
-        <dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-web -->
+
+
+
+        <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-data-jpa -->
+       <!-- <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>3.4.2</version>
+        </dependency>-->
+                <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-actuator</artifactId>
             <version>3.4.2</version>
         </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-thymeleaf</artifactId>
+
+                <!--<dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
             <version>3.4.2</version>
-		</dependency>
+            <exclusions>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-datatype-jdk8</artifactId>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-datatype-jsr310</artifactId>
+                    <groupId>com.fasterxml.jackson.datatype</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-module-parameter-names</artifactId>
+                    <groupId>com.fasterxml.jackson.module</groupId>
+                </exclusion>
+                <exclusion>
+                    <artifactId>jackson-databind</artifactId>
+                    <groupId>com.fasterxml.jackson.core</groupId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin-spring-boot-starter</artifactId>
+            <version>24.6.4</version>
+		</dependency>-->
         <dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-oauth2-client</artifactId>
@@ -99,12 +102,27 @@
 			<artifactId>spring-boot-starter-security</artifactId>
             <version>3.4.2</version>
 		</dependency>
-
+        <!-- PostgreSQL Driver (only if you're using a database) -->
+        <!--<dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.5</version>
+        </dependency>
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+            <version>10.20.1</version>
+		</dependency>
+        <dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-database-postgresql</artifactId>
+            <version>10.20.1</version>
+        </dependency>-->
         
 		<dependency>
 			<groupId>org.springframework.session</groupId>
 			<artifactId>spring-session-core</artifactId>
-            <version>3.4.2</version>
+            <version>3.4.1</version>
 		</dependency>
 
         <dependency>
@@ -112,34 +130,14 @@
 			<artifactId>spring-boot-starter-webflux</artifactId>
             <version>3.4.2</version>
 		</dependency>
-        <!--<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-web</artifactId>
-		<version>3.4.2</version>
-        </dependency>-->
 		<dependency>
 			<groupId>io.micrometer</groupId>
 			<artifactId>micrometer-registry-prometheus</artifactId>
 			<scope>runtime</scope>
             <version>1.14.3</version>
 		</dependency>
-    <dependency>
-      <groupId>org.springframework.boot</groupId>
-      <artifactId>spring-boot-starter-data-r2dbc</artifactId>
-      <version>3.4.2</version>
-    </dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-rest</artifactId>
-            <version>3.4.2</version>
-		</dependency>
-        <!-- https://mvnrepository.com/artifact/org.postgresql/r2dbc-postgresql -->
-<dependency>
-    <groupId>org.postgresql</groupId>
-    <artifactId>r2dbc-postgresql</artifactId>
-    <version>1.0.7.RELEASE</version>
-    <scope>runtime</scope>
-</dependency>
+
+
         <!-- https://mvnrepository.com/artifact/net.jacobpeterson.alpaca/alpaca-java -->
         <dependency>
             <groupId>net.jacobpeterson.alpaca</groupId>
@@ -235,30 +233,31 @@
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-controls</artifactId>
-            <version>23.0.2</version> <!-- Ensure this matches your version -->
-            <scope> runtime</scope>
+            <artifactId>javafx.controls</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.controls.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-graphics</artifactId>
-            <version>23.0.2</version> <!-- Ensure this matches your version -->
-            <scope> runtime</scope>
-            
+            <artifactId>javafx.graphics</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.graphics.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-fxml</artifactId>
-            <version>23.0.2</version> <!-- Ensure this matches your version -->
-            <scope> runtime</scope>
-            
+            <artifactId>javafx.fxml</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.fxml.jar</systemPath>
         </dependency>
         <dependency>
             <groupId>org.openjfx</groupId>
-            <artifactId>javafx-base</artifactId>
-            <version>23.0.2</version> <!-- Ensure this matches your version -->
-            <scope> runtime</scope>
-            
+            <artifactId>javafx.base</artifactId>
+            <version>23.0.1</version> <!-- Ensure this matches your version -->
+            <scope> system</scope>
+            <systemPath>${sdk}javafx.base.jar</systemPath>
         </dependency>
         <!-- https://mvnrepository.com/artifact/io.gsonfire/gson-fire -->
         <dependency>
@@ -275,7 +274,7 @@
         <dependency>
             <groupId>com.jfoenix</groupId>
             <artifactId>jfoenix</artifactId>
-            <version>9.0.1</version>
+            <version>9.0.10</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -288,18 +287,33 @@
         <artifactId>json</artifactId>
         <version>20240303</version>
       </dependency>
-    
     </dependencies>
     <build>
         <plugins>
-
+        <!--<plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-jar-plugin</artifactId>
+            <version>3.2.0</version>
+            <configuration>
+                    <release>21</release>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <mainClass>JAT.JATbot</mainClass>
+                        </manifest>
+                    </archive>
+                    <excludes>
+                        <exclude>**/module-info.class</exclude>
+                    </excludes>
+            </configuration>
+        </plugin>-->
               <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
         <version>3.4.2</version>
         <configuration>
             <jvmArguments>
-                --module-path "C:/Program Files/Java/javafx-sdk-23.0.2/lib/" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=brondon.jfr,settings=profile -XX:FlightRecorderOptions=stackdepth=400 -XX:+UseG1GC -Xmx60g
+                --module-path "C:/Program Files/Java/javafx-sdk-23.0.1/lib/" --add-modules javafx.controls,javafx.fxml,javafx.base,javafx.graphics -XX:StartFlightRecording=duration=60s,filename=brondon.jfr,settings=profile -XX:FlightRecorderOptions=stackdepth=400 -XX:+UseG1GC
             </jvmArguments>
             <mainClass>com.jat.jatbot.JATbot</mainClass>
             <layout>ZIP</layout>

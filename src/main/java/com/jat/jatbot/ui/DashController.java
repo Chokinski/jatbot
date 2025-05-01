@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.ui;
 
 import java.io.IOException;
 
@@ -18,6 +18,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 import javafx.scene.image.ImageView;
@@ -38,9 +39,22 @@ import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import com.jat.ctfxplotsplus.PlotHandler;
+import com.jat.jatbot.alpaca.AlpacaAssetHandler;
+import com.jat.jatbot.alpaca.AlpacaController;
+import com.jat.jatbot.alpaca.AlpacaCryptoHandler;
+import com.jat.jatbot.alpaca.AlpacaStockHandler;
+import com.jat.jatbot.alpaca.StreamListener;
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.algologic.Backtesting;
+import com.jat.jatbot.datahandlers.JATInfoHandler;
+import com.jfoenix.controls.JFXButton;
+import com.jfoenix.controls.JFXDrawer;
+import com.jfoenix.controls.JFXHamburger;
+import com.jfoenix.transitions.hamburger.HamburgerSlideCloseTransition;
 import com.jat.ctfxplotsplus.OHLCChart;
 import com.jat.ctfxplotsplus.OHLCData;
 
@@ -136,11 +150,9 @@ public class DashController {
 
     @FXML
     private Label lblTimeFrameState;
-    @FXML
-    private ListView<String> lvAccTypes;
 
-    @FXML
-    private ListView<String> lvAccValues;
+
+
 
     @FXML
     private ListView<String> lvDataDisplay;
@@ -161,28 +173,30 @@ public class DashController {
     private Slider slideQuantity;
 
     @FXML
-    private ToggleButton tbtnDef1D;
+    private JFXButton btnDef1D;
 
     @FXML
-    private ToggleButton tbtnDef1MIN;
+    private JFXButton btnDef1MIN;
 
     @FXML
-    private ToggleButton tbtnDef1MON;
+    private JFXButton btnDef1MON;
 
     @FXML
-    private ToggleButton tbtnDef1W;
+    private JFXButton btnDef1W;
 
     @FXML
-    private ToggleButton tbtnDef1Y;
+    private JFXButton btnDef1Y;
 
     @FXML
-    private ToggleButton tbtnDef4H;
+    private JFXButton btnDef4H;
 
     @FXML
-    private ToggleButton tbtnDef4MON;
+    private JFXButton btnDef4MON;
 
     @FXML
-    private ToggleButton tbtnHourly;
+    private JFXButton btnHourly;
+    @FXML
+    private JFXHamburger jfxBurger;
 
     @FXML
     private ToggleButton tbtnToggleStream;
@@ -210,26 +224,18 @@ public class DashController {
     @FXML
     private ChoiceBox<String> cbPd;
 
-    @FXML
-    private ChoiceBox<String> cbAssetClass;
 
-    @FXML
-    private TreeTableView<List<Object>> tbWatchlist;
-    @FXML
-    private TreeTableColumn<List<Object>, String> colAssets;
-    @FXML
-    private TreeTableColumn<List<Object>, Number> colAssetBid;
-    @FXML
-    private TreeTableColumn<List<Object>, Number> colAssetBidVol;
-    @FXML
-    private TreeTableColumn<List<Object>, Number> colAssetAsk;
-    @FXML
-    private TreeTableColumn<List<Object>, Number> colAssetAskVol;
-    @FXML
-    private TreeTableColumn<List<Object>, Number> colDaily;
+
+
+ 
+ 
+
+
+
     @FXML
     private AnchorPane mainAnchor;
-
+    @FXML
+    private JFXDrawer drawer;
 
     public ObservableList<OHLCData> ser = FXCollections.observableArrayList();
 
@@ -260,18 +266,20 @@ public class DashController {
     @Autowired
     public AlpacaCryptoHandler cryptoH;
     
+    @Autowired
+    private ApplicationContext applicationContext;
     private double initialX;
     private double initialY;
     private double deltaX;
     private double deltaY;
-
+    public HamburgerSlideCloseTransition burgerTask;
     private OHLCChart chart;
     private PlotHandler ph = new PlotHandler();
     //private ApiClient adc;
     private List<Assets> assets;
-    private List<String> watchlist = new ArrayList<>(Arrays.asList("AAPL","TSLA","MSFT","META","GOLD"));
     
-    public JATInfoHandler jai = new JATInfoHandler();
+    @Autowired
+    public JATInfoHandler jai;
     // private JFreeChart chart;
 
     @FXML
@@ -285,7 +293,6 @@ public class DashController {
 
         // Add the strings to the ListView when the scene is loaded
         Platform.runLater(() -> {
-            
             vbDash.setPrefSize(1044, 702);
             vbDash.setMinSize(1044, 702);
             vbDash.setMaxSize(1044, 702);
@@ -294,146 +301,110 @@ public class DashController {
             assets = ac.getAssets();
             stockH = ac.stockH;
             //adc = ac.alpaca.marketData().getInternalAPIClient();
-            for(String x : watchlist){
-                System.out.println(x);
-            }
-            addInfo();
 
+            
+
+            
             
             jai.resetRate();
             //jai.dataFromList(assets,watchlist, ac.stockH,ac.assetH, timeframes);
-
+            
             // nodeChart.setMouseTransparent(true);
             // redrawChart();
-
+            
             // Redraw the chart when the canvas size changes
             // chartCanvas.widthProperty().addListener(obs -> redrawChart());
             // chartCanvas.heightProperty().addListener(obs -> redrawChart());
-
+            
             startMarketTimeUpdate();
             provideListeners();
             tfSymboltoGet.setText("AAPL");
             onBacktest(new ActionEvent());
+            initDrawer();
             
 
         });
 
     }
+public void addInfo() {
 
-    protected void addInfo() {
+    ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour", "Daily", "Weekly", "Month",
+    "Year");
+cbPd.setItems(periods);
+lblChecking.setText("");
+lvDataDisplay.getItems().addAll("");
 
-        lblChecking.setText("");
-        lvDataDisplay.getItems().addAll("");
-        lvAccTypes.getItems().addAll(
-                "Account ID", "Portfolio Value", "Account Created", "Account Status",
-                "Account Cash", "Buying Power", "Day Trade Count", "Day Trade Limit",
-                "Equity", "Initial Margin", "Last Equity", "Last Maintenance Margin");
-        lvAccValues.getItems().addAll(ac.getAccID(), ac.getPortValue(),
-                ac.getCreateDate(), ac.getAccStatus(),
-                ac.getAccCash(), ac.getBuyingPower(),
-                ac.getDayTradeCount(), ac.getDayTradeLimit(),
-                ac.getEquity(), ac.getInitialMargin(),
-                ac.getLastEquity(), ac.getLastMaintenanceMargin(),
-                "");
-
-        ObservableList<String> periods = FXCollections.observableArrayList("Min", "Hour", "Daily", "Weekly", "Month",
-                "Year");
-        cbPd.setItems(periods);
-        ObservableList<String> classes = FXCollections.observableArrayList("Stocks", "Crypto","Options","Futures","Forex");
-        cbAssetClass.setItems(classes);
+}
 
 
-        populateWatchlist(watchlist);
-        
+    @FXML
+    void handleDrawer(MouseEvent event) {
+        burgerTask.setRate(burgerTask.getRate() * -1);
+        burgerTask.play();
+        if (drawer.isHidden()) {
+            drawer.open();
+        } else {
+            drawer.close();
+        }
 
     }
-public void populateWatchlist(List<String> watchlist) {
-    // Initialize root node with an empty list of objects (no initial data)
-    final TreeItem<List<Object>> root = new TreeItem<>(new ArrayList<>(Arrays.asList("Assets", "", "", "")));
-    root.setExpanded(true); // Expand the root node by default
-    tbWatchlist.setShowRoot(false); // Hide the root node in the TreeTableView
-    tbWatchlist.setRoot(root);
 
-    // Set up the cell value factories for each column
-    colAssets.setCellValueFactory(param -> new ReadOnlyStringWrapper(param.getValue().getValue().get(0).toString())); // Asset symbol (String)
+    @FXML
+    void postOrder(ActionEvent event) {
+    
+        String assetclass = getAssetClass().toString();
+        switch(assetclass) {
 
-    colAssetAsk.setCellValueFactory(param -> {
-        Object value = param.getValue().getValue().get(1);
-        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
-    });
+        case "crypto":{
 
-    colAssetBid.setCellValueFactory(param -> {
-        Object value = param.getValue().getValue().get(2);
-        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
-    });
-
-    colDaily.setCellValueFactory(param -> {
-        Object value = param.getValue().getValue().get(3);
-        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
-    });
-
-    colAssetBidVol.setCellValueFactory(param -> {
-        Object value = param.getValue().getValue().get(4);
-        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
-    });
-
-    colAssetAskVol.setCellValueFactory(param -> {
-        Object value = param.getValue().getValue().get(5);
-        return value instanceof Number ? new ReadOnlyObjectWrapper<Number>((Number) value) : null;
-    });
-
-    // Fetch the stock snapshots asynchronously
-    Map<String, StockSnapshot> snapResp = stockH.getStockSnapshots(String.join(",", watchlist)).join();
-
-    List<CompletableFuture<Void>> futures = new ArrayList<>();
-
-    // Iterate over each symbol in snapResp
-    for (Map.Entry<String, StockSnapshot> entry : snapResp.entrySet()) {
-        String symbol = entry.getKey();
-        StockSnapshot snapshot = entry.getValue();
-
-        // Get the StockQuote for bid/ask/bidVol/askVol
-        jai.addToRate();
-        StockQuote quote = snapshot.getLatestQuote();
-        if (quote != null) {
-            double bid = quote.getBp();
-            double ask = quote.getAp();
-            int bidVol = quote.getBs();
-            int askVol = quote.getAs();
-
-            // Calculate the daily percentage change
-            double dailyPercentage = 0;
-            StockBar dailyBar = snapshot.getDailyBar();
-            StockTrade latestT = snapshot.getLatestTrade();
-            if (latestT != null && dailyBar != null && dailyBar.getO() != 0) {
-                dailyPercentage = (dailyBar.getC() - latestT.getP()) / dailyBar.getO() * 100;
+            if (event.getSource() == btnBuy) {
+                ac.postCryptoOrder(tfSymboltoGet.getText(),tfVol.getText(),"buy" );
+                System.out.println("Buy button clicked!");
+            } else if (event.getSource() == btnSell) {
+                ac.postCryptoOrder(tfSymboltoGet.getText(),tfVol.getText(),"sell" );
+                System.out.println("Sell button clicked!");
             }
+            break;
+        }
+        case "us_equity":{
+            if (event.getSource() == btnBuy) {
+                ac.postOrder(tfSymboltoGet.getText(),tfVol.getText(),"buy" );
+                System.out.println("Buy button clicked!");
+            } else if (event.getSource() == btnSell) {
+                ac.postOrder(tfSymboltoGet.getText(),tfVol.getText(),"sell" );
+                System.out.println("Sell button clicked!");
+            }
+            
+                break;
 
-            // Create the row with asset data: symbol, bid, ask, daily%, bidVol, askVol
-            List<Object> row = Arrays.asList(symbol, ask, bid, dailyPercentage, bidVol, askVol);
+        }
 
-            // Create a new TreeItem for the row
-            TreeItem<List<Object>> treeItem = new TreeItem<>(row);
 
-            // Add the new TreeItem to the TreeView in a thread-safe way
-            Platform.runLater(() -> {
-                root.getChildren().add(treeItem); // Add directly to the root
-            });
-        } else {
-            System.err.println("No quote data available for symbol: " + symbol);
         }
     }
 
-    // Wait for all futures to complete (if necessary)
-    CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-            .thenRun(() -> {
-                System.out.println("All asset data fetched and added to the watchlist.");
-            })
-            .exceptionally(e -> {
-                e.printStackTrace();
-                return null;
-            });
-}
+    public void initDrawer() {
+        
+        burgerTask = new HamburgerSlideCloseTransition(jfxBurger);
+        burgerTask.setRate(-1);
+
+        try {
+            
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("/com/jat/jatbot/drawerscene.fxml"));
+                loader.setControllerFactory(applicationContext::getBean);
+                VBox sidebar = loader.load();    
+            drawer.setSidePane(sidebar);
+            
+            drawer.close();
+
+            
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+
+    }
+
     
 
     protected void provideListeners() {
@@ -697,6 +668,22 @@ public void populateWatchlist(List<String> watchlist) {
          * "\nEnd Year: " + endYear+"\nEnd Month: " + endMonth+"\nEnd Day: " + endDay);
          */
         // Retrieve new data series
+        AssetClass assetc = getAssetClass();
+        System.out.println(assetc.toString());
+        switch(assetc.toString()) 
+            {
+                case "crypto":
+                datatoreturn = cryptoH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+                    break;
+
+                case "us_equity":
+                datatoreturn = stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
+            }
+
+            return datatoreturn;
+    }
+    public AssetClass getAssetClass() {
+
         CompletableFuture<AssetClass> assetClass = 
         CompletableFuture.supplyAsync(()->{
             boolean stop = false;
@@ -717,19 +704,9 @@ public void populateWatchlist(List<String> watchlist) {
             ex.printStackTrace();
             return null;
         });
-        AssetClass assetc = assetClass.join();
-        System.out.println(assetc.toString());
-        switch(assetc.toString()) 
-            {
-                case "crypto":
-                datatoreturn = cryptoH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
-                    break;
+        return assetClass.join();
 
-                case "us_equity":
-                datatoreturn = stockH.getBarsDataAsync(tfSymboltoGet.getText(), selectedTimePeriod,jai.getCount()).join();
-            }
 
-            return datatoreturn;
     }
 
     // Sets the text of the button
@@ -822,7 +799,7 @@ public void populateWatchlist(List<String> watchlist) {
         // System.out.println("\nStarting market time update.");
         // Create a scheduled executor to periodically update the market time label
         ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-        executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 10, TimeUnit.SECONDS); // Update every second
+        executorService.scheduleAtFixedRate(this::updateMarketTimeLabel, 0, 1, TimeUnit.SECONDS); // Update every second
     }
 
     private Stage mainWindow;
@@ -833,17 +810,6 @@ public void populateWatchlist(List<String> watchlist) {
 
 
 
-    @FXML
-
-    public void onSell(ActionEvent event) {
-
-    }
-
-    @FXML
-
-    public void onBuy(ActionEvent event) {
-
-    }
 
 
     public void animateBackgroundColor(boolean isCryptoSelected) {
@@ -911,7 +877,7 @@ public void populateWatchlist(List<String> watchlist) {
 
     @FXML
     public void onTimePeriodToggle(ActionEvent event) {
-        ToggleButton selectedButton = (ToggleButton) event.getSource();
+        JFXButton selectedButton = (JFXButton) event.getSource();
         String buttonId = selectedButton.getId();
 
         switch (buttonId) {

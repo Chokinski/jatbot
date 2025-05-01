@@ -1,26 +1,22 @@
 package com.jat.jatbot;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
-import java.net.URISyntaxException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
-import java.util.Properties;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationRunner;
-import org.springframework.boot.SpringApplication;
+
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+
+import com.jat.jatbot.ai.robot;
+import com.jat.jatbot.ui.Controller;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -42,7 +38,7 @@ public class JATbot extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         // Ensure that a dedicated folder for JAT exists in the user's home directory
-        ensureProps();
+        
         initUI(primaryStage);
 
 
@@ -71,7 +67,7 @@ public class JATbot extends Application {
 
 
     }
-    private void ensureProps() throws IOException{
+    /*private void ensureProps() throws IOException{
 
         Path jatDir = Paths.get(System.getProperty("user.home"), "JAT");
         if (!Files.exists(jatDir)) {
@@ -87,7 +83,7 @@ public class JATbot extends Application {
         }
 
 
-    }
+    }*/
     public static void setPrimaryStage(Stage theStage) {
         primaryStage = theStage;
 
@@ -119,7 +115,12 @@ public class JATbot extends Application {
     springContext = new SpringApplicationBuilder(JATbot.class).run();
 }
     @Bean
-    public ApplicationRunner applicationRunner() {
-        return args -> botLogger.info("JATbot is running...");
+    public ApplicationRunner applicationRunner(robot robot) {
+        /*return args -> botLogger.info("JATbot is running...");*/
+        return args -> {
+            System.out.println("Starting robot training process...");
+            //robot.loadAndSaveModel();
+            //System.out.println("Training process complete.");
+        };
     }
 }

@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.alpaca;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -12,6 +12,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.stereotype.Service;
 
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.JATbot;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -42,12 +43,12 @@ public class AlpacaCryptoHandler extends CryptoApi {
         ZoneId zid = ZoneId.of("America/New_York");
         ZoneOffset zoffset = zid.getRules().getOffset(LocalDateTime.now());
 
-        OffsetDateTime startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset);
+        OffsetDateTime startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset);
         // Adjust start date dynamically based on timeframe
-        startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+        startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
         switch (timeframe) {
             case "1Day":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
                 break;
             case "15min":
                 startDateTime = OffsetDateTime.now().minusDays(30).withOffsetSameLocal(zoffset); // For example, limit
@@ -60,7 +61,7 @@ public class AlpacaCryptoHandler extends CryptoApi {
                                                                                                 // data
                 break;
             case "4Hour":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
                 // startDateTime = startDateTime.minusDays(90); // For example, limit to 90 days
                 // ago for 4Hour data
                 break;
@@ -69,7 +70,7 @@ public class AlpacaCryptoHandler extends CryptoApi {
                                                                                                   // to 365 days ago for
                                                                                                   // 1Week data
             case "1Month":
-                startDateTime = OffsetDateTime.of(2016, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
+                startDateTime = OffsetDateTime.of(2023, 01, 10, 9, 30, 0, 0, zoffset); // Earlier start for daily
             default:
                 break;
 
@@ -90,7 +91,7 @@ public class AlpacaCryptoHandler extends CryptoApi {
                 od.getDateTime().getDayOfMonth(), od.getDateTime().getHour(),
                 od.getDateTime().getMinute(), od.getDateTime().getSecond(),
                 0, zoffset);
-        return cryptoBarsAsync(CryptoLoc.US, symbols, timeframe, startDateTime, null, 1000L, null, null,
+        return cryptoBarsAsync(CryptoLoc.US, symbols, timeframe, startDateTime, null, 10000L, null, null,
                 _callback);
     }
 
@@ -104,7 +105,6 @@ public class AlpacaCryptoHandler extends CryptoApi {
      * Asynchronously fetches the latest OHLC data for a specified symbol and
      * returns it as an
      * ObservableList.
-     *
      * @param sym  the crypto symbol
      * @param feed the feed to use for the data
      * @return a CompletableFuture that completes with an ObservableList of OHLCData
@@ -267,7 +267,7 @@ public class AlpacaCryptoHandler extends CryptoApi {
         ObservableList<OHLCData> ohlcDataList = FXCollections.observableArrayList();
 
         try {
-            getCryptoBarsAsync(sym, timeframe, 1000L, new ApiCallback<CryptoBarsResp>() {
+            getCryptoBarsAsync(sym, timeframe, 10000L, new ApiCallback<CryptoBarsResp>() {
                 @Override
                 public void onSuccess(CryptoBarsResp result, int statusCode,
                         Map<String, List<String>> responseHeaders) {

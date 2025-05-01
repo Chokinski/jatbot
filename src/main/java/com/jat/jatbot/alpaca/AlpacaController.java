@@ -1,4 +1,4 @@
-package com.jat.jatbot;
+package com.jat.jatbot.alpaca;
 
 import net.jacobpeterson.alpaca.AlpacaAPI;
 import net.jacobpeterson.alpaca.openapi.trader.model.*;
@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 
@@ -36,6 +37,8 @@ import net.jacobpeterson.alpaca.openapi.marketdata.model.*;
 
 
 import com.jat.ctfxplotsplus.OHLCData;
+import com.jat.jatbot.JATbot;
+import com.jat.jatbot.datahandlers.JATInfoHandler;
 
 /**
  * The AlpacaController class provides methods to interact with the Alpaca API for trading and market data.
@@ -86,23 +89,26 @@ import com.jat.ctfxplotsplus.OHLCData;
 public class AlpacaController extends AlpacaAPI {
     public AlpacaAPI alpaca;
     private OkHttpClient okClient;
-    private static JATInfoHandler infoHandler = new JATInfoHandler();
-    static String[]  props = infoHandler.loadProperties();
+    @Autowired
+    public JATInfoHandler infoH;
     @Autowired
     public AlpacaStockHandler stockH;
     @Autowired
     public AlpacaCryptoHandler cryptoH;
     @Autowired
     public AlpacaAssetHandler assetH;
+    public String[] props;
     
-    public AlpacaController(AlpacaAPI alpacaAPI,AlpacaStockHandler sH, AlpacaCryptoHandler cH, AlpacaAssetHandler aH) {
-        super(props[0], props[1], TraderAPIEndpointType.valueOf(props[2]),
-        MarketDataWebsocketSourceType.valueOf(props[3]),new OkHttpClient());
+    public AlpacaController(AlpacaAPI alpacaAPI,AlpacaStockHandler sH, AlpacaCryptoHandler cH, AlpacaAssetHandler aH, JATInfoHandler infoHandler) {
+        super(infoHandler.loadProperties()[0], infoHandler.loadProperties()[1], TraderAPIEndpointType.valueOf(infoHandler.loadProperties()[2]),
+        MarketDataWebsocketSourceType.valueOf(infoHandler.loadProperties()[3]),new OkHttpClient());
         this.alpaca = alpacaAPI;
         okClient = this.getOkHttpClient();
         this.assetH = aH;
         this.cryptoH = cH;
         this.stockH = sH;
+        props = infoHandler.loadProperties();
+        this.infoH = infoHandler;
         
     }
 
@@ -351,6 +357,60 @@ public class AlpacaController extends AlpacaAPI {
         
     }
 
+    public void postOrder(String sym, String dollarAmt, String side) {
+        
+        OrderSide orderSide =  side.equalsIgnoreCase("buy") ? OrderSide.BUY : OrderSide.SELL;
+        try {
+            Order newOrder = alpaca.trader().orders().postOrder(new PostOrderRequest().symbol(sym).notional(dollarAmt).side(orderSide)
+                    .type(OrderType.MARKET).timeInForce(TimeInForce.DAY));
+            JATbot.botLogger.info("Order placed: {}", newOrder);
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error placing order: " + exception.getMessage());
+        }
+
+
+
+    }
+    public void postCryptoOrder(String sym, String dollarAmt, String side) {
+        
+        OrderSide orderSide =  side.equalsIgnoreCase("buy") ? OrderSide.BUY : OrderSide.SELL;
+        try {
+            Order newOrder = alpaca.trader().orders().postOrder(new PostOrderRequest().symbol(sym).notional(dollarAmt).side(orderSide)
+                    .type(OrderType.MARKET).timeInForce(TimeInForce.GTC));
+            JATbot.botLogger.info("Order placed: {}", newOrder);
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error placing order: " + exception.getMessage());
+        }
+    }
+
+    public List<Order> getAllOrders() {
+
+        try {
+            List<Order> orders = alpaca.trader().orders().getAllOrders("all",null,null,null,null,null,null,null);
+            return orders;
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error getting orders: " + exception.getMessage());
+            return null;
+        }
+    } 
+    public List<Position> getAllPositions() {
+
+        try {
+            List<Position> positions = alpaca.trader().positions().getAllOpenPositions();
+            return positions;
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error getting positions: " + exception.getMessage());
+            return null;
+        }
+    }
+    public void closePosition(String assetId, BigDecimal qty) {
+        try {
+            Order closeThis = alpaca.trader().positions().deleteOpenPosition(assetId, qty, null);
+            JATbot.botLogger.info("Closed position: {}", closeThis);
+        } catch (ApiException exception) {
+            JATbot.botLogger.error("Error closing position: " + exception.getMessage());
+        }
+    }
 
 
     /**
